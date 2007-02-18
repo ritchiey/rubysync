@@ -18,11 +18,16 @@ module RubySync
     
     class BaseConnector
       
+      include RubySync::Utilities
+      
       attr_accessor :once_only, :name, :is_vault
       
       
       def initialize options={}
         once_only = false
+        options.each do |key, value|
+          send("#{key}=", value) if respond_to? "#{key}="
+        end
         self.name = options[:name]
         self.is_vault = options[:is_vault]
         if is_vault && !can_act_as_vault?
@@ -55,7 +60,10 @@ module RubySync
         started()
         while @running
           check do |event|
-            yield(event) unless is_delete_echo?(event) || is_echo?(event)
+            unless is_delete_echo?(event) || is_echo?(event)
+              call_if_exists :source_transform, event
+              yield(event)
+            end
           end
 
           if once_only
@@ -93,23 +101,41 @@ module RubySync
       end
       
       def perform_add event
+        log.info "Adding '#{event.target_path}' to '#{name}'"
         raise Exception.new("#{name}: Entry with path '#{event.target_path}' already exists, add failing.") if self[event.target_path]
-        self[event.target_path] = event.payload
+        if is_vault? && event.association_key != nil && path_for_association_key(event.association_key)
+          raise Exception.new("#{name}: Association_key already in use. Add failing.") 
+        end
+        call_if_exists(:target_transform, event)
+        add event.target_path, event.payload
         return association_key_for(event.target_path) unless is_vault?
-        associate_with_foreign_key(event.association_key, event.target_path)
+        if is_vault? && !event.association_key
+          raise Exception.new("#{name}: No association key supplied to add.")
+        else
+          associate_with_foreign_key(event.association_key, event.target_path)
+        end
       end
 
       def perform_delete event
         raise Exception.new("#{name}: Delete of unassociated object. No action taken.") unless event.association_key
-        path = path_for_own_association_key(event.association_key)
+        path = path_for_association_key(event.association_key)
+        log.info "Deleting '#{path}' from '#{name}'"
         raise Exception.new("#{name}: Attempted to delete non-existent entry '#{path}'") unless delete(path)
         return nil # don't want to create any new associations
       end
       
       def perform_modify event
-        raise Exception.new("#{name}: Attempted to modify non-existent entry '#{event.target_path}'") unless self[event.target_path]
-        self[event.target_path].merge(event.payload)
-        return association_key_for(event.target_path) unless is_vault?
+        path = path_for_association_key(event.association_key)
+        raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
+        call_if_exists(:target_transform, event)
+        modify path, event.payload
+        return (is_vault?)? nil : association_key_for(event.target_path)
+      end
+
+
+      # Returns the correct id for the given association_key 
+      def path_for_association_key(key)
+        (is_vault)? path_for_foreign_key(key) : path_for_own_association_key(key)
       end
 
       # Returns the association key for the given path. Called if this connector is the client.
@@ -140,9 +166,8 @@ module RubySync
       # and entry_for_association_key(key).
       def can_act_as_vault?
         defined? associate_with_foreign_key and
-        defined? entry_for_foreign_key and defined? foreign_key_for
+        defined? path_for_foreign_key and defined? foreign_key_for
       end
-
 
       
       # Attempts to delete non-existent items may occur due to echoing. Many systems won't be able to record
@@ -165,6 +190,23 @@ module RubySync
       end
       
       def is_echo?; false end
+      
+      # Called by unit tests to inject data
+      def test_add id, details
+        add id, details
+      end
+      
+      # Called by unit tests to modify data
+      def test_modify id, details
+        modify id, details
+      end
+      
+      # Called by unit tests to delete a record
+      def test_delete id
+        delete id
+      end
+  
+      
     end
   end
 end

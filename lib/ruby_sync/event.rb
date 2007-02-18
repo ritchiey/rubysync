@@ -22,22 +22,24 @@ module RubySync
 
     
     def self.delete source, source_path, association_key
-      event = self.new(:delete, source, source_path)
-      event.association_key = association_key
-      event
+      self.new(:delete, source, source_path, association_key)
     end
     
     def self.add source, source_path, association_key=nil, payload=nil
-      event = self.new(:add, source, source_path, payload)
-      event.association_key = association_key
-      event
+      self.new(:add, source, source_path, association_key, payload)
     end
     
-    def initialize type, source, source_path=nil, payload=nil
+    def self.modify source, source_path, association_key=nil, payload=nil
+      self.new(:modify, source, source_path, association_key, payload)
+    end
+    
+    def initialize type, source, source_path=nil, association_key=nil, payload=nil
       self.type = type
       self.source = source
       self.source_path = source_path
+      self.association_key = association_key
       self.payload = payload
+      @target_path = nil
     end
     
     def merge other
@@ -55,7 +57,7 @@ module RubySync
     end
     
     def to_yaml_properties
-      %w{ @type @source_path @target_path @association_key }
+      %w{ @type @source_path @target_path @association_key @payload}
     end
     
     

@@ -29,17 +29,17 @@ module RubySync
       def is_echo? event
         event.payload && event.payload[:modifier] == 'rubysync'
       end
-  
+
       def associate_with_foreign_key(key, path)
         log.info "Associating foreign key '#{key}' with '#{path}'"
         entry = @data[path]
          if entry
-           @association_index[key] = entry
+           @association_index[key] = path
            entry[:foreign_key] = key
          end
       end
 
-      def entry_for_foreign_key(key)
+      def path_for_foreign_key(key)
         @association_index[key]
       end
   
@@ -63,20 +63,40 @@ module RubySync
         @association_index = {}
       end
   
+      # Normally, the add method is called by the pipeline and simply stores
+      # the data to the datastore and that's it.
+      # In this case, though, we also generate an add event.
+      # This simulates the likely effect that an add would have on a proper datastore
+      # where doing an add would very likely cause an event to be generated that the
+      # pipeline should rightly ignore because it's just a side-effect.
+      # In other words, we're simply simulating an undesirable behaviour for testing
+      # purposes. 
       def add id, details
         raise Exception.new("Item already exists") if @data[id]
         @data[id] = details
         association_key = (is_vault?)? nil : association_key_for(id)
-        @events << RubySync::Event.add(self, id, association_key, details)
+        log.info "#{name}: Injecting add event"
+        @events << RubySync::Event.add(self, id, association_key, @data[id].dup)
         return id
       end
   
       def delete id
         raise Exception.new("Can't delete non-existent item '#{id}'") unless @data[id]
         association_key = (is_vault?)? foreign_key_for(id) : association_key_for(id)
-          @association_index.delete association_key
-          @events << (event = RubySync::Event.delete(self, id, association_key))
+        @association_index.delete association_key
+        log.info "#{name}: Injecting delete event"
+        @events << (event = RubySync::Event.delete(self, id, association_key))
         @data.delete id
+      end
+  
+      # Put a clue there that we did this change so that we can detect and filter
+      # out the echo.
+      def target_transform event
+        event.payload.merge!({:modifier => 'rubysync'})
+      end
+      
+      def source_transform event
+        [:modifier, :foreign_key].each {|key| event.payload.delete key}
       end
   
       def drop_pending_events
@@ -86,7 +106,7 @@ module RubySync
       def [](key)
         @data[key]
       end
-  
+        
       def []=(key, value)
         @data[key] = value
       end

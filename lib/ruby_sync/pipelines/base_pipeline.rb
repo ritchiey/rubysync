@@ -36,6 +36,8 @@ module RubySync
     # the identity vault to the client as out-going. Methods in this class prefixed with 'in_' or 'out_'
     # work on the incoming or outgoing flows respectively.
     class BasePipeline
+
+      include RubySync::Utilities
       
       def initialize
       end
@@ -49,7 +51,7 @@ module RubySync
         class_name = "::" + "#{connector_name}_connector".camelize
         options[:is_vault] = false
         class_def 'client' do
-          @client || @client = eval(class_name).new(options)
+          @client ||= eval(class_name).new(options)
         end
       end
 
@@ -59,18 +61,10 @@ module RubySync
         options[:name] ||= "#{self.name}(vault)"
         options[:is_vault] = true
         class_def 'vault' do
-          @vault || @vault = eval(class_name).new(options)
+          @vault ||= eval(class_name).new(options)
         end
       end
 
-       # Perform an action and rescue any exceptions thrown, display the exception with the specified text
-       def with_rescue text
-         begin
-           yield
-         rescue Exception => exception
-           log.warn "#{text}: #{exception.message}"
-         end
-       end
 
       # Called by the identity-vault connector in the 'out' thread to process events generated
       # by the identity vault.
@@ -79,17 +73,17 @@ module RubySync
         log.info "Processing out-going #{event.type} event"
         log.info YAML.dump(event)
         return unless out_event_filter event
-                          
+
         if !event.association_key and [:delete, :remove_association].include? event.type
           log.info "#{name}: No action for #{event.type} of unassociated entry"
           log.info YAML.dump(event)
           return
         end
-        
+
         if event.type == :modify and !event.association
           event.convert_to_add
         end
-        
+
         if event.type == :add
           match = out_match(event, client) # exactly one event record on the client matched
           log.info "Attempting to match"
@@ -103,12 +97,12 @@ module RubySync
           end
           
           if out_create(event)
-            out_place(event)
+            call_if_exists :out_place, event
           end
         end
 
-        out_map_schema(event)
-        out_transform(event)
+        call_if_exists :out_map_schema, event
+        call_if_exists :out_transform, event
         association_key=nil
         with_rescue("#{client.name}: Processing command") do
           association_key = client.process(event)
@@ -121,8 +115,8 @@ module RubySync
       end
       
       # Override to map schema from vault namespace to client namespace
-      def out_map_schema event
-      end
+      # def out_map_schema event
+      # end
 
       # Combines the id of this pipeline with the given key
       # to provide a unique association key to be stored in the
@@ -147,8 +141,8 @@ module RubySync
       end
       
       # Transform the out-going event before the client receives it
-      def out_transform(event)
-      end
+      # def out_transform(event)
+      # end
       
       # Execute the pipeline once then return.
       # TODO Consider making this run in and out simultaneously
@@ -206,22 +200,7 @@ module RubySync
         
       end
 
-      def call_if_exists(method, event)
-        result = nil
-        if respond_to? method
-          with_rescue(method) {result = send method, event}
-          log_progress method, event
-        else
-          log.debug "No #{method}(event) method, continuing"
-        end
-        return result
-      end
-
-
-      def log_progress last_action, event
-        log.info "Result of #{last_action}:\n" + YAML.dump(event)
-      end
-      
+     
       # Override to perform whatever transformation on the event is required
       #def in_transform(event); event; end
       
