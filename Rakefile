@@ -13,28 +13,12 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-#
-# Performs end-to-end tests of the memory based testing connectors.
-#
-lib_path = File.dirname(__FILE__) + '/../lib'
-$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
 
-require 'ruby_sync_test'
-require 'hashlike_tests'
-require 'ruby_sync/connectors/memory_connector'
-
-
-class TestConnector < RubySync::Connectors::MemoryConnector
-end
-
-class TestPipeline < RubySync::Pipelines::BasePipeline
-  client :test
-  vault :test
-end
-
-class TestMemoryConnectors < Test::Unit::TestCase
-  
-  include RubySyncTest
-  include HashlikeTests
-
+Rake::TestTask.new do |t|
+  t.libs << "test"
+  t.test_files = FileList['test/test_*.rb']
+  t.verbose=true
 end

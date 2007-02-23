@@ -18,7 +18,7 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'rubygems'
 require 'active_support'
-require 'ruby_sync/utilities'
+require 'ruby_sync/util/utilities'
 require 'ruby_sync/connectors/base_connector'
 require 'ruby_sync/pipelines/base_pipeline'
 require 'ruby_sync/event'

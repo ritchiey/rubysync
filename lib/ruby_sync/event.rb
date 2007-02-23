@@ -49,19 +49,56 @@ module RubySync
     
     # Retrieves all known values for the record affected by this event and
     # sets the event's type to :add
+    # If the source connector doesn't implement retrieve we'll assume thats
+    # because it can't and that it gave us all it had to start with.
     def convert_to_add
       log.info "Converting '#{type}' event to add"
-      full = source.retrieve(source_path)
-      payload = full.payload
-      type = :add
+      if (source.respond_to? :retrieve)
+        full = source.retrieve(source_path)
+        payload = full.payload
+      end
+      @type = :add
     end
+          
     
     def to_yaml_properties
       %w{ @type @source_path @target_path @association_key @payload}
     end
     
+    # True if this event will lead to the field name given being set
+    # if value is non-nil then if it will lead to it being set to
+    # the value given.
+    # Note: This implementation is not completely accurate. Just looks
+    # at the last operation in the payload. A better implementation would
+    # look at all items that affect the named field to work out the value.
+    def sets_value? field_name, value=nil
+      return false if @payload == nil
+      @payload.reverse_each do |r|
+        return true if r[1] == field_name && (value == nil || r[2] == value.as_array)
+      end
+      return false
+    end
     
-  end
+    # Remove any operations from the payload that affect fields with the given key or
+    # keys (key can be a single field name or an array of field names)
+    def drop_changes_to key
+      keys = key.as_array
+      return unless @payload
+      @payload = @payload.delete_if {|command| keys.include? command[1] }
+    end
+    
+    def add_default field_name, value
+      add_value field_name, value unless sets_value? field_name
+    end
+    
+    def add_value field_name, value
+      payload << [:add, field_name, value.as_array]
+    end
+
+    def set_value field_name, value
+      payload << [:replace, field_name, value.as_array]
+    end
+  end  
 end
 
     

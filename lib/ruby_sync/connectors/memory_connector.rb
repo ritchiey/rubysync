@@ -16,6 +16,14 @@
 
 require "yaml"
 
+class Object
+  
+  # If not already an array, slip into one
+  def as_array
+    (instance_of? Array)? self : [self]
+  end
+end
+
 module RubySync
   module Connectors
     class MemoryConnector < RubySync::Connectors::BaseConnector
@@ -27,16 +35,16 @@ module RubySync
       end
   
       def is_echo? event
-        event.payload && event.payload[:modifier] == 'rubysync'
+        event.sets_value?(:modifier, 'rubysync')
       end
 
       def associate_with_foreign_key(key, path)
         log.info "Associating foreign key '#{key}' with '#{path}'"
         entry = @data[path]
-         if entry
-           @association_index[key] = path
-           entry[:foreign_key] = key
-         end
+        if entry
+          @association_index[key] = path
+          entry[:foreign_key] = key
+        end
       end
 
       def path_for_foreign_key(key)
@@ -71,15 +79,25 @@ module RubySync
       # pipeline should rightly ignore because it's just a side-effect.
       # In other words, we're simply simulating an undesirable behaviour for testing
       # purposes. 
-      def add id, details
+      def add id, operations
         raise Exception.new("Item already exists") if @data[id]
-        @data[id] = details
+        @data[id] = perform_operations operations
         association_key = (is_vault?)? nil : association_key_for(id)
         log.info "#{name}: Injecting add event"
-        @events << RubySync::Event.add(self, id, association_key, @data[id].dup)
+        @events << RubySync::Event.add(self, id, association_key, operations.dup)
+        return id
+      end
+      
+      def modify id, operations
+        raise Exception.new("Attempting to modify non-existent record '#{id}'") unless @data[id]
+        perform_operations operations, @data[id]
+        association_key = (is_vault?)? nil : association_key_for(id)
+        log.info "#{name}: Injecting modify event"
+        @events << RubySync::Event.add(self, id, association_key, operations.dup)
         return id
       end
   
+
       def delete id
         raise Exception.new("Can't delete non-existent item '#{id}'") unless @data[id]
         association_key = (is_vault?)? foreign_key_for(id) : association_key_for(id)
@@ -88,15 +106,15 @@ module RubySync
         @events << (event = RubySync::Event.delete(self, id, association_key))
         @data.delete id
       end
-  
+
       # Put a clue there that we did this change so that we can detect and filter
       # out the echo.
       def target_transform event
-        event.payload.merge!({:modifier => 'rubysync'})
+        event.payload << [:add, :modifier, ['rubysync']]
       end
       
       def source_transform event
-        [:modifier, :foreign_key].each {|key| event.payload.delete key}
+        event.drop_changes_to [:modifier, :foreign_key]
       end
   
       def drop_pending_events

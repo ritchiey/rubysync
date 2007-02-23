@@ -25,13 +25,17 @@ module RubySync
       
       def initialize options={}
         once_only = false
-        options.each do |key, value|
-          send("#{key}=", value) if respond_to? "#{key}="
-        end
         self.name = options[:name]
         self.is_vault = options[:is_vault]
         if is_vault && !can_act_as_vault?
           raise Exception.new("#{self.class.name} can't act as an identity vault.")
+        end
+        options.each do |key, value|
+          if self.respond_to? "#{key}="
+            self.send("#{key}=", value) 
+          else
+            log.debug "#{name}: doesn't respond to #{key}="
+          end
         end
       end
       
@@ -55,19 +59,21 @@ module RubySync
       # to generate events.
       # Should generally only be called by the pipeline to which it is attached.
       def start
-        log.info "#{name}: Starting"
+        log.info "#{name}: Started"
         @running = true
         started()
         while @running
           check do |event|
-            unless is_delete_echo?(event) || is_echo?(event)
+            if is_delete_echo?(event) || is_echo?(event)
+              log.debug "Ignoring echoed event"
+            else
               call_if_exists :source_transform, event
               yield(event)
             end
           end
 
           if once_only
-            log.debug "#{name}: Once only, setting @running to false"
+            log.debug "#{name}: Stopped"
             @running = false
           else
             log.debug "#{name}: sleeping"
@@ -79,7 +85,7 @@ module RubySync
 
       # Politely stop the connector.
       def stop
-        log.info "#{name}: Stopping"
+        log.info "#{name}: Attempting to stop"
         @running = false
       end
 
@@ -169,6 +175,16 @@ module RubySync
         defined? path_for_foreign_key and defined? foreign_key_for
       end
 
+
+      # Should only be called on the vault. Returns the entry associated with
+      # the foreign key passed. Some connectors may wish to override this if
+      # they have a more efficient way of retrieving the record from the foreign
+      # key.
+      def find_associated foreign_key
+        path = path_for_foreign_key foreign_key
+        self[path]
+      end
+      
       
       # Attempts to delete non-existent items may occur due to echoing. Many systems won't be able to record
       # the fact that an entry has been deleted rubysync because after the delete, there is no entry left to
@@ -189,7 +205,7 @@ module RubySync
         false #TODO implement delete event caching
       end
       
-      def is_echo?; false end
+      def is_echo? event; false end
       
       # Called by unit tests to inject data
       def test_add id, details
@@ -206,7 +222,53 @@ module RubySync
         delete id
       end
   
+      # Return an array of operations that would create the given record
+      # if applied to an empty hash.
+      def create_operations_for record
+        record.keys.map {|key| [:add, key, record[key]]}
+      end
+
+
+      # Performs the given operations on the given record. The record is a
+      # Hash in which each key is a field name and each value is an array of
+      # values for that field.
+      # Operations is an Array of operations to be performed on the record. It has
+      # the same form as operations in Net::LDAP.
+      # TODO: Expand on this
+      def perform_operations operations, record={}
+        operations.each do |op|
+          type, field, value = op
+          # Ensure that value is always an array
+          values = value.as_array
+          case type
+          when :add
+            if record[field]
+              existing = record[field].as_array
+              unless (existing & values).empty?
+                raise Exception.new("Attempt to add duplicate elements to #{name}")
+              end
+              existing += values
+            else
+              record[field] = values
+            end
+          when :replace
+            record[field] = values
+          when :delete
+            if value == nil || value == "" || value = []
+              record.delete(field)
+            else
+              record[field] -= values
+            end
+          else
+            raise Exception.new("Unknown operation '#{type}'")
+          end
+        end
+        return record
+      end
       
+
+
+
     end
   end
 end

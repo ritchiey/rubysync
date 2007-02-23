@@ -13,28 +13,34 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-#
-# Performs end-to-end tests of the memory based testing connectors.
-#
+
 lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-require 'ruby_sync_test'
-require 'hashlike_tests'
-require 'ruby_sync/connectors/memory_connector'
+require 'ruby_sync'
+require 'test/unit'
 
+module RubySyncTest
 
-class TestConnector < RubySync::Connectors::MemoryConnector
-end
-
-class TestPipeline < RubySync::Pipelines::BasePipeline
-  client :test
-  vault :test
-end
-
-class TestMemoryConnectors < Test::Unit::TestCase
+  def initialize(test)
+    super(test)
+    @bob_details = {:givenName=>['Robert'],
+                    :sn=>['Smith'],
+                    :interests=>['music', 'makeup']
+    }
+  end
   
-  include RubySyncTest
-  include HashlikeTests
+  
+  def setup
+    @pipeline = TestPipeline.new
+    @client = @pipeline.client
+    @vault = @pipeline.vault
+    @client.delete(path) if @client[path]
+    @vault.delete(path) if @vault[path]
+  end  
 
+  def banner(label)
+    puts '*' * 10 + " #{label} " + '*' * 10
+  end
+  
 end
