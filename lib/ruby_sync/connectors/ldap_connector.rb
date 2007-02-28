@@ -21,6 +21,13 @@ require 'ruby_sync'
 require 'net/ldap'
 
 
+class Net::LDAP::Entry
+  
+  def to_hash
+    return @myhash.dup
+  end
+end
+
 module RubySync
   module Connectors
     class LdapConnector < RubySync::Connectors::BaseConnector
@@ -51,7 +58,7 @@ module RubySync
         with_ldap do |ldap|
           result = ldap.search :base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*'
           return nil if !result or result.size == 0
-          return result[0]
+          result[0].to_hash
         end
       end
       

@@ -66,11 +66,33 @@ module RubySync
       end
       
       def self.map_client_to_vault mappings
+        remove_method :client_to_vault_map if method_defined? :client_to_vault_map
         class_def 'client_to_vault_map' do
           @client_to_vault_map ||= mappings
         end
+        unless method_defined? :vault_to_client_map
+          class_def 'vault_to_client_map' do
+            @vault_to_client_map ||= mappings.invert
+          end
+        end
+      end
+
+      def self.map_vault_to_client mappings
+        remove_method :vault_to_client_map if method_defined? :vault_to_client_map
         class_def 'vault_to_client_map' do
-          @vault_to_client_map ||= mappings.invert
+          @vault_to_client_map ||= mappings
+        end
+        unless method_defined? :client_to_vault_map
+          class_def 'client_to_vault_map' do
+            @client_to_vault_map ||= mappings.invert
+          end
+        end
+      end
+      
+      def self.out_transform &blk
+        define_method :out_transform do |event|
+          event.meta_def :transform, &blk
+          event.transform
         end
       end
 
@@ -235,13 +257,23 @@ module RubySync
       # then fix up the contents of the payload to refer to the fields by
       # the names in the vault namespace
       def in_map_schema event
-        return unless defined? client_to_vault_map
-        return unless defined? event.payload
+        map_schema event, client_to_vault_map
+      end
+      
+      def out_map_schema event
+        map_schema event, vault_to_client_map
+      end
+      
+      def map_schema event, map
+        return unless defined? map and defined? event.payload
         event.payload.each do |op|
-          op[1] = client_to_vault_map[op[1]] || op[1]
+          # op[1] contains the field name that is the subject of the operation
+          op[1] = map[op[1]] || op[1] if op[1]
         end
       end
-
+        
+        
+          
       
      
       # Override to perform whatever transformation on the event is required

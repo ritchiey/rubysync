@@ -35,7 +35,15 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
         :password=>'secret'
 
   vault :my_memory
-   
+  
+  map_client_to_vault :cn=>:givenName
+  map_vault_to_client :givenName=>:cn
+  
+  out_transform do
+    #puts "Hi! I'm the out transform. My class is '#{self.class.name}'"
+    operations_on("cn").each { |operation| append operation.same_but_on('givenName') }
+  end
+
 end
 
 
@@ -62,5 +70,5 @@ class TestLdapConnector < Test::Unit::TestCase
   end
 
   def test_client_to_vault
-  en
+  end
 end

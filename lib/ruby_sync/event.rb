@@ -65,8 +65,8 @@ module RubySync
       %w{ @type @source_path @target_path @association_key @payload}
     end
     
-    # True if this event will lead to the field name given being set
-    # if value is non-nil then if it will lead to it being set to
+    # True if this event will lead to the field name given being set.
+    # If value is non-nil then if it will lead to it being set to
     # the value given.
     # Note: This implementation is not completely accurate. Just looks
     # at the last operation in the payload. A better implementation would
@@ -87,18 +87,55 @@ module RubySync
       @payload = @payload.delete_if {|command| keys.include? command[1] }
     end
     
-    def add_default field_name, value
-      add_value field_name, value unless sets_value? field_name
+    # def add_default field_name, value
+    #   add_value field_name, value unless sets_value? field_name
+    # end
+    # 
+    # def add_value field_name, value
+    #   payload << [:add, field_name, value.as_array]
+    # end
+    # 
+    # def set_value field_name, value
+    #   uncommitted_operations << [:replace, field_name, value.as_array]
+    # end
+
+  
+    def uncommitted_operations
+      @uncommitted_operations ||= payload
     end
-    
-    def add_value field_name, value
-      payload << [:add, field_name, value.as_array]
+  
+    # Add one or more operations to the list to be performed.
+    # The operations won't be added to the payload until commit_changes
+    # is called and won't be added at all if rollback_changes is called
+    # first.
+    def append new_operations
+      uncommitted_operations += new_operations.as_array
     end
 
-    def set_value field_name, value
-      payload << [:replace, field_name, value.as_array]
+    # Rollback any changes that 
+    def rollback_changes
+      uncommitted_operations = nil
     end
+  
+    def commit_changes
+      if uncommitted_operations 
+        payload = uncommitted_operations
+        uncommitted_operations = nil
+      end
+    end
+  
+  protected
+
+    # Yield to block for each operation in the payload for which the the subject is
+    # the specified subject
+    def operations_on subject
+      return unless payload
+      payload.each {|op| yield op if op.subject == subject}
+    end
+
   end  
+
+  
 end
 
     
