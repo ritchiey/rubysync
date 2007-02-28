@@ -257,11 +257,11 @@ module RubySync
       # then fix up the contents of the payload to refer to the fields by
       # the names in the vault namespace
       def in_map_schema event
-        map_schema event, client_to_vault_map
+        map_schema event, client_to_vault_map if respond_to? :client_to_vault_map
       end
       
       def out_map_schema event
-        map_schema event, vault_to_client_map
+        map_schema event, vault_to_client_map if respond_to? :vault_to_client_map
       end
       
       def map_schema event, map

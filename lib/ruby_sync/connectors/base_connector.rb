@@ -225,7 +225,7 @@ module RubySync
       # Return an array of operations that would create the given record
       # if applied to an empty hash.
       def create_operations_for record
-        record.keys.map {|key| [:add, key, record[key]]}
+        record.keys.map {|key| Operation.new(:add, key, record[key])}
       end
 
 
@@ -237,30 +237,30 @@ module RubySync
       # TODO: Expand on this
       def perform_operations operations, record={}
         operations.each do |op|
-          type, field, value = op
+          #type, field, value = op
           # Ensure that value is always an array
-          values = value.as_array
+          values = op.value.as_array
           case type
           when :add
-            if record[field]
-              existing = record[field].as_array
-              unless (existing & values).empty?
+            if record[op.field]
+              existing = record[op.field].as_array
+              unless (existing & op.values).empty?
                 raise Exception.new("Attempt to add duplicate elements to #{name}")
               end
-              existing += values
+              existing += op.values
             else
-              record[field] = values
+              record[op.field] = op.values
             end
           when :replace
-            record[field] = values
+            record[op.field] = op.values
           when :delete
             if value == nil || value == "" || value == []
-              record.delete(field)
+              record.delete(op.field)
             else
-              record[field] -= values
+              record[op.field] -= values
             end
           else
-            raise Exception.new("Unknown operation '#{type}'")
+            raise Exception.new("Unknown operation '#{op.type}'")
           end
         end
         return record

@@ -21,6 +21,7 @@ require 'active_support'
 require 'ruby_sync/util/utilities'
 require 'ruby_sync/connectors/base_connector'
 require 'ruby_sync/pipelines/base_pipeline'
+require 'ruby_sync/operation'
 require 'ruby_sync/event'
 
 

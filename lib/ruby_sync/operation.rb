@@ -18,7 +18,7 @@ module RubySync
   # Operations that may be performed on an attribute
   class Operation < Array
   
-    def initialise type, subject, values
+    def initialize type, subject, values
       self.type = type
       self.subject = subject
       self.values = values
