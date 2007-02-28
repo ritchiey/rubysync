@@ -254,7 +254,7 @@ module RubySync
           when :replace
             record[field] = values
           when :delete
-            if value == nil || value == "" || value = []
+            if value == nil || value == "" || value == []
               record.delete(field)
             else
               record[field] -= values
@@ -265,9 +265,6 @@ module RubySync
         end
         return record
       end
-      
-
-
 
     end
   end
