@@ -52,14 +52,32 @@ module HashlikeTests
     assert_nil @client[path], "Client already contains bob"
     @pipeline.run_once
     assert_not_nil @client[path], "#{path} wasn't created on the client"
-    assert_equal @bob_details, @client[path].reject {|k,v| k == :modifier}
+    assert_equal normalise(@bob_details), normalise(@client[path])
     @vault.delete path
-    assert_equal @bob_details, @client[path].reject {|k,v| k == :modifier}
+    assert_equal normalise(@bob_details), normalise(@client[path])
     assert_nil @vault[path], "Bob disappeared from the client before we ran the pipeline"
     @pipeline.run_once
     assert_nil @client[path], "Bob wasn't deleted from the client"
     @pipeline.run_once # run again in case there were unhandled echos
     assert_nil @client[path], "Bob is back in client, he may have been recreated by an echoed add event"
+  end
+
+  # Names of attributes that can't be synched
+  def unsynchable
+    [:modifier]
+  end
+  
+  def normalise details
+    normal = {}
+    @unsynchable ||= unsynchable.map{|u| u.to_s.downcase}
+    details.each_pair do |k,v|
+      key = k.to_s.downcase
+      unless @unsynchable.include?(key)
+        normal[key] = v
+#        puts "[#{@unsynchable.join ','}] doesn't include '#{key}'"
+      end
+    end
+    normal
   end
 
 
@@ -76,8 +94,8 @@ module HashlikeTests
   def test_perform_operations
     banner :test_perform_operations
     result = @vault.perform_operations [
-      [:add, :name, 'Fred'],
-      [:add, :email, 'fred@test.com']
+      RubySync::Operation.new(:add, :name, 'Fred'),
+      RubySync::Operation.new(:add, :email, 'fred@test.com')
       ]
     assert_equal({:name=>['Fred'], :email=>['fred@test.com']}, result)
   end

@@ -16,7 +16,10 @@
 module RubySync
   
   # Operations that may be performed on an attribute
-  class Operation < Array
+  class Operation
+  
+  attr_accessor :type, :subject, :values
+  
   
     def initialize type, subject, values
       self.type = type
@@ -24,24 +27,17 @@ module RubySync
       self.values = values
     end
   
-    def type; self[0]; end
-    def type=(value)
-      unless [:add, :delete, :replace].include? value.to_sym
+    remove_method :type=
+    def type=(type)
+      unless [:add, :delete, :replace].include? type.to_sym
         raise Exception.new("Invalid operation type '#{value}'")
       end
+      @type = type
     end
     
-    def subject; self[1]; end
-    def subject=(subject)
-      self[1]= subject
-    end
-    
-    def values
-      self[2]
-    end
-    
+    remove_method :values=
     def values=(values)
-      self[2] = values.as_array
+      @values = values.as_array
     end
     
     # Returns a duplicate of this operation but with the subject

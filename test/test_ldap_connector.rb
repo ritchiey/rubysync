@@ -36,12 +36,12 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
 
   vault :my_memory
   
-  map_client_to_vault :cn=>:givenName
-  map_vault_to_client :givenName=>:cn
+  allow_out :cn, :givenName, :sn
   
   out_transform do
-    #puts "Hi! I'm the out transform. My class is '#{self.class.name}'"
-    operations_on("cn").each { |operation| append operation.same_but_on('givenName') }
+    log.info "Performing out_transform on #{self.class.name}"
+    each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
+    append RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson'])
   end
 
 end
@@ -51,6 +51,12 @@ class TestLdapConnector < Test::Unit::TestCase
     
   include RubySyncTest
   include HashlikeTests
+
+  def unsynchable
+    [:objectclass, :interests, :cn, :dn]
+  end
+
+
 
   def path
     'cn=bob,dc=example,dc=com'
@@ -66,9 +72,10 @@ class TestLdapConnector < Test::Unit::TestCase
       "mail"=>"bob@roberts.com"
     }
     @client.add path, @client.create_operations_for(ldap_attr)
-    assert_equal @bob_details, @client[path]
+    assert_not_nil @client[path], "#{path} wasn't created"
   end
 
   def test_client_to_vault
   end
+
 end

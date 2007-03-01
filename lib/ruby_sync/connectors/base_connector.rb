@@ -232,32 +232,31 @@ module RubySync
       # Performs the given operations on the given record. The record is a
       # Hash in which each key is a field name and each value is an array of
       # values for that field.
-      # Operations is an Array of operations to be performed on the record. It has
-      # the same form as operations in Net::LDAP.
-      # TODO: Expand on this
+      # Operations is an Array of RubySync::Operation objects to be performed on the record.
       def perform_operations operations, record={}
         operations.each do |op|
-          #type, field, value = op
-          # Ensure that value is always an array
-          values = op.value.as_array
-          case type
+          unless op.instance_of? Operation
+            log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
+            p op
+          end
+          case op.type
           when :add
-            if record[op.field]
-              existing = record[op.field].as_array
+            if record[op.subject]
+              existing = record[op.subject].as_array
               unless (existing & op.values).empty?
                 raise Exception.new("Attempt to add duplicate elements to #{name}")
               end
-              existing += op.values
+              record[op.subject] =  existing + op.values
             else
-              record[op.field] = op.values
+              record[op.subject] = op.values
             end
           when :replace
-            record[op.field] = op.values
+            record[op.subject] = op.values
           when :delete
             if value == nil || value == "" || value == []
-              record.delete(op.field)
+              record.delete(op.subject)
             else
-              record[op.field] -= values
+              record[op.subject] -= values
             end
           else
             raise Exception.new("Unknown operation '#{op.type}'")

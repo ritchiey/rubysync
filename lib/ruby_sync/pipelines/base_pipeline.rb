@@ -36,7 +36,7 @@ module RubySync
     # the identity vault to the client as out-going. Methods in this class prefixed with 'in_' or 'out_'
     # work on the incoming or outgoing flows respectively.
     class BasePipeline
-
+      
       include RubySync::Utilities
       
       def initialize
@@ -45,7 +45,7 @@ module RubySync
       def name
         self.class.name
       end
-
+      
       def self.client(connector_name, options={})
         options[:name] ||= "#{self.name}(client)"
         class_name = "::" + "#{connector_name}_connector".camelize
@@ -54,8 +54,8 @@ module RubySync
           @client ||= eval(class_name).new(options)
         end
       end
-
-
+      
+      
       def self.vault(connector_name, options={})
         class_name = "::" + "#{connector_name}_connector".camelize
         options[:name] ||= "#{self.name}(vault)"
@@ -76,7 +76,7 @@ module RubySync
           end
         end
       end
-
+      
       def self.map_vault_to_client mappings
         remove_method :vault_to_client_map if method_defined? :vault_to_client_map
         class_def 'vault_to_client_map' do
@@ -95,7 +95,7 @@ module RubySync
           event.transform
         end
       end
-
+      
       # Called by the identity-vault connector in the 'out' thread to process events generated
       # by the identity vault.
       def out_handler(event)
@@ -103,17 +103,20 @@ module RubySync
         log.info "Processing out-going #{event.type} event #{hint}"
         log.info YAML.dump(event)
         return unless out_event_filter event
+        
+        # Remove unwanted attributes
+        perform_transform :out_filter, event
 
         if !event.association_key and [:delete, :remove_association].include? event.type
           log.info "#{name}: No action for #{event.type} of unassociated entry"
           log.info YAML.dump(event)
           return
         end
-
+        
         if event.type == :modify and !event.association
           event.convert_to_add
         end
-
+        
         if event.type == :add
           match = out_match(event, client) # exactly one event record on the client matched
           log.info "Attempting to match"
@@ -127,12 +130,12 @@ module RubySync
           end
           
           if out_create(event)
-            call_if_exists :out_place, event
+            perform_transform :out_place, event
           end
         end
-
-        call_if_exists :out_map_schema, event
-        call_if_exists :out_transform, event
+        
+        perform_transform :out_map_schema, event
+        perform_transform :out_transform, event
         association_key=nil
         with_rescue("#{client.name}: Processing command") do
           association_key = client.process(event)
@@ -147,7 +150,7 @@ module RubySync
       # Override to map schema from vault namespace to client namespace
       # def out_map_schema event
       # end
-
+      
       # Combines the id of this pipeline with the given key
       # to provide a unique association key to be stored in the
       # identity vault
@@ -160,31 +163,36 @@ module RubySync
         log.debug "Default matching rule - no match"
         false
       end
-
-        # Override to restrict creation on the client
-        def out_create event
-          log.debug "Create allowed through default rule"
-          true
-        end
-        
-        # Override to restrict creation on the vault
-        def in_create event
-          log.debug "Create allowed through default rule"
-          true
-        end
       
-        # Override to modify the target path for creation on the client
-        def out_place(event)
-          log.debug "Default placement rule target_path = source_path"
-          event.target_path = event.source_path
-        end
-
-        # Override to modify the target path for creation in the vault
-        def in_place(event)
-          log.debug "Default placement rule target_path = source_path"
-          event.target_path = event.source_path
-        end
-
+      # Override to restrict creation on the client
+      def out_create event
+        log.debug "Create allowed through default rule"
+        true
+      end
+      
+      # Override to restrict creation on the vault
+      def in_create event
+        log.debug "Create allowed through default rule"
+        true
+      end
+      
+      # Override to modify the target path for creation on the client
+      def out_place(event)
+        log.debug "Default placement rule target_path = source_path"
+        event.target_path = event.source_path
+      end
+      
+      # Override to modify the target path for creation in the vault
+      def in_place(event)
+        log.debug "Default placement rule target_path = source_path"
+        event.target_path = event.source_path
+      end
+      
+      def perform_transform name, event, hint=""
+        call_if_exists name, event, hint
+        event.commit_changes
+        log_progress name, event, hint
+      end
       
       # Transform the out-going event before the client receives it
       # def out_transform(event)
@@ -222,9 +230,9 @@ module RubySync
         hint = " (#{client.name} => #{vault.name})"
         log.info "Processing incoming #{event.type} event"+hint
         log.info YAML.dump(event)
-        call_if_exists :in_map_schema, event, hint
-        call_if_exists :in_transform, event, hint
-        call_if_exists :in_filter, event, hint
+        perform_transform :in_map_schema, event, hint
+        perform_transform :in_transform, event, hint
+        perform_transform :in_filter, event, hint
         
         if event.type == :modify
           unless event.association_key and (associated = vault.find_associated(event))
@@ -240,19 +248,19 @@ module RubySync
           end
           
           if in_create(event)
-            call_if_exists :in_place, event, hint
+            perform_transform :in_place, event, hint
           end
         end
         with_rescue("#{vault.name}: Processing command") {vault.process(event)}
         
       end
-
-
+      
+      
       def in_match(event, client)
         log.debug "Default match returning false"
         return false
       end
-
+      
       # If client_to_vault_map is defined (usually by map_client_to_vault)
       # then fix up the contents of the payload to refer to the fields by
       # the names in the vault namespace
@@ -268,44 +276,64 @@ module RubySync
         return unless defined? map and defined? event.payload
         event.payload.each do |op|
           # op[1] contains the field name that is the subject of the operation
-          op[1] = map[op[1]] || op[1] if op[1]
+          op.subject = map[op.subject] || op.subject if op.subject
         end
       end
-        
-        
-          
       
-     
+      
+      
+      
+      
       # Override to perform whatever transformation on the event is required
       #def in_transform(event); event; end
       
       # Convert fields in the incoming event to those used by the identity vault
       #def in_map_schema(event); end
-
-     # Specify which fields will be allowed through the incoming filter
-     # If nil (the default), all fields are allowed. 
-     def self.allow_in *fields
-       class_def 'allowed_in' do
-         fields
-       end
-     end
- 
-     # default allowed_in in case allow_in doesn't get called
-     def allowed_in; nil; end
- 
-     # Default method for allowed_in. Override by calling allow_in
-     #def allowed_in; false; end
-     def in_filter(record)
-        if allowed_in
-          filtered={}
-          allowed_in.each {|key| filtered[key] = record[key] if record[key]}
-          return filtered
-        else
-          record
+      
+      # Specify which fields will be allowed through the incoming filter
+      # If nil (the default), all fields are allowed. 
+      def self.allow_in *fields
+        class_def 'allowed_in' do
+          fields
         end
       end
+      
+      # default allowed_in in case allow_in doesn't get called
+      def allowed_in; nil; end
+      
+      # Default method for allowed_in. Override by calling allow_in
+      #def allowed_in; false; end
+      def in_filter(event)
+        if allowed_in
+          event.drop_all_but_changes_to allowed_in
+        else
+          event
+        end
+      end
+
+
+      # Specify which fields will be allowed through the incoming filter
+      # If nil (the default), all fields are allowed. 
+      def self.allow_out *fields
+        class_def 'allowed_out' do
+          fields
+        end
+      end
+      
+      # default allowed_out in case allow_out doesn't get called
+      def allowed_out; nil; end
+      
+      # Default method for allowed_out. Override by calling allow_in
+      #def allowed_out; false; end
+      def out_filter(event)
+        if allowed_out
+          event.drop_all_but_changes_to allowed_out
+        else
+          event
+        end
+      end
+
+
     end
   end
 end
-
-

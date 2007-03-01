@@ -71,37 +71,49 @@ module RubySync
     # Note: This implementation is not completely accurate. Just looks
     # at the last operation in the payload. A better implementation would
     # look at all items that affect the named field to work out the value.
-    def sets_value? field_name, value=nil
+    def sets_value? subject, value=nil
       return false if @payload == nil
-      @payload.reverse_each do |r|
-        return true if r[1] == field_name && (value == nil || r[2] == value.as_array)
+      @payload.reverse_each do |op|
+        return true if op.subject == subject && (value == nil || op.values == value.as_array)
       end
       return false
     end
     
     # Remove any operations from the payload that affect fields with the given key or
-    # keys (key can be a single field name or an array of field names)
-    def drop_changes_to key
-      keys = key.as_array
-      return unless @payload
-      @payload = @payload.delete_if {|command| keys.include? command[1] }
+    # keys (key can be a single field name or an array of field names).
+    def drop_changes_to subject
+      subjects = subject.as_array
+      uncommitted_operations
+      @uncommitted_operations = @uncommitted_operations.delete_if {|op| subjects.include? op.subject }
+    end
+
+    def drop_all_but_changes_to subject
+      subjects = subject.as_array
+      @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject)}
     end
     
-    # def add_default field_name, value
-    #   add_value field_name, value unless sets_value? field_name
-    # end
-    # 
-    # def add_value field_name, value
-    #   payload << [:add, field_name, value.as_array]
-    # end
-    # 
-    # def set_value field_name, value
-    #   uncommitted_operations << [:replace, field_name, value.as_array]
-    # end
+     # Add a value to a given subject if there are no 
+     def add_default field_name, value
+       add_value field_name, value unless sets_value? field_name
+     end
+     
+     
+     def add_value field_name, value
+       uncommitted_operations << Operation.new(:add, field_name, value.as_array)
+     end
+     
+     def set_value field_name, value
+       uncommitted_operations << Operation.new(:replace, field_name, value.as_array)
+     end
 
   
     def uncommitted_operations
-      @uncommitted_operations ||= payload
+      @uncommitted_operations ||= @payload || []
+      return @uncommitted_operations
+    end
+ 
+    def uncommitted_operations= ops
+      @uncommitted_operations = ops
     end
   
     # Add one or more operations to the list to be performed.
@@ -109,18 +121,19 @@ module RubySync
     # is called and won't be added at all if rollback_changes is called
     # first.
     def append new_operations
-      uncommitted_operations += new_operations.as_array
+      uncommitted_operations
+      @uncommitted_operations += new_operations.as_array
     end
 
     # Rollback any changes that 
     def rollback_changes
-      uncommitted_operations = nil
+      @uncommitted_operations = nil
     end
   
     def commit_changes
       if uncommitted_operations 
-        payload = uncommitted_operations
-        uncommitted_operations = nil
+        @payload = uncommitted_operations
+        @uncommitted_operations = nil
       end
     end
   
@@ -128,9 +141,14 @@ module RubySync
 
     # Yield to block for each operation in the payload for which the the subject is
     # the specified subject
-    def operations_on subject
+    def each_operation_on subject
       return unless payload
-      payload.each {|op| yield op if op.subject == subject}
+      subjects = subject.as_array.map {|s| s.to_s}
+      payload.each do |op|
+        if subjects.include?(op.subject.to_s)
+          yield(op)
+        end
+      end
     end
 
   end  

@@ -36,7 +36,6 @@ module RubySync
       result = nil
       if respond_to? method
         with_rescue("#{method} #{hint}") {result = send method, event}
-        log_progress method, event, hint
       else
         log.debug "No #{method}(event) method, continuing #{hint}"
       end

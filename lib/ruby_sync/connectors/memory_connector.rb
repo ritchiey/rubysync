@@ -99,7 +99,10 @@ module RubySync
   
 
       def delete id
-        raise Exception.new("Can't delete non-existent item '#{id}'") unless @data[id]
+        unless @data[id]
+           log.warn "Can't delete non-existent item '#{id}'"
+           return
+         end
         association_key = (is_vault?)? foreign_key_for(id) : association_key_for(id)
         @association_index.delete association_key
         log.info "#{name}: Injecting delete event"
@@ -110,7 +113,7 @@ module RubySync
       # Put a clue there that we did this change so that we can detect and filter
       # out the echo.
       def target_transform event
-        event.payload << [:add, :modifier, ['rubysync']]
+        event.payload << Operation.new(:add, :modifier, ['rubysync'])
       end
       
       def source_transform event
