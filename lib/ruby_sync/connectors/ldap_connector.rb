@@ -32,13 +32,39 @@ module RubySync
   module Connectors
     class LdapConnector < RubySync::Connectors::BaseConnector
       
-      attr_accessor :host, :port, :bind_method, :username, :password
+      attr_accessor :host, :port, :bind_method, :username, :password,
+                    :search_filter, :search_base
+      
+      def started
+      end
+      
+      def check
+        Net::LDAP.open(:host=>@host, :port=>@port, :auth=>auth) do |ldap|
+          ldap.search :base => @search_base, :filter => @search_filter do |entry|
+            operations = create_operations_for_ldap_entry(entry)
+            association_key = (is_vault?)? nil : entry.dn
+            yield Event.add(self, entry.dn, association_key, operations)
+          end
+        end
+      end
+      
+      def create_operations_for_ldap_entry entry
+        operations = []
+        entry.each do |k, v|
+          operations << Operation.new(:add, k, v)
+        end
+        operations
+      end
+      
+      def stopped
+      end
       
       def initialize options
         super options
         @bind_method ||= :simple
         @host ||= 'localhost'
         @port ||= 389
+        @search_filter ||= "cn=*"
       end
       
       

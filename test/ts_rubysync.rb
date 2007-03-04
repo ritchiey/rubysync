@@ -13,26 +13,7 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-lib_path = File.dirname(__FILE__)
-$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
-
-require 'rubygems'
-require 'active_support'
-require 'ruby_sync/util/utilities'
-require 'ruby_sync/connectors/base_connector'
-require 'ruby_sync/pipelines/base_pipeline'
-require 'ruby_sync/operation'
-require 'ruby_sync/event'
-
-
-# Make the log method globally available
-class Object
-  def log
-    unless defined? @@log
-      @@log = Logger.new(STDOUT)
-      @@log.level = Logger::INFO
-      @@log.datetime_format = "%H:%M:%S"
-    end
-    @@log
-  end
-end
+require 'test/unit'
+require 'test_memory_connectors'
+require 'test_csv_file_connector'
+require 'test_ldap_connector'

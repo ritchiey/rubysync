@@ -13,14 +13,17 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
+lib_path = File.dirname(__FILE__) + '/../lib'
+$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
+require "ruby_sync"
 require "simpleconsole"
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require "rubysync"
 
 
 class Controller < SimpleConsole::Controller
+
+  include RubySync::Utilities
   
-  params :string => {:p => :pipe}
+  params :string => {:p => :pipe, :t =>:type}
   
   def default
   end
@@ -30,6 +33,44 @@ class Controller < SimpleConsole::Controller
     puts "Not yet implemented"
   end
 
+  def create
+    config_path = params[:id]
+    ensure_dir config_path
+    ensure_dir config_path + "/pipelines"
+    ensure_dir config_path + "/connectors"  
+  end
+  
+  def connector
+    name = params[:id]
+    type = params[:type]
+    unless name and type
+      puts "Usage: rubysync connector connector_name -t connector_type"
+      return
+    end
+    if base_path
+      File.open("#{base_path}/connectors/#{name}", "w") do |file|
+        file.puts connector_template(name, type)
+      end
+    else
+      puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
+    end
+  end
+  
+  def pipeline
+    name = params[:id]
+    unless name and type
+      puts "Usage: rubysync pipeline pipeline_name"
+      return
+    end
+    if base_path
+      File.open("#{base_path}/pipelines/#{name}", "w") do |file|
+        file.puts pipeline_template(name)
+      end
+    else
+      puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
+    end
+  end
+  
   
 end
 
@@ -37,7 +78,7 @@ end
 class View < SimpleConsole::View
 
   def default
-    puts "Usage: rip command -p pipename"
+    puts "Usage: rubysync command -p pipename"
   end
   
   def start
@@ -45,5 +86,36 @@ class View < SimpleConsole::View
   end
 
 end
+
+
+  def connector_template name, type
+    return <<-"end;"
+class #{name.to_s.camelize}Connector < RubySync::Connectors::#{type.to_s.camelize}Connector
+end
+    end;
+  end
+  
+  def pipeline_template name
+    return <<-"end;"
+class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
+
+  #client :client_connector_name
+
+  #vault :vault_connector_name
+
+  #allow_out :allow, :these, :fields
+
+  # in means going from client to vault
+  #in_transform do
+  #end
+
+  # out means going from vault to client
+  #out_transform do
+  #end
+
+end
+    end;
+  end
+
 
 SimpleConsole::Application.run(ARGV, Controller, View)

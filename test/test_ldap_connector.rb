@@ -32,16 +32,19 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
         :host=>'localhost',
         :port=>10389,
         :username=>'uid=admin,ou=system',
-        :password=>'secret'
+        :password=>'secret',
+        :search_filter=>"cn=*",
+        :search_base=>"dc=example,dc=com"
 
   vault :my_memory
   
   allow_out :cn, :givenName, :sn
   
   out_transform do
-    log.info "Performing out_transform on #{self.class.name}"
-    each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
-    append RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson'])
+    if type == :add or type == :modify
+      each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
+      append RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson'])
+    end
   end
 
 end

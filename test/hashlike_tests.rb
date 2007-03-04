@@ -31,6 +31,7 @@ module HashlikeTests
     @client.add path, @client.create_operations_for(@bob_details)
     assert_nil @vault[path], "Vault already contains bob"
     @pipeline.run_once
+    assert_not_nil @vault[path], "#{path} wasn't created on the vault"
     assert_equal @bob_details, @vault[path].reject {|k,v| [:modifier,:foreign_key].include? k}
     if @client.respond_to? :delete
       @client.delete path

@@ -14,6 +14,7 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 
+require 'fileutils'
 
 
 # Generally useful methods
@@ -28,7 +29,7 @@ module RubySync
         yield
       rescue Exception => exception
         log.warn "#{text}: #{exception.message}"
-        log.warn exception.backtrace.join("\n")
+        log.debug exception.backtrace[0..4].join("\n")
       end
     end    
     
@@ -42,10 +43,44 @@ module RubySync
       return result
     end
 
-
     def log_progress last_action, event, hint=""
       log.info "Result of #{last_action}: #{hint}\n" + YAML.dump(event)
     end
     
+    
+    # Ensure that a given path exists as a directory
+    def ensure_dir path
+      raise Exception.new("Can't create nil directory") unless path
+      if File.exist? path
+        unless File.directory? path
+          raise Exception.new("'#{path}' exists but is not a directory")
+        end
+      else
+        log.info "Creating directory '#{path}'"
+        FileUtils.mkpath path
+      end
+    end
+    
+    
+    def base_path
+      @base_path = find_base_path unless defined? @base_path
+      @base_path
+    end
+
+    # Locate a configuration directory by checking the current directory and
+    # all of it's ancestors until it finds one that looks like a rubysync configuration
+    # directory.
+    # Returns false if no suitable directory was found
+    def find_base_path
+      base_path = "."
+      while File.directory? base_path 
+        puts "Looking at #{base_path}"
+        return File.expand_path(base_path) if File.directory?("#{base_path}/pipelines") &&
+                            File.directory?("#{base_path}/connectors")
+        base_path += "/.."
+      end
+      return nil
+    end
+        
   end
 end
