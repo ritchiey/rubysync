@@ -15,12 +15,13 @@
 
 
 require 'fileutils'
+require 'irb'
+
 
 
 # Generally useful methods
 module RubySync
   module Utilities
-    
     
 
     # Perform an action and rescue any exceptions thrown, display the exception with the specified text
@@ -49,7 +50,7 @@ module RubySync
     
     
     # Ensure that a given path exists as a directory
-    def ensure_dir path
+    def ensure_dir_exists path
       raise Exception.new("Can't create nil directory") unless path
       if File.exist? path
         unless File.directory? path
@@ -61,7 +62,31 @@ module RubySync
       end
     end
     
+    def pipeline_called name
+      something_called name, "pipeline"
+    end
     
+    
+    def connector_called name
+      something_called name, "connector"
+    end
+
+    # Locates and returns an instance of a class for
+    # the given name.
+    def something_called name, extension
+      filename = "#{name.to_s}_#{extension}"
+      $".include?(filename) or require filename or return nil
+      eval(filename.camelize).new
+    end
+    
+    # Ensure that path is in the search path
+    # prepends it if it's not
+    def include_in_search_path path
+      path = File.expand_path(path)
+      $:.unshift path unless $:.include?(path)
+    end
+    
+    # Return the base_path 
     def base_path
       @base_path = find_base_path unless defined? @base_path
       @base_path
@@ -72,14 +97,16 @@ module RubySync
     # directory.
     # Returns false if no suitable directory was found
     def find_base_path
-      base_path = "."
-      while File.directory? base_path 
-        puts "Looking at #{base_path}"
-        return File.expand_path(base_path) if File.directory?("#{base_path}/pipelines") &&
+      base_path = File.expand_path(".")
+      last = nil
+      # Keep going up until we start repeating ourselves
+      while File.directory?(base_path) && base_path != last && base_path != "/"
+        return base_path if File.directory?("#{base_path}/pipelines") &&
                             File.directory?("#{base_path}/connectors")
-        base_path += "/.."
+        last = base_path
+        base_path = File.expand_path("#{base_path}/..")
       end
-      return nil
+      return false
     end
         
   end

@@ -20,8 +20,8 @@ module RubySync
       
       
       def started
-        ensure_dir @in_path
-        ensure_dir @out_path
+        ensure_dir_exists @in_path
+        ensure_dir_exists @out_path
       end
       
       def check(&blk)

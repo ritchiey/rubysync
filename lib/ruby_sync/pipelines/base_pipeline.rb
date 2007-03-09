@@ -16,6 +16,7 @@
 lib_path = File.dirname(__FILE__) + '/../..'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
+require 'active_support'
 require 'ruby_sync/util/metaid'
 require 'yaml'
 
@@ -48,20 +49,30 @@ module RubySync
       
       def self.client(connector_name, options={})
         options[:name] ||= "#{self.name}(client)"
-        class_name = "::" + "#{connector_name}_connector".camelize
+        filename = "#{connector_name}_connector"
+        class_name = filename.camelize
+        eval "defined? #{class_name}" or
+        $".include?(filename) or
+        require filename or
+        raise Exception.new("Can't find connector '#{filename}'")
         options[:is_vault] = false
         class_def 'client' do
-          @client ||= eval(class_name).new(options)
+          @client ||= eval("::#{class_name}").new(options)
         end
       end
       
       
       def self.vault(connector_name, options={})
-        class_name = "::" + "#{connector_name}_connector".camelize
-        options[:name] ||= "#{self.name}(vault)"
+        options[:name] ||= "#{self.name}(client)"
+        filename = "#{connector_name}_connector"
+        class_name = filename.camelize
+        eval "defined? #{class_name}" or
+        $".include?(filename) or
+        require filename or
+        raise Exception.new("Can't find connector '#{filename}'")
         options[:is_vault] = true
         class_def 'vault' do
-          @vault ||= eval(class_name).new(options)
+          @vault ||= eval("::" + class_name).new(options)
         end
       end
       

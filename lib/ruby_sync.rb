@@ -24,9 +24,21 @@ require 'ruby_sync/pipelines/base_pipeline'
 require 'ruby_sync/operation'
 require 'ruby_sync/event'
 
+class Configuration
+
+  include RubySync::Utilities
+
+  def initialize
+    include_in_search_path "#{base_path}/pipelines"
+    include_in_search_path "#{base_path}/connectors"
+  end
+end
+Configuration.new
+
 
 # Make the log method globally available
 class Object
+
   def log
     unless defined? @@log
       @@log = Logger.new(STDOUT)
@@ -35,4 +47,10 @@ class Object
     end
     @@log
   end
+  
+  def breakpoint b
+    puts "Executing breakpoint at " + caller.first
+    IRB.start("IRB::WorkSpace.new(b)")
+  end
+  
 end

@@ -23,21 +23,31 @@ class Controller < SimpleConsole::Controller
 
   include RubySync::Utilities
   
-  params :string => {:p => :pipe, :t =>:type}
+  params :string => {:p => :pipe},
+         :string => {:t => :type},
+         :bool =>{:v => :verbose}
   
   def default
   end
   
   # Run specified pipeline once then exit
-  def run_once
-    puts "Not yet implemented"
+  def once
+    log.level = (params[:verbose])? Logger::INFO : Logger::WARN
+    
+    pipeline_name = params[:id]
+    pipeline = pipeline_called pipeline_name
+    if pipeline
+      pipeline.run_once
+    else
+      log.error "Couldn't find a pipeline called '#{pipeline_name}'"
+    end
   end
 
   def create
     config_path = params[:id]
-    ensure_dir config_path
-    ensure_dir config_path + "/pipelines"
-    ensure_dir config_path + "/connectors"  
+    ensure_dir_exists config_path
+    ensure_dir_exists config_path + "/pipelines"
+    ensure_dir_exists config_path + "/connectors"  
   end
   
   def connector
@@ -48,7 +58,7 @@ class Controller < SimpleConsole::Controller
       return
     end
     if base_path
-      File.open("#{base_path}/connectors/#{name}", "w") do |file|
+      File.open("#{base_path}/connectors/#{name}_connector.rb", "w") do |file|
         file.puts connector_template(name, type)
       end
     else
@@ -58,12 +68,12 @@ class Controller < SimpleConsole::Controller
   
   def pipeline
     name = params[:id]
-    unless name and type
+    unless name
       puts "Usage: rubysync pipeline pipeline_name"
       return
     end
     if base_path
-      File.open("#{base_path}/pipelines/#{name}", "w") do |file|
+      File.open("#{base_path}/pipelines/#{name}_pipeline.rb", "w") do |file|
         file.puts pipeline_template(name)
       end
     else

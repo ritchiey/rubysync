@@ -33,8 +33,8 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   client :test_csv_file,
          :field_names => ['id', 'given name', 'last name', 'email'],
          :path_field => 'id',
-         :in_path => "~/rubysync/csv_test/in",
-         :out_path => "~/rubysync/csv_test/out"
+         :in_path => File.expand_path("~/rubysync/csv_test/in"),
+         :out_path => File.expand_path("~/rubysync/csv_test/out")
          
   vault :test_memory
   
