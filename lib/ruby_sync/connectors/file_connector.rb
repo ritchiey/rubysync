@@ -16,12 +16,14 @@ module RubySync
       
       attr_accessor :in_path  # scan this directory for suitable files
       attr_accessor :out_path # write received events to this directory
+      attr_accessor :out_extension # the file extension of files written to out_path
       attr_accessor :in_glob # The filename glob for incoming files
       
       
       def started
         ensure_dir_exists @in_path
         ensure_dir_exists @out_path
+        @out_extension ||= ".out"
       end
       
       def check(&blk)
@@ -44,10 +46,28 @@ module RubySync
       end
 
 
+      # TODO: Write to a temp file first and then move it to where it will
+      # be picked up by the receiving process.
+      # TODO: Make this use the same file for multiple records depending
+      # upon configuration of maximum lines per file and a timeout
+      def add path, operations
+        File.open(output_file_name, 'a') do |file|
+          write_record(file, path, operations)
+        end
+      end
 
+      # Called to append a given record to an open file.
+      # Subclasses of FileConnector should override this.
+      def write_record file, path, operations
+        raise Exception.new("#{name} needs to implement 'write_record file, path, operations'")
+      end
       
+      
+      # Generate a unique and appropriate filename within the given path 
+      def output_file_name
+       File.join(@out_path, Time.now.strftime('%Y%m%d%H%M%S') + @out_extension)
+      end
+            
     end
-
-
   end
 end

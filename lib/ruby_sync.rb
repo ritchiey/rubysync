@@ -19,22 +19,10 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 require 'rubygems'
 require 'active_support'
 require 'ruby_sync/util/utilities'
-require 'ruby_sync/connectors/base_connector'
-require 'ruby_sync/pipelines/base_pipeline'
+#require 'ruby_sync/connectors/base_connector'
+#require 'ruby_sync/pipelines/base_pipeline'
 require 'ruby_sync/operation'
 require 'ruby_sync/event'
-
-class Configuration
-
-  include RubySync::Utilities
-
-  def initialize
-    include_in_search_path "#{base_path}/pipelines"
-    include_in_search_path "#{base_path}/connectors"
-  end
-end
-Configuration.new
-
 
 # Make the log method globally available
 class Object
@@ -47,10 +35,47 @@ class Object
     end
     @@log
   end
-  
-  def breakpoint b
-    puts "Executing breakpoint at " + caller.first
-    IRB.start("IRB::WorkSpace.new(b)")
+end  
+
+class Configuration
+
+  include RubySync::Utilities
+
+  def initialize
+    include_in_search_path "#{base_path}/pipelines"
+    include_in_search_path "#{base_path}/connectors"
+
+    lib_path = File.dirname(__FILE__)
+    require_all_in_dir "#{lib_path}/ruby_sync/connectors", "*_connector.rb"
+    require_all_in_dir "#{lib_path}/ruby_sync/pipelines", "*_pipeline.rb"
   end
-  
+
+  # We find the first directory in the search path that is a parent of the specified
+  # directory and do our requires relative to that in order to increase the likelihood
+  # that duplicate requires will be recognised.
+  def require_all_in_dir(dir, glob="*.rb")
+    expanded = File.expand_path dir
+    base = $:.detect do |path_dir|
+      expanded_pd = File.expand_path(path_dir)
+      expanded[0, expanded_pd.length] == expanded_pd
+    end
+    prefix = (base)? expanded[File.expand_path(base).length+1, expanded.length]+"/" : ""
+
+    # puts $:.join "\n"
+    # puts "expanded = '#{expanded}'"
+    # puts "base = '#{base}'"
+    # puts "prefix = '#{prefix}'"
+
+    Dir.chdir dir do |cwd|
+      Dir.glob(glob) do |filename|
+        require prefix + filename
+      end
+    end
+  end
+
 end
+
+Configuration.new
+
+
+  

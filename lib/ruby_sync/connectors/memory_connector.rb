@@ -62,6 +62,13 @@ module RubySync
         end
         return nil
       end
+      
+      def remove_foreign_key(key)
+        path = @association_index[key]
+        @association_index.delete key
+        entry = @data[path]
+        entry.delete :association_key if entry
+      end
   
 
       def initialize options

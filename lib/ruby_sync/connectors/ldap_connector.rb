@@ -18,8 +18,10 @@ lib_path = File.dirname(__FILE__) + '/..'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
 require 'ruby_sync'
-require 'net/ldap'
 
+$VERBOSE = false
+require 'net/ldap'
+$VERBOSE = true
 
 class Net::LDAP::Entry
   
@@ -33,28 +35,24 @@ module RubySync
     class LdapConnector < RubySync::Connectors::BaseConnector
       
       attr_accessor :host, :port, :bind_method, :username, :password,
-                    :search_filter, :search_base
+                    :search_filter, :search_base,
+                    :association_attribute # name of the attribute in which to store the association key(s)
       
       def started
+        #TODO: If vault, check the schema to make sure that the association_attribute is there
+        @association_attribute ||= 'RubySyncAssociation'
       end
       
       def check
         Net::LDAP.open(:host=>@host, :port=>@port, :auth=>auth) do |ldap|
           ldap.search :base => @search_base, :filter => @search_filter do |entry|
-            operations = create_operations_for_ldap_entry(entry)
+            operations = operations_for_entry(entry)
             association_key = (is_vault?)? nil : entry.dn
             yield Event.add(self, entry.dn, association_key, operations)
           end
         end
       end
-      
-      def create_operations_for_ldap_entry entry
-        operations = []
-        entry.each do |k, v|
-          operations << Operation.new(:add, k, v)
-        end
-        operations
-      end
+
       
       def stopped
       end
@@ -90,9 +88,60 @@ module RubySync
       
       def target_transform event
         event.add_default 'objectclass', 'inetOrgUser'
+        # TODO: Add modifier and timestamp unless LDAP dir does this automatically
       end
 
+      def associate_with_foreign_key key, path
+        with_ldap do |ldap|
+          ldap.add_attribute(path, @association_attribute, key.to_s)
+        end
+      end
+      
+      def path_for_foreign_key key
+        entry = entry_for_foreign_key key
+        (entry)? entry.dn : nil
+      end
+      
+      def foreign_key_for path
+          entry = self[path]
+          (entry)? entry.dn : nil
+      end
+
+      def remove_foreign_key key
+        with_ldap do |ldap|
+          entry = entry_for_foreign_key key
+          if entry
+            modify :dn=>entry.dn, :operations=>[ [:delete, @association_attribute, key] ]
+          end
+        end
+      end
+
+      def find_associated foreign_key
+        entry = entry_for_foreign_key key
+        (entry)? operations_for_entry(entry) : nil
+      end
+      
+
 private
+
+      def operations_for_entry entry
+        # TODO: This could probably be done better by mixing Enumerable into Entry and then calling collect
+        ops = []
+        entry.each do |name, values|
+          ops << Operation.add(name, values)
+        end
+        ops
+      end
+
+      def entry_for_foreign_key key
+        with_ldap do |ldap|
+          result = ldap.search :base=>@search_base, :filter=>"#{@association_attribute}=#{key}"
+          return nil if !result or result.size == 0
+          result[0]
+        end
+      end
+
+
       def with_ldap
         result = nil
         Net::LDAP.open(:host=>@host, :port=>@port, :auth=>auth) do |ldap|

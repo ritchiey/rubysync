@@ -22,9 +22,10 @@ module RubySync
 
       def initialize options
         super options
-        @in_glob ||= "*.csv"
+        @in_glob ||= '*.csv'
+        @out_extension ||= '.csv'
         @field_names ||= []
-        @path_field ||= (@field_names.empty?)? "field_0": @field_names[0]
+        @path_field ||= (@field_names.empty?)? 'field_0': @field_names[0]
       end
       
       # Called for each filename matching in_glob in in_path
@@ -46,6 +47,14 @@ module RubySync
         end
       end
 
+
+      def write_record file, path, operations
+        record = perform_operations operations
+        line = CSV.generate_line(@field_names.map {|f| record[f]})
+        file.puts line
+      end
+        
+
       
       # Return the value to be used as the source_path for the event given the
       # supplied row data.
@@ -55,6 +64,13 @@ module RubySync
         end
         return nil
       end
+      
+      # A file based system probably can't look data up so always return nil
+      # for lookup attempts
+      def [](path)
+        nil
+      end
+      
       
     end
   end

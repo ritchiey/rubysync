@@ -13,12 +13,15 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
+require 'ruby_sync/connectors/connector_event_processing'
+
 module RubySync
   module Connectors
     
     class BaseConnector
       
       include RubySync::Utilities
+      include ConnectorEventProcessing
       
       attr_accessor :once_only, :name, :is_vault
       
@@ -96,47 +99,6 @@ module RubySync
       end
       
 
-      def process(event)
-        case event.type
-        when :add: return perform_add(event)
-        when :delete: return perform_delete(event)
-        when :modify: return perform_modify(event)
-        else
-            raise Exception.new("#{name}: Unknown event type '#{event.type}' received")
-        end
-      end
-      
-      def perform_add event
-        log.info "Adding '#{event.target_path}' to '#{name}'"
-        raise Exception.new("#{name}: Entry with path '#{event.target_path}' already exists, add failing.") if self[event.target_path]
-        if is_vault? && event.association_key != nil && path_for_association_key(event.association_key)
-          raise Exception.new("#{name}: Association_key already in use. Add failing.") 
-        end
-        call_if_exists(:target_transform, event)
-        add event.target_path, event.payload
-        return association_key_for(event.target_path) unless is_vault?
-        if is_vault? && !event.association_key
-          raise Exception.new("#{name}: No association key supplied to add.")
-        else
-          associate_with_foreign_key(event.association_key, event.target_path)
-        end
-      end
-
-      def perform_delete event
-        raise Exception.new("#{name}: Delete of unassociated object. No action taken.") unless event.association_key
-        path = path_for_association_key(event.association_key)
-        log.info "Deleting '#{path}' from '#{name}'"
-        raise Exception.new("#{name}: Attempted to delete non-existent entry '#{path}'") unless delete(path)
-        return nil # don't want to create any new associations
-      end
-      
-      def perform_modify event
-        path = path_for_association_key(event.association_key)
-        raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
-        call_if_exists(:target_transform, event)
-        modify path, event.payload
-        return (is_vault?)? nil : association_key_for(event.target_path)
-      end
 
 
       # Returns the correct id for the given association_key 
@@ -167,14 +129,27 @@ module RubySync
       # Typically, databases and directories can act as vaults, text documents and HR or finance
       # applications probably can't.
       # To enable a connector to act as a vault, define the following methods:
-      # => entry_for_foreign_key(pipeline_id, key)
-      # => foreign_key_for()
-      # and entry_for_association_key(key).
+      # => path_for_foreign_key(pipeline_id, key)
+      # => foreign_key_for(path)
+      # and associate_with_foreign_key(key, path).
       def can_act_as_vault?
         defined? associate_with_foreign_key and
-        defined? path_for_foreign_key and defined? foreign_key_for
+        defined? path_for_foreign_key and
+        defined? foreign_key_for and
+        defined? remove_foreign_key
       end
 
+      # def associate_with_foreign_key key, path
+      # end
+      # 
+      # def path_for_foreign_key key
+      # end
+      # 
+      # def foreign_key_for path
+      # end
+      #
+      # def remove_foreign_key key
+      # end
 
       # Should only be called on the vault. Returns the entry associated with
       # the foreign key passed. Some connectors may wish to override this if

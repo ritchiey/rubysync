@@ -21,6 +21,19 @@ module RubySync
   attr_accessor :type, :subject, :values
   
   
+    def self.add subject, values
+      self.new(:add, subject, values)
+    end
+    
+    def self.delete subject, values
+      self.new(:delete, subject, values)
+    end
+    
+    def self.replace subject, values
+      self.new(:replace, subject, values)
+    end
+      
+  
     def initialize type, subject, values
       self.type = type
       self.subject = subject
