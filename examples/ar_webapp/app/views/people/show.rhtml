@@ -1,0 +1,8 @@
+<h1><%="#{@person.first_name} #{@person.last_name}"%></h1>
+
+<h2>Hobbies</h2>
+<ul>
+<% @person.hobbies.each do |hobby| %>
+	<li><%= hobby.name %></li>
+<%end%>
+</ul>	

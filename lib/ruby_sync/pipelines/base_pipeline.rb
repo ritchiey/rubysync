@@ -63,7 +63,7 @@ module RubySync
       
       
       def self.vault(connector_name, options={})
-        options[:name] ||= "#{self.name}(client)"
+        options[:name] ||= "#{self.name}(vault)"
         filename = "#{connector_name}_connector"
         class_name = filename.camelize
         eval "defined? #{class_name}" or

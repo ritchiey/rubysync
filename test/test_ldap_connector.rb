@@ -60,22 +60,27 @@ class TestLdapConnector < Test::Unit::TestCase
   end
 
 
+  def vault_path
+    # TODO: Try using a different path for the vault that's derived from the client source path
+    'cn=bob,dc=example,dc=com'
+  end
 
-  def path
+
+  def client_path
     'cn=bob,dc=example,dc=com'
   end
 
 
   def test_ldap_add
-    assert_nil @client[path], "#{path} already exists on client"
+    assert_nil @client[client_path], "#{client_path} already exists on client"
     ldap_attr = {
       "objectclass"=>['inetOrgPerson'],
       "cn"=>'bob',
       "sn"=>'roberts',
       "mail"=>"bob@roberts.com"
     }
-    @client.add path, @client.create_operations_for(ldap_attr)
-    assert_not_nil @client[path], "#{path} wasn't created"
+    @client.add client_path, @client.create_operations_for(ldap_attr)
+    assert_not_nil @client[client_path], "#{client_path} wasn't created"
   end
 
   def test_client_to_vault

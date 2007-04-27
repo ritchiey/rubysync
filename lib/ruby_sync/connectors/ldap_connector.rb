@@ -104,7 +104,7 @@ module RubySync
       
       def foreign_key_for path
           entry = self[path]
-          (entry)? entry.dn : nil
+          (entry)? entry.dn : nil # TODO: That doesn't look right. Should return an association key, not a path.
       end
 
       def remove_foreign_key key

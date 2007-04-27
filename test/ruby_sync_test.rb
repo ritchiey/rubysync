@@ -22,6 +22,7 @@ require 'test/unit'
 
 module RubySyncTest
 
+
   def initialize(test)
     super(test)
     @bob_details = {:givenName=>['Robert'],
@@ -30,13 +31,13 @@ module RubySyncTest
     }
   end
   
-  
+
   def setup
     @pipeline = TestPipeline.new
     @client = @pipeline.client
     @vault = @pipeline.vault
-    @client.delete(path) if @client[path]
-    @vault.delete(path) if @vault[path]
+    @client.delete(client_path) if @client[client_path]
+    @vault.delete(vault_path) if @vault[vault_path]
   end  
 
   def banner(label)

@@ -18,9 +18,7 @@
 module RubySync
   module Connectors
     
-    # This is included into BaseConnector. The methods here are not handle processing events
-    # and are not likely to be overridden so they've been taken out of BaseConnector for
-    # readibility.
+    # This is included into BaseConnector.
     module ConnectorEventProcessing
     
       def process(event)
@@ -33,6 +31,9 @@ module RubySync
         end
       end
 
+      # Add a record to the connected store. If acting as vault, also associate with the attached association
+      # key for later retrieval. This implementation assumes that the target path is used. Connectors that
+      # make up their own key on creation of a record will need to override this.
       def perform_add event
         log.info "Adding '#{event.target_path}' to '#{name}'"
         raise Exception.new("#{name}: Entry with path '#{event.target_path}' already exists, add failing.") if self[event.target_path]
@@ -42,7 +43,7 @@ module RubySync
         call_if_exists(:target_transform, event)
         add event.target_path, event.payload
         return association_key_for(event.target_path) unless is_vault?
-        if is_vault? && !event.association_key
+        unless event.association_key
           raise Exception.new("#{name}: No association key supplied to add.")
         else
           associate_with_foreign_key(event.association_key, event.target_path)

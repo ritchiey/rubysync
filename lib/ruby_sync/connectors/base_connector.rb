@@ -93,17 +93,13 @@ module RubySync
       end
 
       
-      # Convenience method for consistency
       def is_vault?
         @is_vault
       end
       
-
-
-
       # Returns the correct id for the given association_key 
       def path_for_association_key(key)
-        (is_vault)? path_for_foreign_key(key) : path_for_own_association_key(key)
+        (is_vault?)? path_for_foreign_key(key) : path_for_own_association_key(key)
       end
 
       # Returns the association key for the given path. Called if this connector is the client.
@@ -138,6 +134,10 @@ module RubySync
         defined? foreign_key_for and
         defined? remove_foreign_key
       end
+
+      # TODO: These method signatures need to change to include a connector or pipeline id so that
+      # we can distinguish between foreign keys for the same record but different
+      # connectors/pipelines.
 
       # def associate_with_foreign_key key, path
       # end

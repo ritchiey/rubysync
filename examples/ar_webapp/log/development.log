@@ -1,0 +1,1173 @@
+PeopleController: missing default helper path people_helper
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2007-04-24 14:01:35) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+
+
+ArgumentError (wrong number of arguments (0 for 1)):
+    /app/controllers/people_controller.rb:8:in `scaffold'
+    /app/controllers/people_controller.rb:8
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:203:in `load_without_new_constant_marking'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:203:in `load_file'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:342:in `new_constants_in'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:202:in `load_file'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:94:in `require_or_load'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:248:in `load_missing_constant'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:452:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:464:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/inflector.rb:250:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/core_ext/string/inflections.rb:148:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/routing.rb:1284:in `recognize'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:40:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:02:06) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+
+
+NameError (uninitialized constant People):
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:266:in `load_missing_constant'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:452:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:464:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/inflector.rb:250:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/core_ext/string/inflections.rb:148:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:195:in `paginator_and_collection_for'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:130:in `paginate'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:108:in `list'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:96:in `index'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `perform_action_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:02:20) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+
+
+Mysql::Error (#42000Unknown database 'ar_webapp_development'):
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:523:in `read'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:153:in `real_connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:389:in `connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:152:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `mysql_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `connection_without_query_cache='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/query_cache.rb:54:in `connection='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:230:in `retrieve_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:78:in `connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/base.rb:763:in `columns'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:257:in `column_for'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:116:in `calculate'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:45:in `count'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:173:in `count_collection_for_pagination'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:197:in `paginator_and_collection_for'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:130:in `paginate'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:108:in `list'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:96:in `index'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `perform_action_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:02:25) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+
+
+Mysql::Error (#42000Unknown database 'ar_webapp_development'):
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:523:in `read'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:153:in `real_connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:389:in `connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:152:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `mysql_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `connection_without_query_cache='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/query_cache.rb:54:in `connection='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:230:in `retrieve_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:78:in `connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/base.rb:763:in `columns'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:257:in `column_for'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:116:in `calculate'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:45:in `count'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:173:in `count_collection_for_pagination'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:197:in `paginator_and_collection_for'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:130:in `paginate'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:108:in `list'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:96:in `index'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `perform_action_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:04:03) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+
+
+Mysql::Error (#42000Unknown database 'ar_webapp_development'):
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:523:in `read'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:153:in `real_connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:389:in `connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:152:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `mysql_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `connection_without_query_cache='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/query_cache.rb:54:in `connection='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:230:in `retrieve_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:78:in `connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/base.rb:763:in `columns'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:257:in `column_for'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:116:in `calculate'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:45:in `count'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:173:in `count_collection_for_pagination'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:197:in `paginator_and_collection_for'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:130:in `paginate'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:108:in `list'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:96:in `index'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `perform_action_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:04:06) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+
+
+Mysql::Error (#42000Unknown database 'ar_webapp_development'):
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:523:in `read'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/vendor/mysql.rb:153:in `real_connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:389:in `connect'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:152:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:82:in `mysql_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:262:in `connection_without_query_cache='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/query_cache.rb:54:in `connection='
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:230:in `retrieve_connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract/connection_specification.rb:78:in `connection'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/base.rb:763:in `columns'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:257:in `column_for'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:116:in `calculate'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:45:in `count'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:173:in `count_collection_for_pagination'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:197:in `paginator_and_collection_for'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:130:in `paginate'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:108:in `list'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:96:in `index'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `perform_action_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:04:18) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mSQL (0.000234)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.000000)[0m   [0mMysql::Error: #42S02Table 'rubysync_development.people' doesn't exist: SHOW FIELDS FROM people[0m
+
+
+ActiveRecord::StatementInvalid (Mysql::Error: #42S02Table 'rubysync_development.people' doesn't exist: SHOW FIELDS FROM people):
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/abstract_adapter.rb:128:in `log'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:243:in `execute'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/connection_adapters/mysql_adapter.rb:348:in `columns'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/base.rb:763:in `columns'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:257:in `column_for'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:116:in `calculate'
+    /opt/local/lib/ruby/gems/1.8/gems/activerecord-1.15.3/lib/active_record/calculations.rb:45:in `count'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:173:in `count_collection_for_pagination'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:197:in `paginator_and_collection_for'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/pagination.rb:130:in `paginate'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:108:in `list'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/scaffolding.rb:96:in `index'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1095:in `perform_action_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+  [4;36;1mSQL (0.000197)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.002556)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000650)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000440)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.000198)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000394)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.000211)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000403)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.103115)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000473)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000453)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.023604)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000482)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000441)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.016845)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000502)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.001246)[0m   [0;1mSELECT * FROM schema_info[0m
+  [4;35;1mSQL (0.000628)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.002083)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.001956)[0m   [0mSHOW KEYS FROM hobbies[0m
+  [4;36;1mSQL (0.002214)[0m   [0;1mSHOW FIELDS FROM interests[0m
+  [4;35;1mSQL (0.001711)[0m   [0mSHOW KEYS FROM interests[0m
+  [4;36;1mSQL (0.002193)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.001678)[0m   [0mSHOW KEYS FROM people[0m
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:07:16) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.008716)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000506)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000558)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/scaffolds/layout.rhtml
+Completed in 0.11205 (8 reqs/sec) | Rendering: 0.00428 (3%) | DB: 0.01001 (8%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2007-04-24 14:07:19) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003176)[0m   [0mSHOW FIELDS FROM people[0m
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/scaffolds/layout.rhtml
+Completed in 0.01422 (70 reqs/sec) | Rendering: 0.00044 (3%) | DB: 0.00318 (22%) | 200 OK [http://localhost/people/new]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#create (for 127.0.0.1 at 2007-04-24 14:07:25) [POST]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"commit"=>"Create", "Person"=>{"first_name"=>"Ritchie", "last_name"=>"Young"}, "action"=>"create", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003304)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000242)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000425)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('Ritchie', 'Young')[0m
+  [4;35;1mSQL (0.000914)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.01377 (72 reqs/sec) | DB: 0.00489 (35%) | 302 Found [http://localhost/people/create]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-24 14:07:25) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003299)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000489)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000572)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/scaffolds/layout.rhtml
+Completed in 0.01397 (71 reqs/sec) | Rendering: 0.00048 (3%) | DB: 0.00436 (31%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-24 14:11:19) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.004647)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.002612)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000460)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01783 (56 reqs/sec) | Rendering: 0.00092 (5%) | DB: 0.00772 (43%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-24 14:11:19) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003336)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000526)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000589)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01390 (71 reqs/sec) | Rendering: 0.00042 (2%) | DB: 0.00445 (32%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-24 14:11:27) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003353)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000488)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000572)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01458 (68 reqs/sec) | Rendering: 0.00104 (7%) | DB: 0.00441 (30%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-24 14:12:15) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003404)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000492)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000633)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01538 (65 reqs/sec) | Rendering: 0.00134 (8%) | DB: 0.00453 (29%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:12:18) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003360)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000488)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000579)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01422 (70 reqs/sec) | Rendering: 0.00062 (4%) | DB: 0.00443 (31%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:13:04) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003347)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000488)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000579)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01544 (64 reqs/sec) | Rendering: 0.00200 (12%) | DB: 0.00441 (28%) | 200 OK [http://localhost/people]
+InterestsConroller: missing default helper path interests_conroller_helper
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2007-04-24 14:13:06) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"interests"}
+
+
+LoadError (Expected /Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/controllers/interests_controller.rb to define InterestsController):
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:249:in `load_missing_constant'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:452:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:464:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/inflector.rb:250:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/core_ext/string/inflections.rb:148:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/routing.rb:1284:in `recognize'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:40:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+InterestsController: missing default helper path interests_helper
+
+
+Processing InterestsController#index (for 127.0.0.1 at 2007-04-24 14:13:33) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"interests"}
+  [4;35;1mInterest Columns (0.003460)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.000489)[0m   [0;1mSELECT count(*) AS count_all FROM interests [0m
+  [4;35;1mInterest Load (0.000539)[0m   [0mSELECT * FROM interests LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01254 (79 reqs/sec) | Rendering: 0.00111 (8%) | DB: 0.00449 (35%) | 200 OK [http://localhost/interests]
+InterestsController: missing default helper path interests_helper
+
+
+Processing InterestsController#new (for 127.0.0.1 at 2007-04-24 14:13:36) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"new", "controller"=>"interests"}
+  [4;36;1mInterest Columns (0.003289)[0m   [0;1mSHOW FIELDS FROM interests[0m
+Rendering layouts/application
+Completed in 0.01185 (84 reqs/sec) | Rendering: 0.00111 (9%) | DB: 0.00329 (27%) | 200 OK [http://localhost/interests/new]
+InterestsController: missing default helper path interests_helper
+
+
+Processing InterestsController#list (for 127.0.0.1 at 2007-04-24 14:13:41) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"interests"}
+  [4;35;1mInterest Columns (0.002585)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.001700)[0m   [0;1mSELECT count(*) AS count_all FROM interests [0m
+  [4;35;1mInterest Load (0.000454)[0m   [0mSELECT * FROM interests LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01281 (78 reqs/sec) | Rendering: 0.00095 (7%) | DB: 0.00474 (37%) | 200 OK [http://localhost/interests/list]
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2007-04-24 14:13:45) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"hobbies"}
+
+
+SyntaxError (/Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/controllers/hobbies_controller.rb:6: syntax error, unexpected '<', expecting '\n' or ';'
+def HobbyController < ApplicationController
+                     ^
+/Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/controllers/hobbies_controller.rb:11: syntax error, unexpected kEND, expecting $end):
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:203:in `load_without_new_constant_marking'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:203:in `load_file'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:342:in `new_constants_in'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:202:in `load_file'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:94:in `require_or_load'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:248:in `load_missing_constant'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:452:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:464:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/inflector.rb:250:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/core_ext/string/inflections.rb:148:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/routing.rb:1284:in `recognize'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:40:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2007-04-24 14:14:05) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"hobbies"}
+
+
+SyntaxError (/Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/controllers/hobbies_controller.rb:6: syntax error, unexpected '<', expecting '\n' or ';'
+def HobbiesController < ApplicationController
+                       ^
+/Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/controllers/hobbies_controller.rb:11: syntax error, unexpected kEND, expecting $end):
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:203:in `load_without_new_constant_marking'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:203:in `load_file'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:342:in `new_constants_in'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:202:in `load_file'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:94:in `require_or_load'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:248:in `load_missing_constant'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:452:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/dependencies.rb:464:in `const_missing'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/inflector.rb:250:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/activesupport-1.4.2/lib/active_support/core_ext/string/inflections.rb:148:in `constantize'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/routing.rb:1284:in `recognize'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:40:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#index (for 127.0.0.1 at 2007-04-24 14:14:17) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"hobbies"}
+  [4;36;1mHobby Columns (0.003199)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000495)[0m   [0mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;36;1mHobby Load (0.000463)[0m   [0;1mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01327 (75 reqs/sec) | Rendering: 0.00108 (8%) | DB: 0.00416 (31%) | 200 OK [http://localhost/hobbies]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#new (for 127.0.0.1 at 2007-04-24 14:14:19) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"new", "controller"=>"hobbies"}
+  [4;35;1mHobby Columns (0.003233)[0m   [0mSHOW FIELDS FROM hobbies[0m
+Rendering layouts/application
+Completed in 0.08237 (12 reqs/sec) | Rendering: 0.00111 (1%) | DB: 0.00323 (3%) | 200 OK [http://localhost/hobbies/new]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#create (for 127.0.0.1 at 2007-04-24 14:14:25) [POST]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"commit"=>"Create", "action"=>"create", "controller"=>"hobbies", "Hobby"=>{"name"=>"Boxing"}}
+  [4;36;1mHobby Columns (0.003135)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000241)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000406)[0m   [0;1mINSERT INTO hobbies (`name`) VALUES('Boxing')[0m
+  [4;35;1mSQL (0.000757)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/hobbies/list
+Completed in 0.01438 (69 reqs/sec) | DB: 0.00454 (31%) | 302 Found [http://localhost/hobbies/create]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#list (for 127.0.0.1 at 2007-04-24 14:14:25) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"hobbies"}
+  [4;36;1mHobby Columns (0.003149)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000500)[0m   [0mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;36;1mHobby Load (0.000496)[0m   [0;1mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01415 (70 reqs/sec) | Rendering: 0.00109 (7%) | DB: 0.00414 (29%) | 200 OK [http://localhost/hobbies/list]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#new (for 127.0.0.1 at 2007-04-24 14:14:26) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"new", "controller"=>"hobbies"}
+  [4;35;1mHobby Columns (0.003245)[0m   [0mSHOW FIELDS FROM hobbies[0m
+Rendering layouts/application
+Completed in 0.01291 (77 reqs/sec) | Rendering: 0.00108 (8%) | DB: 0.00324 (25%) | 200 OK [http://localhost/hobbies/new]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#create (for 127.0.0.1 at 2007-04-24 14:14:32) [POST]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"commit"=>"Create", "action"=>"create", "controller"=>"hobbies", "Hobby"=>{"name"=>"Fishing"}}
+  [4;36;1mHobby Columns (0.003035)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000245)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000360)[0m   [0;1mINSERT INTO hobbies (`name`) VALUES('Fishing')[0m
+  [4;35;1mSQL (0.000818)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/hobbies/list
+Completed in 0.01332 (75 reqs/sec) | DB: 0.00446 (33%) | 302 Found [http://localhost/hobbies/create]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#list (for 127.0.0.1 at 2007-04-24 14:14:33) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"hobbies"}
+  [4;36;1mHobby Columns (0.003197)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000494)[0m   [0mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;36;1mHobby Load (0.000524)[0m   [0;1mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01474 (67 reqs/sec) | Rendering: 0.00110 (7%) | DB: 0.00422 (28%) | 200 OK [http://localhost/hobbies/list]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#new (for 127.0.0.1 at 2007-04-24 14:14:35) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"new", "controller"=>"hobbies"}
+  [4;35;1mHobby Columns (0.003531)[0m   [0mSHOW FIELDS FROM hobbies[0m
+Rendering layouts/application
+Completed in 0.08240 (12 reqs/sec) | Rendering: 0.00114 (1%) | DB: 0.00353 (4%) | 200 OK [http://localhost/hobbies/new]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#create (for 127.0.0.1 at 2007-04-24 14:14:40) [POST]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"commit"=>"Create", "action"=>"create", "controller"=>"hobbies", "Hobby"=>{"name"=>"Fencing"}}
+  [4;36;1mHobby Columns (0.003669)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000256)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000344)[0m   [0;1mINSERT INTO hobbies (`name`) VALUES('Fencing')[0m
+  [4;35;1mSQL (0.000778)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/hobbies/list
+Completed in 0.01370 (72 reqs/sec) | DB: 0.00505 (36%) | 302 Found [http://localhost/hobbies/create]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#list (for 127.0.0.1 at 2007-04-24 14:14:40) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"hobbies"}
+  [4;36;1mHobby Columns (0.003405)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000497)[0m   [0mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;36;1mHobby Load (0.000807)[0m   [0;1mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01576 (63 reqs/sec) | Rendering: 0.00110 (6%) | DB: 0.00471 (29%) | 200 OK [http://localhost/hobbies/list]
+InterestsController: missing default helper path interests_helper
+
+
+Processing InterestsController#index (for 127.0.0.1 at 2007-04-24 14:14:43) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"interests"}
+  [4;35;1mInterest Columns (0.003267)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.000481)[0m   [0;1mSELECT count(*) AS count_all FROM interests [0m
+  [4;35;1mInterest Load (0.000537)[0m   [0mSELECT * FROM interests LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01255 (79 reqs/sec) | Rendering: 0.00108 (8%) | DB: 0.00428 (34%) | 200 OK [http://localhost/interests]
+InterestsController: missing default helper path interests_helper
+
+
+Processing InterestsController#new (for 127.0.0.1 at 2007-04-24 14:14:45) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"new", "controller"=>"interests"}
+  [4;36;1mInterest Columns (0.003524)[0m   [0;1mSHOW FIELDS FROM interests[0m
+Rendering layouts/application
+Completed in 0.01187 (84 reqs/sec) | Rendering: 0.00117 (9%) | DB: 0.00352 (29%) | 200 OK [http://localhost/interests/new]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#index (for 127.0.0.1 at 2007-04-24 14:15:03) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"hobbies"}
+  [4;35;1mHobby Columns (0.003552)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.000492)[0m   [0;1mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;35;1mHobby Load (0.000551)[0m   [0mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01634 (61 reqs/sec) | Rendering: 0.00133 (8%) | DB: 0.00460 (28%) | 200 OK [http://localhost/hobbies]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#index (for 127.0.0.1 at 2007-04-24 14:22:51) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"hobbies"}
+  [4;36;1mHobby Columns (0.003245)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.000505)[0m   [0mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;36;1mHobby Load (0.000557)[0m   [0;1mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.08784 (11 reqs/sec) | Rendering: 0.00175 (1%) | DB: 0.00431 (4%) | 200 OK [http://localhost/hobbies]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:22:52) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003069)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000396)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000556)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01442 (69 reqs/sec) | Rendering: 0.00116 (8%) | DB: 0.00402 (27%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-24 14:32:49) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003451)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.000685)[0m   [0mSELECT * FROM people WHERE (people.`id` = 1) [0m
+Rendering  within layouts/application
+Rendering people/show
+ERROR: compiling _run_rhtml_47app47views47people47show46rhtml RAISED compile error
+/Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/views/people/show.rhtml:9: syntax error, unexpected $end, expecting kEND
+Function body: def _run_rhtml_47app47views47people47show46rhtml(local_assigns)
+_erbout = ''; _erbout.concat "<h1>"; _erbout.concat(("#{@person.first_name} #{@person.last_name}").to_s); _erbout.concat "</h1>\n"
+_erbout.concat "\n"
+_erbout.concat "d<h2>Hobbies</h2>\n"
+_erbout.concat "<ul>\n"
+ @person.hobbies.each do |hobby| ; _erbout.concat "\n"
+_erbout.concat "\t<ul>"; _erbout.concat(( hobby.name ).to_s); _erbout.concat "</ul>\n"
+_erbout.concat "</ul>\t\n"
+_erbout
+end
+Backtrace: /Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/views/people/show.rhtml:9:in `compile_template'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_view/base.rb:319:in `compile_and_render_template'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_view/base.rb:301:in `render_template'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_view/base.rb:260:in `render_file'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:806:in `render_file'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:711:in `render_with_no_layout'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/layout.rb:247:in `render_without_benchmark'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:50:in `render'
+/opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:50:in `render'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1096:in `perform_action_without_filters'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+/opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+/opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+/opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+/opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+/opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+/opt/local/bin/mongrel_rails:18:in `load'
+/opt/local/bin/mongrel_rails:18
+
+
+ActionView::TemplateError (compile error
+/Users/ritchiey/Projects/rubysync/examples/ar_webapp/config/../app/views/people/show.rhtml:9: syntax error, unexpected $end, expecting kEND) on line #9 of app/views/people/show.rhtml:
+6: 	<ul><%= hobby.name %></ul>
+7: </ul>	
+
+    #{RAILS_ROOT}/app/views/people/show.rhtml:9:in `compile_template'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_view/base.rb:319:in `compile_and_render_template'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_view/base.rb:301:in `render_template'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_view/base.rb:260:in `render_file'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:806:in `render_file'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:711:in `render_with_no_layout'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/layout.rb:247:in `render_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:50:in `render'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:50:in `render'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:1096:in `perform_action_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:632:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:634:in `call_filter'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:619:in `perform_action_without_benchmark'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/benchmarking.rb:66:in `perform_action_without_rescue'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/rescue.rb:83:in `perform_action'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `send'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:430:in `process_without_filters'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/filters.rb:624:in `process_without_session_management_support'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/session_management.rb:114:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/base.rb:330:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/rails-1.2.3/lib/dispatcher.rb:41:in `dispatch'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:84:in `process'
+    /opt/local/lib/ruby/1.8/sync.rb:229:in `synchronize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/rails.rb:83:in `process'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:580:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:579:in `process_client'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:686:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `initialize'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `new'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel.rb:673:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:267:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `each'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/configurator.rb:266:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:127:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/lib/mongrel/command.rb:211:in `run'
+    /opt/local/lib/ruby/gems/1.8/gems/mongrel-0.3.13.4/bin/mongrel_rails:231
+    /opt/local/bin/mongrel_rails:18:in `load'
+    /opt/local/bin/mongrel_rails:18
+
+
+Rendering /opt/local/lib/ruby/gems/1.8/gems/actionpack-1.13.3/lib/action_controller/templates/rescues/layout.rhtml (500 Internal Error)
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-24 14:33:19) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003411)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.000696)[0m   [0mSELECT * FROM people WHERE (people.`id` = 1) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;36;1mHobby Load (0.000627)[0m   [0;1mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 1)) [0m
+Completed in 0.02384 (41 reqs/sec) | Rendering: 0.01280 (53%) | DB: 0.00473 (19%) | 200 OK [http://localhost/people/show/1]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-24 14:33:33) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003297)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mPerson Load (0.000696)[0m   [0;1mSELECT * FROM people WHERE (people.`id` = 1) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;35;1mHobby Load (0.000622)[0m   [0mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 1)) [0m
+Completed in 0.02439 (41 reqs/sec) | Rendering: 0.01336 (54%) | DB: 0.00461 (18%) | 200 OK [http://localhost/people/show/1]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-24 14:33:39) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003567)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000503)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000573)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01532 (65 reqs/sec) | Rendering: 0.00125 (8%) | DB: 0.00464 (30%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#edit (for 127.0.0.1 at 2007-04-24 14:33:40) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"edit", "id"=>"1", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003308)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mPerson Load (0.000670)[0m   [0;1mSELECT * FROM people WHERE (people.`id` = 1) [0m
+Rendering layouts/application
+Completed in 0.03469 (28 reqs/sec) | Rendering: 0.00121 (3%) | DB: 0.00398 (11%) | 200 OK [http://localhost/people/edit/1]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-24 14:33:43) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003341)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000497)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000597)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01572 (63 reqs/sec) | Rendering: 0.00116 (7%) | DB: 0.00443 (28%) | 200 OK [http://localhost/people/list]
+  [4;36;1mSQL (0.000194)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000374)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000264)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000275)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000274)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;35;1mSQL (0.133433)[0m   [0mCREATE TABLE association_keys (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `value` varchar(255) DEFAULT NULL, `record_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.051547)[0m   [0;1mCREATE INDEX `index_association_keys_on_value` ON association_keys (`value`)[0m
+  [4;35;1mSQL (0.031801)[0m   [0mCREATE INDEX `index_association_keys_on_record_id` ON association_keys (`record_id`)[0m
+  [4;36;1mSQL (0.000440)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000629)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000786)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002834)[0m   [0mSHOW FIELDS FROM association_keys[0m
+  [4;36;1mSQL (0.002387)[0m   [0;1mSHOW KEYS FROM association_keys[0m
+  [4;35;1mSQL (0.002137)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.002024)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.001741)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.001939)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.001731)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001779)[0m   [0;1mSHOW KEYS FROM people[0m
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-24 16:06:11) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003642)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.000672)[0m   [0mSELECT * FROM people WHERE (people.`id` = 1) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;36;1mHobby Load (0.000619)[0m   [0;1mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 1)) [0m
+Completed in 0.02497 (40 reqs/sec) | Rendering: 0.01266 (50%) | DB: 0.00493 (19%) | 200 OK [http://localhost/people/show/1]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-25 08:24:07) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003379)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000518)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000591)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01665 (60 reqs/sec) | Rendering: 0.00122 (7%) | DB: 0.00449 (26%) | 200 OK [http://localhost/people]
+InterestsController: missing default helper path interests_helper
+
+
+Processing InterestsController#index (for 127.0.0.1 at 2007-04-25 08:24:09) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"interests"}
+  [4;36;1mInterest Columns (0.003200)[0m   [0;1mSHOW FIELDS FROM interests[0m
+  [4;35;1mSQL (0.001769)[0m   [0mSELECT count(*) AS count_all FROM interests [0m
+  [4;36;1mInterest Load (0.000469)[0m   [0;1mSELECT * FROM interests LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01413 (70 reqs/sec) | Rendering: 0.00097 (6%) | DB: 0.00544 (38%) | 200 OK [http://localhost/interests]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#index (for 127.0.0.1 at 2007-04-25 08:24:10) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"hobbies"}
+  [4;35;1mHobby Columns (0.003305)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.000548)[0m   [0;1mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;35;1mHobby Load (0.000564)[0m   [0mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01579 (63 reqs/sec) | Rendering: 0.00110 (6%) | DB: 0.00442 (27%) | 200 OK [http://localhost/hobbies]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-25 08:24:12) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002916)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000414)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000445)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01392 (71 reqs/sec) | Rendering: 0.00083 (5%) | DB: 0.00378 (27%) | 200 OK [http://localhost/people]
+HobbiesController: missing default helper path hobbies_helper
+
+
+Processing HobbiesController#index (for 127.0.0.1 at 2007-04-25 08:24:14) [GET]
+  Session ID: f30b9791de10257fe957e5c7edbe6b11
+  Parameters: {"action"=>"index", "controller"=>"hobbies"}
+  [4;35;1mHobby Columns (0.003476)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.000485)[0m   [0;1mSELECT count(*) AS count_all FROM hobbies [0m
+  [4;35;1mHobby Load (0.000552)[0m   [0mSELECT * FROM hobbies LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01649 (60 reqs/sec) | Rendering: 0.00116 (7%) | DB: 0.00451 (27%) | 200 OK [http://localhost/hobbies]
