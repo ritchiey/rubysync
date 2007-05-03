@@ -5,12 +5,14 @@
 ActiveRecord::Schema.define(:version => 4) do
 
   create_table "association_keys", :force => true do |t|
-    t.column "value",     :string
-    t.column "record_id", :integer
+    t.column "pipeline",            :string
+    t.column "value",               :string
+    t.column "synchronizable_id",   :integer
+    t.column "synchronizable_type", :string
   end
 
-  add_index "association_keys", ["value"], :name => "index_association_keys_on_value"
-  add_index "association_keys", ["record_id"], :name => "index_association_keys_on_record_id"
+  add_index "association_keys", ["pipeline", "value"], :name => "index_association_keys_on_pipeline_and_value", :unique => true
+  add_index "association_keys", ["synchronizable_id"], :name => "index_association_keys_on_synchronizable_id"
 
   create_table "hobbies", :force => true do |t|
     t.column "name", :string

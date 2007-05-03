@@ -16,31 +16,67 @@
 
 
 module RubySync
+  
+  class Association
+    attr_accessor :context, # many associations will share the same context
+                            # it is a function of pipeline and the client connector
+                            # to which the association applies
+                  :key      # the key is unique within the context and vault
+    
+    def initialize(context, key)
+      @context = context
+      @key = key
+    end
+    
+    def to_s
+      "#{context}:#{key}"
+    end
+
+  end  
+  
   class Event
 
-    attr_accessor :type, :source, :payload, :source_path, :target_path, :association_key
+    attr_accessor :type,        # delete, add, modify ...
+                  :source,
+                  :payload,
+                  :source_path,
+                  :target_path,
+                  :association
 
     
-    def self.delete source, source_path, association_key
-      self.new(:delete, source, source_path, association_key)
+    def self.delete source, source_path, association=nil
+      self.new(:delete, source, source_path, association)
     end
     
-    def self.add source, source_path, association_key=nil, payload=nil
-      self.new(:add, source, source_path, association_key, payload)
+    def self.add source, source_path, association=nil, payload=nil
+      self.new(:add, source, source_path, association, payload)
     end
     
-    def self.modify source, source_path, association_key=nil, payload=nil
-      self.new(:modify, source, source_path, association_key, payload)
+    def self.modify source, source_path, association=nil, payload=nil
+      self.new(:modify, source, source_path, association, payload)
     end
-    
-    def initialize type, source, source_path=nil, association_key=nil, payload=nil
+
+    def initialize type, source, source_path=nil, association=nil, payload=nil
       self.type = type
       self.source = source
       self.source_path = source_path
-      self.association_key = association_key
+      self.association = (association.kind_of? Array)? Association.new(association):association
       self.payload = payload
       @target_path = nil
     end
+
+    def retrieve_association(context)
+      if self.source.is_vault?
+        @association =  self.source.association_for(context, path)
+      else
+        if self.association
+          self.association.context = context
+        else
+          @association = Association.new(context, self.source.association_key_for(path))
+        end
+      end
+    end
+    
     
     def merge other
       # TODO implement merge
@@ -62,7 +98,7 @@ module RubySync
           
     
     def to_yaml_properties
-      %w{ @type @source_path @target_path @association_key @payload}
+      %w{ @type @source_path @target_path @association @payload}
     end
     
     # True if this event will lead to the field name given being set.

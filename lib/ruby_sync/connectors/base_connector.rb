@@ -15,9 +15,7 @@
 
 require 'ruby_sync/connectors/connector_event_processing'
 
-module RubySync
-  module Connectors
-    
+module RubySync::Connectors
     class BaseConnector
       
       include RubySync::Utilities
@@ -27,6 +25,7 @@ module RubySync
       
       
       def initialize options={}
+        options = self.class.default_options.merge(options)
         once_only = false
         self.name = options[:name]
         self.is_vault = options[:is_vault]
@@ -40,6 +39,12 @@ module RubySync
             log.debug "#{name}: doesn't respond to #{key}="
           end
         end
+      end      
+      
+      
+      # Override this to return a string that will be included within the class definition of
+      # of configurations based on your connector.
+      def self.sample_config
       end
       
       # Override this to perform actions that must be performed the
@@ -97,14 +102,15 @@ module RubySync
         @is_vault
       end
       
-      # Returns the correct id for the given association_key 
-      def path_for_association_key(key)
-        (is_vault?)? path_for_foreign_key(key) : path_for_own_association_key(key)
+      # Returns the correct id for the given association 
+      def path_for_association(association)
+        (is_vault?)?
+          path_for_foreign_key(association) : path_for_own_association_key(association.key)
       end
 
       # Returns the association key for the given path. Called if this connector is the client.
       # Default implementation returns the path itself. If there is a more
-      # effecient key for looking up an entry in the client, override to return
+      # efficient key for looking up an entry in the client, override to return
       # that instead.
       def association_key_for(path)
         path
@@ -129,40 +135,45 @@ module RubySync
       # => foreign_key_for(path)
       # and associate_with_foreign_key(key, path).
       def can_act_as_vault?
-        defined? associate_with_foreign_key and
-        defined? path_for_foreign_key and
-        defined? foreign_key_for and
-        defined? remove_foreign_key
+        defined? associate and
+        defined? path_for_association and
+        defined? association_for and
+        defined? remove_association
       end
 
       # TODO: These method signatures need to change to include a connector or pipeline id so that
       # we can distinguish between foreign keys for the same record but different
       # connectors/pipelines.
 
-      # def associate_with_foreign_key key, path
+      # def associate association, path
       # end
       # 
-      # def path_for_foreign_key key
+      # def path_for_association association
       # end
       # 
-      # def foreign_key_for path
+      # def association_for context, path
       # end
       #
-      # def remove_foreign_key key
+      # def remove_association association
       # end
 
       # Should only be called on the vault. Returns the entry associated with
       # the foreign key passed. Some connectors may wish to override this if
-      # they have a more efficient way of retrieving the record from the foreign
-      # key.
-      def find_associated foreign_key
-        path = path_for_foreign_key foreign_key
+      # they have a more efficient way of retrieving the record for a given
+      # association.
+      def find_associated association
+        path = path_for_association association
         self[path]
       end
       
+      # The context to be used to for all associations created where this
+      # connector is the client.
+      def association_context
+        self.name
+      end      
       
       # Attempts to delete non-existent items may occur due to echoing. Many systems won't be able to record
-      # the fact that an entry has been deleted rubysync because after the delete, there is no entry left to
+      # the fact that an entry has been deleted by rubysync because after the delete, there is no entry left to
       # record the information in. Therefore, they may issue a notification that the item has been deleted. This
       # becomes an event and the connector won't know that it caused the delete. The story usually has a reasonably happy
       # ending though.
@@ -200,7 +211,7 @@ module RubySync
       # Return an array of operations that would create the given record
       # if applied to an empty hash.
       def create_operations_for record
-        record.keys.map {|key| Operation.new(:add, key, record[key])}
+        record.keys.map {|key| RubySync::Operation.new(:add, key, record[key])}
       end
 
 
@@ -210,7 +221,7 @@ module RubySync
       # Operations is an Array of RubySync::Operation objects to be performed on the record.
       def perform_operations operations, record={}
         operations.each do |op|
-          unless op.instance_of? Operation
+          unless op.instance_of? RubySync::Operation
             log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
             p op
           end
@@ -240,7 +251,16 @@ module RubySync
         return record
       end
 
+private
+
+      def self.options options
+        @options = options
+      end
+        
+      def self.default_options
+        @options ||= {}
+      end
+  
     end
-  end
 end
 

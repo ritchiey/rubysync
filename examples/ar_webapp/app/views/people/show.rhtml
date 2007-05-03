@@ -6,3 +6,11 @@
 	<li><%= hobby.name %></li>
 <%end%>
 </ul>	
+
+
+<h2>DirSync Associations</h2>
+<ul>
+<% @person.association_keys.each do |key| %>
+	<li><%= key.value %></li>
+<%end%>
+</ul>	

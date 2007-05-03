@@ -14,7 +14,9 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 require 'ERB'
+$VERBOSE=false
 require "active_record"
+$VERBOSE=true
 require "ruby_sync/connectors/base_connector"
 
 
@@ -113,23 +115,23 @@ module RubySync::Connectors
     # we can distinguish between foreign keys for the same record but different
     # connectors/pipelines.
 
-    def associate_with_foreign_key key, path
-      ::AssociationKey.create({:record_id=>path, :value=>key})
+    def associate_with_foreign_key pipeline, key, path
+      ::AssociationKey.create({:record_id=>path, :pipeline=>pipeline, :value=>key})
     end
 
-    def path_for_foreign_key key
-      assoc = AssociationKey.find_by_value(key)
-      (assoc)? assoc.record_id : nil
+    def path_for_foreign_key pipeline, key
+      assoc = AssociationKey.find :first, :conditions=>["pipeline=? and value=?", pipeline, key]
+      (assoc)? assoc.synchronizable_id : nil
     end
 
-    def foreign_key_for path
-      record = Person.find path, :include=>:association_keys
-      record.association_keys.find :first
+    def foreign_key_for pipeline, path
+      record = AssociationKey.find :first, :conditions=>["pipeline=? and synchable_id=?", pipeline, path]
+      record.value
     end
     
     
-    def remove_foreign_key key
-       ::AssociationKey.find_by_value(key).destroy
+    def remove_foreign_key pipeline, key
+       ::AssociationKey.find_by_pipeline_and_value(pipeline, key).destroy
      rescue ActiveRecord::RecordNotFound
        return nil
     end

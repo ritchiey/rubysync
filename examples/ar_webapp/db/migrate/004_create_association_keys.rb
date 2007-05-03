@@ -1,16 +1,18 @@
 class CreateAssociationKeys < ActiveRecord::Migration
   def self.up
-    create_table :association_keys do |t|
-      t.column  :value, :string
-      t.column  :record_id, :integer
+    create_table "association_keys" do |t|
+      t.column "pipeline",  :string
+      t.column "value",     :string
+      t.column "synchronizable_id", :integer
+      t.column "synchronizable_type", :string
     end
-    add_index :association_keys, :value
-    add_index :association_keys, :record_id
+    add_index "association_keys", ["pipeline", "value"], :unique=>true
+    add_index "association_keys", ["synchronizable_id"]
   end
 
   def self.down
-    remove_index :association_keys, :value
-    remove_index :association_keys, :record_id
+  #  remove_index :association_keys, [:pipeline, :value]
+  #  remove_index :association_keys, :synchronizable_id
     drop_table :association_keys
   end
 end

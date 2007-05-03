@@ -1171,3 +1171,391 @@ Processing HobbiesController#index (for 127.0.0.1 at 2007-04-25 08:24:14) [GET]
   [4;35;1mHobby Load (0.000552)[0m   [0mSELECT * FROM hobbies LIMIT 0, 10[0m
 Rendering layouts/application
 Completed in 0.01649 (60 reqs/sec) | Rendering: 0.00116 (7%) | DB: 0.00451 (27%) | 200 OK [http://localhost/hobbies]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-27 14:21:24) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mSQL (0.000243)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.002967)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.039728)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000733)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.18959 (5 reqs/sec) | Rendering: 0.01499 (7%) | DB: 0.04367 (23%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-27 14:21:30) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"show", "id"=>"29", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003310)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.000669)[0m   [0mSELECT * FROM people WHERE (people.`id` = 29) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;36;1mHobby Load (0.051814)[0m   [0;1mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 29)) [0m
+Completed in 0.10741 (9 reqs/sec) | Rendering: 0.04417 (41%) | DB: 0.05579 (51%) | 200 OK [http://localhost/people/show/29]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-27 14:21:33) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003565)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000482)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000717)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01779 (56 reqs/sec) | Rendering: 0.00109 (6%) | DB: 0.00476 (26%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#destroy (for 127.0.0.1 at 2007-04-27 14:21:39) [POST]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"destroy", "id"=>"29", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003601)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.001223)[0m   [0mSELECT * FROM people WHERE (people.`id` = 29) [0m
+  [4;36;1mSQL (0.000216)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Destroy (0.000341)[0m   [0m DELETE FROM people
+ WHERE `id` = 29
+[0m
+  [4;36;1mSQL (0.014961)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.03004 (33 reqs/sec) | DB: 0.02034 (67%) | 302 Found [http://localhost/people/destroy/29]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-27 14:21:40) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003329)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000480)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000630)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01704 (58 reqs/sec) | Rendering: 0.00108 (6%) | DB: 0.00444 (26%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#destroy (for 127.0.0.1 at 2007-04-27 14:21:42) [POST]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"destroy", "id"=>"28", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002253)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.004238)[0m   [0mSELECT * FROM people WHERE (people.`id` = 28) [0m
+  [4;36;1mSQL (0.000185)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Destroy (0.000267)[0m   [0m DELETE FROM people
+ WHERE `id` = 28
+[0m
+  [4;36;1mSQL (0.056154)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.07268 (13 reqs/sec) | DB: 0.06310 (86%) | 302 Found [http://localhost/people/destroy/28]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-27 14:21:42) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002832)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.002238)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000474)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01664 (60 reqs/sec) | Rendering: 0.00099 (5%) | DB: 0.00554 (33%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#destroy (for 127.0.0.1 at 2007-04-27 14:21:44) [POST]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"destroy", "id"=>"27", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.014115)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.025492)[0m   [0mSELECT * FROM people WHERE (people.`id` = 27) [0m
+  [4;36;1mSQL (0.000246)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Destroy (0.000368)[0m   [0m DELETE FROM people
+ WHERE `id` = 27
+[0m
+  [4;36;1mSQL (0.006431)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.05664 (17 reqs/sec) | DB: 0.04665 (82%) | 302 Found [http://localhost/people/destroy/27]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-27 14:21:45) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.041099)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.005342)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000712)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.05908 (16 reqs/sec) | Rendering: 0.00113 (1%) | DB: 0.04715 (79%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#destroy (for 127.0.0.1 at 2007-04-27 14:21:46) [POST]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"destroy", "id"=>"26", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003328)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.000680)[0m   [0mSELECT * FROM people WHERE (people.`id` = 26) [0m
+  [4;36;1mSQL (0.000208)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Destroy (0.000878)[0m   [0m DELETE FROM people
+ WHERE `id` = 26
+[0m
+  [4;36;1mSQL (0.000978)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.01631 (61 reqs/sec) | DB: 0.00607 (37%) | 302 Found [http://localhost/people/destroy/26]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-27 14:21:47) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003166)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000548)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000564)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01439 (69 reqs/sec) | Rendering: 0.00108 (7%) | DB: 0.00428 (29%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-04-27 14:22:05) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002357)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000406)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000484)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01366 (73 reqs/sec) | Rendering: 0.00082 (6%) | DB: 0.00325 (23%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-27 14:23:52) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003401)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000487)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000611)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01616 (61 reqs/sec) | Rendering: 0.00109 (6%) | DB: 0.00450 (27%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-27 14:24:22) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"show", "id"=>"31", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002788)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.000667)[0m   [0mSELECT * FROM people WHERE (people.`id` = 31) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;36;1mHobby Load (0.000584)[0m   [0;1mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 31)) [0m
+Completed in 0.02416 (41 reqs/sec) | Rendering: 0.01297 (53%) | DB: 0.00404 (16%) | 200 OK [http://localhost/people/show/31]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-27 14:26:25) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"show", "id"=>"31", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003380)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mPerson Load (0.153292)[0m   [0;1mSELECT * FROM people WHERE (people.`id` = 31) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;35;1mHobby Load (0.000530)[0m   [0mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 31)) [0m
+  [4;36;1mAssociationKey Load (0.000647)[0m   [0;1mSELECT * FROM association_keys WHERE (association_keys.record_id = 31) [0m
+  [4;35;1mAssociationKey Columns (0.002824)[0m   [0mSHOW FIELDS FROM association_keys[0m
+Completed in 0.18612 (5 reqs/sec) | Rendering: 0.01805 (9%) | DB: 0.16067 (86%) | 200 OK [http://localhost/people/show/31]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-27 14:28:23) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"show", "id"=>"31", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003270)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.000669)[0m   [0mSELECT * FROM people WHERE (people.`id` = 31) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;36;1mHobby Load (0.000636)[0m   [0;1mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 31)) [0m
+  [4;35;1mAssociationKey Load (0.000711)[0m   [0mSELECT * FROM association_keys WHERE (association_keys.record_id = 31) [0m
+  [4;36;1mAssociationKey Columns (0.002477)[0m   [0;1mSHOW FIELDS FROM association_keys[0m
+Completed in 0.03251 (30 reqs/sec) | Rendering: 0.01751 (53%) | DB: 0.00776 (23%) | 200 OK [http://localhost/people/show/31]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2007-04-27 14:28:25) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"show", "id"=>"31", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002252)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mPerson Load (0.001185)[0m   [0;1mSELECT * FROM people WHERE (people.`id` = 31) [0m
+Rendering  within layouts/application
+Rendering people/show
+  [4;35;1mHobby Load (0.000519)[0m   [0mSELECT hobbies.* FROM hobbies INNER JOIN interests ON hobbies.id = interests.hobby_id WHERE ((interests.person_id = 31)) [0m
+  [4;36;1mAssociationKey Load (0.000543)[0m   [0;1mSELECT * FROM association_keys WHERE (association_keys.record_id = 31) [0m
+  [4;35;1mAssociationKey Columns (0.002532)[0m   [0mSHOW FIELDS FROM association_keys[0m
+Completed in 0.02804 (35 reqs/sec) | Rendering: 0.01394 (49%) | DB: 0.00703 (25%) | 200 OK [http://localhost/people/show/31]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-27 14:28:29) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.003286)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000504)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000667)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01741 (57 reqs/sec) | Rendering: 0.00118 (6%) | DB: 0.00446 (25%) | 200 OK [http://localhost/people]
+  [4;36;1mSQL (0.000218)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Delete all (0.001535)[0m   [0mDELETE FROM people [0m
+  [4;36;1mAssociationKey Delete all (0.002218)[0m   [0;1mDELETE FROM association_keys [0m
+  [4;35;1mPerson Delete all (0.000470)[0m   [0mDELETE FROM people [0m
+  [4;36;1mAssociationKey Delete all (0.001671)[0m   [0;1mDELETE FROM association_keys [0m
+  [4;36;1mSQL (0.000220)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.014271)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000432)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000223)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000340)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000275)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000220)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000342)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000273)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000501)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42000Can't DROP 'index_association_keys_on_pipeline_and_value'; check that column/key exists: DROP INDEX `index_association_keys_on_pipeline_and_value` ON association_keys[0m
+  [4;36;1mSQL (0.000221)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000339)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000272)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000339)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;36;1mSQL (0.063831)[0m   [0;1mDROP TABLE association_keys[0m
+  [4;35;1mSQL (0.011315)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000448)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.002177)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000367)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000373)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.002114)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000350)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000367)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.001938)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000308)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000450)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000540)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000213)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000342)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000276)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000272)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000303)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000492)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000204)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000373)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.074298)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000462)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000449)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.002404)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000368)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000426)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002876)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000354)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000420)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;35;1mSQL (0.002306)[0m   [0mCREATE TABLE association_keys (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `pipeline` varchar(255) DEFAULT NULL, `value` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.007404)[0m   [0;1mCREATE UNIQUE INDEX `index_association_keys_on_pipeline_and_value` ON association_keys (`pipeline`, `value`)[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42000Key column 'record_id' doesn't exist in table: CREATE INDEX `index_association_keys_on_record_id` ON association_keys (`record_id`)[0m
+  [4;36;1mSQL (0.000220)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000342)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000276)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000318)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000273)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.002285)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000402)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000393)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.144816)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000424)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000445)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.001966)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000411)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000590)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000753)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002719)[0m   [0mSHOW FIELDS FROM association_keys[0m
+  [4;36;1mSQL (0.002664)[0m   [0;1mSHOW KEYS FROM association_keys[0m
+  [4;36;1mSQL (0.000206)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000387)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.019253)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000448)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000419)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.002544)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000366)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000374)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002441)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000314)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000345)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'association_keys' already exists: CREATE TABLE association_keys (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `pipeline` varchar(255) DEFAULT NULL, `value` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000213)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.003360)[0m   [0mCREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000752)[0m   [0;1mINSERT INTO schema_info (version) VALUES(0)[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000457)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.002994)[0m   [0mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000412)[0m   [0;1mUPDATE schema_info SET version = 1[0m
+  [4;35;1mSQL (0.000382)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.021006)[0m   [0;1mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000450)[0m   [0mUPDATE schema_info SET version = 2[0m
+  [4;36;1mSQL (0.000439)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.002447)[0m   [0mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000391)[0m   [0;1mUPDATE schema_info SET version = 3[0m
+  [4;35;1mSQL (0.000436)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;36;1mSQL (0.002366)[0m   [0;1mCREATE TABLE association_keys (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `pipeline` varchar(255) DEFAULT NULL, `value` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.006949)[0m   [0mCREATE UNIQUE INDEX `index_association_keys_on_pipeline_and_value` ON association_keys (`pipeline`, `value`)[0m
+  [4;36;1mSQL (0.007158)[0m   [0;1mCREATE INDEX `index_association_keys_on_synchronizable_id` ON association_keys (`synchronizable_id`)[0m
+  [4;35;1mSQL (0.000400)[0m   [0mUPDATE schema_info SET version = 4[0m
+  [4;36;1mSQL (0.000603)[0m   [0;1mSELECT * FROM schema_info[0m
+  [4;35;1mSQL (0.000758)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.002749)[0m   [0;1mSHOW FIELDS FROM association_keys[0m
+  [4;35;1mSQL (0.002458)[0m   [0mSHOW KEYS FROM association_keys[0m
+  [4;36;1mSQL (0.001995)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.001821)[0m   [0mSHOW KEYS FROM hobbies[0m
+  [4;36;1mSQL (0.001814)[0m   [0;1mSHOW FIELDS FROM interests[0m
+  [4;35;1mSQL (0.001988)[0m   [0mSHOW KEYS FROM interests[0m
+  [4;36;1mSQL (0.002128)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.001000)[0m   [0mSHOW KEYS FROM people[0m
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-04-27 15:41:38) [GET]
+  Session ID: 732c8cc6a44e696174d0c0adb70d6c0b
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003399)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000519)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000548)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01463 (68 reqs/sec) | Rendering: 0.00112 (7%) | DB: 0.00447 (30%) | 200 OK [http://localhost/people]
+  [4;36;1mSQL (0.000220)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Delete all (0.001588)[0m   [0mDELETE FROM people [0m
+  [4;36;1mAssociationKey Delete all (0.000291)[0m   [0;1mDELETE FROM association_keys [0m
+  [4;35;1mAssociationKey Load (0.000961)[0m   [0mSELECT * FROM association_keys [0m
+  [4;36;1mPerson Load (0.000679)[0m   [0;1mSELECT * FROM people [0m
+  [4;35;1mPerson Delete all (0.002189)[0m   [0mDELETE FROM people [0m

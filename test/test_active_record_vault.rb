@@ -30,7 +30,6 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   
   map_client_to_vault :givenName  => :first_name,
                       :sn         => :last_name
-                      
 end
 
 
@@ -38,13 +37,13 @@ end
 class TestActiveRecordVault < Test::Unit::TestCase
 
   include RubySyncTest
-  
+
   def client_path
     'bob'
   end
   
   def vault_path
-    @vault.path_for_foreign_key(client_path)
+    @vault.path_for_foreign_key(@pipeline.name, client_path)
   end
 
   def initialize(test)

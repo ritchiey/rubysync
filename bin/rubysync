@@ -30,6 +30,9 @@ class Controller < SimpleConsole::Controller
   def default
   end
   
+  def example
+  end
+  
   # Run specified pipeline once then exit
   def once
     log.level = (params[:verbose])? Logger::INFO : Logger::WARN
@@ -89,7 +92,51 @@ class View < SimpleConsole::View
 
   def default
     puts "Usage: rubysync command -p pipename"
-  end
+    
+    puts <<END
+Valid commands are:
+
+  create {name}           ; Create a rubysync configuration directory
+
+  connector {name} -t {type} ; Create a connector of the given name in
+                          ; the current rubysync configuration directory
+
+  pipeline {name}         ; Create a rubysync pipeline of the given name
+                          ; in the current rubysync configuration directory
+                          
+  once {name}             ; Execute the named pipeline within the current
+                          ; configuration directory once and then exit
+                          
+  example                 ; Show and example of how this command might be used
+END
+end
+
+def example
+  puts <<END                          
+  Example:
+  
+  This sets up the skeleton of a configuration for provisioning the your LDAP
+  server from your HR system database.
+
+  $ rubysync create my_ims
+  $ cd my_ims
+  $ rubysync connector corp_directory -t ldap
+  $ rubysync connector hr_db -t active_record
+  $ rubysync pipeline hr_import
+
+  You would then edit the files:
+  
+    connectors/corp_directory_connector.rb  ; how to connect to corp ldap
+    connectors/hr_db_connector.rb           ; how to connect to HR database
+    pipelines/hr_import_pipeline.rb         ; Policy for synchronizing
+                                            ; between connectors
+                                            
+  You may then execute the pipeline in one-shot mode (daemon mode is coming):
+  
+  $ rubysync once hr_import
+                                            
+END
+end
   
   def start
     puts "Not yet implemented"
@@ -99,8 +146,13 @@ end
 
 
   def connector_template name, type
+    type_class_name = "RubySync::Connectors::#{type.to_s.camelize}Connector"
+    type_class = eval(type_class_name)
+    sample_config = (type_class && type_class.respond_to?("sample_config")) ?
+      type_class.sample_config : ""
     return <<-"end;"
-class #{name.to_s.camelize}Connector < RubySync::Connectors::#{type.to_s.camelize}Connector
+class #{name.to_s.camelize}Connector < #{type_class_name}
+  #{sample_config}
 end
     end;
   end

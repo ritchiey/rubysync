@@ -95,9 +95,9 @@ module HashlikeTests
     assert @vault.can_act_as_vault?
     assert @vault.is_vault?
     @vault.add vault_path, @vault.create_operations_for(@bob_details)
-    @vault.associate_with_foreign_key 'blah', vault_path
-    assert_equal vault_path, @vault.path_for_foreign_key('blah')
-    assert_equal 'blah', @vault.foreign_key_for(vault_path)
+    @vault.associate_with_foreign_key @pipeline.name, 'blah', vault_path
+    assert_equal vault_path, @vault.path_for_foreign_key(@pipeline.name, 'blah')
+    assert_equal 'blah', @vault.foreign_key_for(@pipeline.name, vault_path)
   end
 
   def test_perform_operations
