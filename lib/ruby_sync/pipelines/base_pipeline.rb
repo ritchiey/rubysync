@@ -136,7 +136,8 @@ module RubySync
           if match # exactly one event record on the client matched
             log.info "Match found, merging"
             event.merge(match)
-            vault.associate_with_foreign_key(self.name, match.src_path, event.source_path)
+            association = Association.new(self.association_context, match.src_path)
+            vault.associate asssociation, event.source_path
             return
           end
           log.info "No match found, creating"
@@ -146,13 +147,14 @@ module RubySync
         
         perform_transform :out_map_schema, event
         perform_transform :out_transform, event
-        association = nil
+        association_key = nil
         with_rescue("#{client.name}: Processing command") do
           association_key = client.process(event)
         end
-        if association
-          with_rescue("#{client.name}: Storing association key #{association} in vault") do
-            vault.associate_with_foreign_key(association_key, event.source_path)
+        if association_key
+          association = Association.new(association_context, association_key)
+          with_rescue("#{client.name}: Storing association #{association} in vault") do
+            vault.associate(association, event.source_path)
           end
         end
       end
@@ -160,13 +162,6 @@ module RubySync
       # Override to map schema from vault namespace to client namespace
       # def out_map_schema event
       # end
-      
-      # Combines the id of this pipeline with the given key
-      # to provide a unique association key to be stored in the
-      # identity vault
-      def association_key_for(key)
-        "#{name}:#{key}"
-      end
       
       # Override to implement some kind of matching
       def out_match event, client
@@ -247,7 +242,7 @@ module RubySync
         perform_transform :in_filter, event, hint
         
         if event.type == :modify
-          unless event.association_key and (associated = vault.find_associated(self.name, event))
+          unless event.association and vault.find_associated(event.association)
             event.convert_to_add
           end
         end
@@ -293,7 +288,7 @@ module RubySync
       end
       
       def map_schema event, map
-        return unless defined? map and defined? event.payload
+        return unless map and event.payload
         event.payload.each do |op|
           # op[1] contains the field name that is the subject of the operation
           op.subject = map[op.subject] || op.subject if op.subject

@@ -37,33 +37,36 @@ module RubySync
       def perform_add event
         log.info "Adding '#{event.target_path}' to '#{name}'"
         raise Exception.new("#{name}: Entry with path '#{event.target_path}' already exists, add failing.") if self[event.target_path]
-        if is_vault? && event.association_key != nil && path_for_association_key(event.association_key)
-          raise Exception.new("#{name}: Association_key already in use. Add failing.") 
+        if is_vault? && event.association && path_for_association(event.association)
+          raise Exception.new("#{name}: Association already in use. Add failing.") 
         end
         call_if_exists(:target_transform, event)
         add event.target_path, event.payload
-        return association_key_for(event.target_path) unless is_vault?
-        unless event.association_key
-          raise Exception.new("#{name}: No association key supplied to add.")
+        if is_vault?
+          if event.association
+            associate(event.association, event.target_path)
+          else
+            raise Exception.new("#{name}: No association key supplied to add.")
+          end
         else
-          associate_with_foreign_key(event.association_key, event.target_path)
+          return own_association_key_for(event.target_path) 
         end
       end
 
       def perform_delete event
-        raise Exception.new("#{name}: Delete of unassociated object. No action taken.") unless event.association_key
-        path = path_for_association_key(event.association_key)
+        raise Exception.new("#{name}: Delete of unassociated object. No action taken.") unless event.association
+        path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
         log.info "Deleting '#{path}' from '#{name}'"
         raise Exception.new("#{name}: Attempted to delete non-existent entry '#{path}'") unless delete(path)
         return nil # don't want to create any new associations
       end
 
       def perform_modify event
-        path = path_for_association_key(event.association_key)
+        path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
         raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
         call_if_exists(:target_transform, event)
         modify path, event.payload
-        return (is_vault?)? nil : association_key_for(event.target_path)
+        return (is_vault?)? nil : own_association_key_for(event.target_path)
       end
     end
   end

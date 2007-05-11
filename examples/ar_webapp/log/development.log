@@ -1559,3 +1559,169 @@ Completed in 0.01463 (68 reqs/sec) | Rendering: 0.00112 (7%) | DB: 0.00447 (30%)
   [4;35;1mAssociationKey Load (0.000961)[0m   [0mSELECT * FROM association_keys [0m
   [4;36;1mPerson Load (0.000679)[0m   [0;1mSELECT * FROM people [0m
   [4;35;1mPerson Delete all (0.002189)[0m   [0mDELETE FROM people [0m
+  [4;36;1mSQL (0.156927)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.090603)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000475)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000473)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;36;1mSQL (0.248027)[0m   [0;1mDROP TABLE association_keys[0m
+  [4;35;1mSQL (0.034146)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000530)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.039800)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000385)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000336)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.016857)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000432)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000443)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.003010)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000381)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000607)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.034529)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000193)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000377)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.066863)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000441)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000447)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.062173)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000430)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000443)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002375)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000382)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000428)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;35;1mSQL (0.002833)[0m   [0mCREATE TABLE rubysync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.131296)[0m   [0;1mCREATE UNIQUE INDEX `index_rubysync_associations_on_context_and_key` ON rubysync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.008261)[0m   [0mCREATE INDEX `index_rubysync_associations_on_synchronizable_id` ON rubysync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000422)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000564)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000760)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.029199)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.001399)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.002989)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.001351)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.002405)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001325)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002784)[0m   [0mSHOW FIELDS FROM rubysync_associations[0m
+  [4;36;1mSQL (0.002702)[0m   [0;1mSHOW KEYS FROM rubysync_associations[0m
+  [4;36;1mSQL (0.000188)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000334)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000263)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000340)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;36;1mSQL (0.157613)[0m   [0;1mDROP INDEX `index_rubysync_associations_on_context_and_key` ON rubysync_associations[0m
+  [4;35;1mSQL (0.007649)[0m   [0mDROP INDEX `index_rubysync_associations_on_synchronizable_id` ON rubysync_associations[0m
+  [4;36;1mSQL (0.002466)[0m   [0;1mDROP TABLE rubysync_associations[0m
+  [4;35;1mSQL (0.000419)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000399)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.001825)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000436)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000432)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.001801)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000391)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000425)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.001747)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000369)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000435)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000619)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000198)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000396)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.003398)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000416)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000436)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.002366)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000393)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000425)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.003069)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000390)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000428)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateAssociationKeys (4)
+  [4;35;1mSQL (0.002498)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.006979)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.007114)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000416)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000441)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000743)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002400)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.002419)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.002407)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.002112)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.001965)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001834)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002006)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.001747)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.000189)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000357)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000279)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000331)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (0.031163)[0m   [0;1mDROP INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations[0m
+  [4;35;1mSQL (0.006955)[0m   [0mDROP INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations[0m
+  [4;36;1mSQL (0.001573)[0m   [0;1mDROP TABLE ruby_sync_associations[0m
+  [4;35;1mSQL (0.000406)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000404)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.001813)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000419)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000380)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.001960)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000342)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000366)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.001528)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000330)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000552)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000530)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000188)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000388)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.002814)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000419)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000435)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.002448)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000368)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000419)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002119)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000417)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000425)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.003023)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.151972)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.010867)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000454)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000453)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000820)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002713)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.002721)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.002331)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.002340)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.002149)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.002106)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002774)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.002961)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m

@@ -87,11 +87,11 @@ module RubySync::Connectors
     def perform_add event
       log.info "Adding '#{event.target_path}' to '#{name}'"
       @ar_class.new() do |record|
-        poplulate(record, perform_operations(event.payload))
+        populate(record, perform_operations(event.payload))
         puts(record.inspect)
         record.save!
         if is_vault?
-          associate_with_foreign_key event.association_key, record.id
+          associate event.association, record.id
         end
         record.id
       end
@@ -100,38 +100,37 @@ module RubySync::Connectors
       
     def modify(path, operations)
       @ar_class.find(path) do |record|
-        poplulate(record, perform_operations(operations))
+        populate(record, perform_operations(operations))
         record.save
       end
     end
     
     def delete(path)
-      @ar_class.delete path
+      @ar_class.destroy path
     end
   
     # Implement vault functionality
 
-    # TODO: These method signatures need to change to include a connector or pipeline id so that
-    # we can distinguish between foreign keys for the same record but different
-    # connectors/pipelines.
-
-    def associate_with_foreign_key pipeline, key, path
-      ::AssociationKey.create({:record_id=>path, :pipeline=>pipeline, :value=>key})
+    def associate association, path
+      ::RubySyncAssociation.create({:synchronizable_id=>path, :context=>association.context, :key=>association.key})
     end
 
-    def path_for_foreign_key pipeline, key
-      assoc = AssociationKey.find :first, :conditions=>["pipeline=? and value=?", pipeline, key]
+    def path_for_association association
+      assoc = ::RubySyncAssociation.find_by_context_and_key association.context, association.key
       (assoc)? assoc.synchronizable_id : nil
     end
 
-    def foreign_key_for pipeline, path
-      record = AssociationKey.find :first, :conditions=>["pipeline=? and synchable_id=?", pipeline, path]
-      record.value
+    def association_key_for context, path
+      record = ::RubySyncAssociation.find_by_synchronizable_id_and_synchronizable_type_and_context association.key, @model.to_s, context
+      record.key
     end
     
+    def associations_for(path)
+      records = ::RubySyncAssociation.find_by_synchronizable_id_and_synchronizable_type(path, @model.to_s)
+    end
     
-    def remove_foreign_key pipeline, key
-       ::AssociationKey.find_by_pipeline_and_value(pipeline, key).destroy
+    def remove_association association
+       ::AssociationKey.find_by_context_and_key(association.context, association.key).destroy
      rescue ActiveRecord::RecordNotFound
        return nil
     end
@@ -145,7 +144,7 @@ module RubySync::Connectors
 
 private
 
-    def poplulate record, content
+    def populate record, content
       @ar_class.content_columns.each do |c|
         record[c.name] = content[c.name.to_sym][0] if content[c.name.to_sym]
       end

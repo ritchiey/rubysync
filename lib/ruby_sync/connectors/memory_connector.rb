@@ -37,6 +37,8 @@ module RubySync::Connectors
       event.sets_value?(:modifier, 'rubysync')
     end
 
+
+
     def associate(association, path)
       log.info "Associating '#{association}' with '#{path}'"
       entry = @data[path]
@@ -47,20 +49,29 @@ module RubySync::Connectors
     end
 
     def path_for_association(association)
-      context = @association_index[association.context]
-      context[key]
+      context = @association_index[association.context] || {}
+      context[association.key]
     end
 
-    def association_for(context, path)
-      log.debug "Retrieving association for '#{path}' within '#{context}'"
+    def association_key_for(context, path)
+      log.debug "Retrieving association key for '#{path}' within '#{context}'"
       entry = @data[path]
-      if entry && entry[:association] && key = entry[:association]
-        association = Assocation.new(context, key)
-        log.debug "Found association '#{association}'"
-        return association
+      unless entry
+        p @data
       end
-      log.debug "No association found."
+      if entry && entry[:association] && key = entry[:association][context]
+        return key
+      end
+      log.info "No association found."
+      log.debug entry.inspect
       return nil
+    end
+    
+    def associations_for path
+      entry = @data[path]
+      (entry[:association] || {}).map do |context, key|
+        RubySync::Association.new(context, key)
+      end
     end
     
     def remove_association(association)
@@ -92,8 +103,9 @@ module RubySync::Connectors
     # purposes. 
     def add id, operations
       raise Exception.new("Item already exists") if @data[id]
+      log.debug "Adding new record with key '#{id}'"
       @data[id] = perform_operations operations
-      association_key = (is_vault?)? nil : association_key_for(id)
+      association_key = (is_vault?)? nil : [nil, own_association_key_for(id)]
       log.info "#{name}: Injecting add event"
       @events << RubySync::Event.add(self, id, association_key, operations.dup)
       return id
@@ -102,9 +114,18 @@ module RubySync::Connectors
     def modify id, operations
       raise Exception.new("Attempting to modify non-existent record '#{id}'") unless @data[id]
       perform_operations operations, @data[id]
-      association_key = (is_vault?)? nil : association_key_for(id)
+      association_key = (is_vault?)? nil : [nil, own_association_key_for(id)]
       log.info "#{name}: Injecting modify event"
-      @events << RubySync::Event.add(self, id, association_key, operations.dup)
+      if is_vault?
+        associations_for(id).each do |association|
+          @events << (event = RubySync::Event.modify(self, id, association))
+        end
+      else
+        association = [nil, own_association_key_for(id)]
+        @events << (event = RubySync::Event.modify(self, id, association))
+      end
+
+      @events << RubySync::Event.modify(self, id, association_key, operations.dup)
       return id
     end
 
@@ -114,17 +135,23 @@ module RubySync::Connectors
          log.warn "Can't delete non-existent item '#{id}'"
          return
        end
-      association_key = (is_vault?)? nil : association_key_for(id)
-      @association_index.delete association_key
-      log.info "#{name}: Injecting delete event"
-      @events << (event = RubySync::Event.delete(self, id, association_key))
+      log.info "#{name}: Injecting delete events"
+      if is_vault?
+        associations_for(id).each do |association|
+          @events << (event = RubySync::Event.delete(self, id, association))
+          @association_index.delete association
+        end
+      else
+        association = [nil, own_association_key_for(id)]
+        @events << (event = RubySync::Event.delete(self, id, association))
+      end
       @data.delete id
     end
 
     # Put a clue there that we did this change so that we can detect and filter
     # out the echo.
     def target_transform event
-      event.payload << Operation.new(:add, :modifier, ['rubysync'])
+      event.payload << RubySync::Operation.new(:add, :modifier, ['rubysync'])
     end
     
     def source_transform event

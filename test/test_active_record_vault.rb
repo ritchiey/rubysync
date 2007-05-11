@@ -43,28 +43,28 @@ class TestActiveRecordVault < Test::Unit::TestCase
   end
   
   def vault_path
-    @vault.path_for_foreign_key(@pipeline.name, client_path)
+    @vault.path_for_association(RubySync::Association.new(@pipeline.association_context, self.client_path))
   end
 
   def initialize(test)
     super(test)
     # Wipe existing database content
     # TODO: Find out how rails does this.
-   # Person.delete :all
-  #  AssociationKey.delete :all
+    #::RubySyncAssociation.delete :all
+    #::Person.delete :all
   end
     
   
   def test_client_to_vault
     banner "test_client_to_vault"
     @client.add client_path, @client.create_operations_for(@bob_details)
- #   assert_nil find_bob, "Vault already contains bob"
+    assert_nil find_bob, "Vault already contains bob"
     @pipeline.run_once
     assert_not_nil find_bob, "#{vault_path} wasn't created on the vault"
-    #assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:foreign_key].include? k}
+    #assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:association].include? k}
     if @client.respond_to? :delete
       @client.delete client_path
-#      assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:foreign_key].include? k}
+#      assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:association].include? k}
       assert_nil @client[client_path], "Bob wasn't deleted from the client"
       @pipeline.run_once
       assert_nil @client[client_path], "Bob reappeared on the client"

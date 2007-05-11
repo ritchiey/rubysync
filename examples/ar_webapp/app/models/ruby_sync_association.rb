@@ -1,4 +1,4 @@
-class AssociationKey < ActiveRecord::Base
+class RubySyncAssociation < ActiveRecord::Base
 
   belongs_to :synchronizable, :polymorphic=>true
 

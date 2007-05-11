@@ -3102,7 +3102,7 @@
 	<array>
 		<dict>
 			<key>Lock</key>
-			<string>NO</string>
+			<string>YES</string>
 			<key>Name</key>
 			<string>Layer 1</string>
 			<key>Print</key>
@@ -3188,7 +3188,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2007-05-02 16:25:25 +0800</string>
+	<string>2007-05-05 21:30:32 +0800</string>
 	<key>Modifier</key>
 	<string>Ritchie Young</string>
 	<key>NotesVisible</key>

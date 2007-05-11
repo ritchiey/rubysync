@@ -60,19 +60,20 @@ module RubySync
       self.type = type
       self.source = source
       self.source_path = source_path
-      self.association = (association.kind_of? Array)? Association.new(association):association
+      self.association = make_association(association)
       self.payload = payload
       @target_path = nil
     end
 
     def retrieve_association(context)
       if self.source.is_vault?
-        @association =  self.source.association_for(context, path)
+        self.association ||=  self.source.association_for(context, self.source_path)
       else
-        if self.association
-          self.association.context = context
+        if self.association # association key was supplied when the event was created
+          self.association.context = context # just add the context
         else
-          @association = Association.new(context, self.source.association_key_for(path))
+          key = self.source.own_association_key_for(self.source_path)
+          @association = Association.new(context, key)
         end
       end
     end
@@ -174,6 +175,19 @@ module RubySync
     end
   
   protected
+
+  # Try to make a sensible association from the passed in object
+  def make_association o
+    if o.kind_of? Array
+      return Association.new(o[0],o[1])
+    elsif o.kind_of? RubySync::Association
+      return o
+    else
+      return Association.new(nil, o)
+    end
+  end
+      
+
 
     # Yield to block for each operation in the payload for which the the subject is
     # the specified subject

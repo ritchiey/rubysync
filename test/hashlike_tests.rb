@@ -18,9 +18,6 @@
 # using the []  and []= operators.
 module HashlikeTests
   
-  
-
-  
    # Override this if :bob isn't a good path for your directory
   # def path
   #   :bob
@@ -40,10 +37,10 @@ module HashlikeTests
     assert_nil @vault[vault_path], "Vault already contains bob"
     @pipeline.run_once
     assert_not_nil @vault[vault_path], "#{vault_path} wasn't created on the vault"
-    assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:foreign_key].include? k}
+    assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:association].include? k}
     if @client.respond_to? :delete
       @client.delete client_path
-      assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:foreign_key].include? k}
+      assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:association].include? k}
       assert_nil @client[client_path], "Bob wasn't deleted from the client"
       @pipeline.run_once
       assert_nil @client[client_path], "Bob reappeared on the client"
@@ -64,7 +61,8 @@ module HashlikeTests
     assert_equal normalise(@bob_details), normalise(@client[client_path])
     @vault.delete vault_path
     assert_equal normalise(@bob_details), normalise(@client[client_path])
-    assert_nil @vault[vault_path], "Bob disappeared from the client before we ran the pipeline"
+    assert_nil @vault[vault_path], "Bob wasn't deleted from the vault"
+    assert_not_nil @client[client_path], "Bob was deleted from the client before we ran the pipe"
     @pipeline.run_once
     assert_nil @client[client_path], "Bob wasn't deleted from the client"
     @pipeline.run_once # run again in case there were unhandled echos
@@ -95,9 +93,10 @@ module HashlikeTests
     assert @vault.can_act_as_vault?
     assert @vault.is_vault?
     @vault.add vault_path, @vault.create_operations_for(@bob_details)
-    @vault.associate_with_foreign_key @pipeline.name, 'blah', vault_path
-    assert_equal vault_path, @vault.path_for_foreign_key(@pipeline.name, 'blah')
-    assert_equal 'blah', @vault.foreign_key_for(@pipeline.name, vault_path)
+    association = RubySync::Association.new(@pipeline.association_context, 'blah')
+    @vault.associate association, vault_path
+    assert_equal vault_path, @vault.path_for_association(association)
+    assert_equal 'blah', @vault.association_key_for(@pipeline.association_context, vault_path)
   end
 
   def test_perform_operations

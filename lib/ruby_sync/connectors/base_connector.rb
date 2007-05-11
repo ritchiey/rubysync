@@ -108,11 +108,13 @@ module RubySync::Connectors
           path_for_foreign_key(association) : path_for_own_association_key(association.key)
       end
 
-      # Returns the association key for the given path. Called if this connector is the client.
-      # Default implementation returns the path itself. If there is a more
+
+      # Returns the association key for the given path. Called if this connector is
+      # the client.
+      # The default implementation returns the path itself. If there is a more
       # efficient key for looking up an entry in the client, override to return
       # that instead.
-      def association_key_for(path)
+      def own_association_key_for(path)
         path
       end
       
@@ -137,8 +139,9 @@ module RubySync::Connectors
       def can_act_as_vault?
         defined? associate and
         defined? path_for_association and
-        defined? association_for and
-        defined? remove_association
+        defined? association_key_for and
+        defined? remove_association and
+        defined? associations_for
       end
 
       # TODO: These method signatures need to change to include a connector or pipeline id so that
@@ -151,14 +154,25 @@ module RubySync::Connectors
       # def path_for_association association
       # end
       # 
-      # def association_for context, path
+      # def association_key_for context, path
+      # end
+      #
+      # def associations_for path
       # end
       #
       # def remove_association association
       # end
+      
+      # Return the association object given the association context and path.
+      # This should only be called on the vault.
+      def association_for(context, path)
+        raise "#{name} is not a vault." unless is_vault?
+        key = association_key_for context, path
+        RubySync::Association.new(context, key)
+      end
 
       # Should only be called on the vault. Returns the entry associated with
-      # the foreign key passed. Some connectors may wish to override this if
+      # the association passed. Some connectors may wish to override this if
       # they have a more efficient way of retrieving the record for a given
       # association.
       def find_associated association

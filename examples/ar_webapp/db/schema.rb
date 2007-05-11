@@ -4,16 +4,6 @@
 
 ActiveRecord::Schema.define(:version => 4) do
 
-  create_table "association_keys", :force => true do |t|
-    t.column "pipeline",            :string
-    t.column "value",               :string
-    t.column "synchronizable_id",   :integer
-    t.column "synchronizable_type", :string
-  end
-
-  add_index "association_keys", ["pipeline", "value"], :name => "index_association_keys_on_pipeline_and_value", :unique => true
-  add_index "association_keys", ["synchronizable_id"], :name => "index_association_keys_on_synchronizable_id"
-
   create_table "hobbies", :force => true do |t|
     t.column "name", :string
   end
@@ -27,5 +17,15 @@ ActiveRecord::Schema.define(:version => 4) do
     t.column "first_name", :string
     t.column "last_name",  :string
   end
+
+  create_table "ruby_sync_associations", :force => true do |t|
+    t.column "context",             :string
+    t.column "key",                 :string
+    t.column "synchronizable_id",   :integer
+    t.column "synchronizable_type", :string
+  end
+
+  add_index "ruby_sync_associations", ["context", "key"], :name => "index_ruby_sync_associations_on_context_and_key", :unique => true
+  add_index "ruby_sync_associations", ["synchronizable_id"], :name => "index_ruby_sync_associations_on_synchronizable_id"
 
 end

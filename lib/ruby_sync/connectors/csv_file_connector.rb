@@ -41,8 +41,7 @@ module RubySync
             field_name = (i < field_names.length)? field_names[i] : "field_#{i}"
             data[field_name] = row[i].data
           end
-          source_path = path_for(data)
-          association_key = (is_vault?)? nil : association_key_for(data[path_field])
+          association_key = source_path = path_for(data)
           yield RubySync::Event.modify(self, source_path, association_key, create_operations_for(data))
         end
       end

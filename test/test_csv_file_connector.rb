@@ -53,20 +53,22 @@ class TestCsvConnector < Test::Unit::TestCase
     @pipeline = TestPipeline.new
     @client = @pipeline.client
     @vault = @pipeline.vault
+    @filename = "#{@client.in_path}/client_to_vault.csv"
     @pipeline.run_once # create the in and out directories if necessary
+    File.delete @filename if File.exists? @filename
     @bob_details = {:cn=>'bob', :givenName=>"Robert", :sn=>"Smith", :mail=>'bob@thecure.com'}
   end
 
   def test_client_to_vault
     banner :test_client_to_vault
-    CSV.open("#{@client.in_path}/client_to_vault.csv", 'w') do |csv|
+    CSV.open(@filename, 'w') do |csv|
       csv << [:cn, :givenName, :sn, :mail].collect {|key| @bob_details[key]}
     end
     assert_nil @vault["bob"], "Vault already contains bob"
     @pipeline.run_once
     assert_not_nil @vault["bob"], "Bob wasn't created in vault"
     modded_bob={}; @bob_details.each_pair {|k,v| modded_bob[k]=v.as_array}
-    assert_equal modded_bob, @vault["bob"].reject {|k,v| [:modifier,:foreign_key].include? k}
+    assert_equal modded_bob, @vault["bob"].reject {|k,v| [:modifier,:association].include? k}
     @pipeline.run_once
   end
   
