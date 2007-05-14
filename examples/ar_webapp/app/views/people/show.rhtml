@@ -10,7 +10,7 @@
 
 <h2>DirSync Associations</h2>
 <ul>
-<% @person.association_keys.each do |key| %>
+<% @person.ruby_sync_associations.each do |key| %>
 	<li><%= key.value %></li>
 <%end%>
 </ul>	

@@ -20,26 +20,6 @@ $VERBOSE=true
 require "ruby_sync/connectors/base_connector"
 
 
-# class Person < ActiveRecord::Base
-#   has_many :association_keys, :class_name => "AssociationKey", :foreign_key => "record_id"
-#   has_many :interests
-#   has_many :hobbies, :class_name => "ClassName", :foreign_key => "hobbies_id"
-# end
-# 
-# class AssociationKey < ActiveRecord::Base
-#   belongs_to :person, :class_name => "Person", :foreign_key => "record_id"
-# end
-# 
-# class Interest < ActiveRecord::Base
-#   belongs_to :person
-#   belongs_to :hobby
-# end
-# 
-# class Hobby < ActiveRecord::Base
-#   has_many :interests
-#   has_many :people, :through=>:interests
-# end
-
 module RubySync::Connectors
 
   # You can initialize this connector with the name of a model and the path to a rails application:
@@ -130,7 +110,7 @@ module RubySync::Connectors
     end
     
     def remove_association association
-       ::AssociationKey.find_by_context_and_key(association.context, association.key).destroy
+       ::RubySyncAssociation.find_by_context_and_key(association.context, association.key).destroy
      rescue ActiveRecord::RecordNotFound
        return nil
     end
