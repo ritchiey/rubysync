@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-require 'ERB'
+require 'erb'
 $VERBOSE=false
 require "active_record"
 $VERBOSE=true
@@ -44,7 +44,7 @@ module RubySync::Connectors
       }
 
       # Rails app specified, use it to configure
-      if @application
+      if defined @application
         # Load the database configuration
         rails_app_path = File.expand_path(@application, File.dirname(__FILE__))
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')

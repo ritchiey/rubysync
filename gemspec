@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby -w
-#
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
 # This file is part of RubySync.
@@ -17,13 +15,14 @@
 require 'rubygems'
 
 SPEC = Gem::Specification.new do |s|
-  s.name = "RubySync"
+  s.name = "rubysync"
   s.version = "0.0.1"
+  s.rubyforge_project = 'rubysync'
   s.author = "Ritchie Young"
   s.email = "ritchiey@gmail.com"
   s.homepage = "http://rubysync.org"
-  s.platform = "Gem::Platform::RUBY"
-  s.summary = "Event driven identity synchronization"
+  #s.platform = "Gem::Platform::RUBY"
+  s.summary = "Event driven identity synchronization engine"
   candidates = Dir.glob "{bin,docs,lib,test,examples}/**/*"
   s.files = candidates.delete_if do |item|
     item.include?("rubysync.tmproj") ||
@@ -33,12 +32,16 @@ SPEC = Gem::Specification.new do |s|
     item.include?('tmp') ||
     item.include?('log')
   end
+  s.bindir = 'bin'
   s.require_path = 'lib'
-  s.autorequire = 'rubysync'
+  s.executables = ['rubysync']
+  s.default_executable = 'rubysync'
+  s.autorequire = 'ruby_sync.rb'
   s.test_file = 'test/ts_rubysync.rb'
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README"]
+  #s.extra_rdoc_files = ["README"]
   s.add_dependency "ruby-net-ldap", ">=0.0.4"
   s.add_dependency "activesupport", ">=1.4.0"
+  s.add_dependency "activerecord", ">=1.15.3"
   s.add_dependency "simpleconsole", ">=0.1.1"
 end
