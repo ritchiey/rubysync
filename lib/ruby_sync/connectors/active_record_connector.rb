@@ -92,7 +92,9 @@ module RubySync::Connectors
     # Implement vault functionality
 
     def associate association, path
-      ::RubySyncAssociation.create({:synchronizable_id=>path, :context=>association.context, :key=>association.key})
+      log.debug "Associating '#{association}' with '#{path}'"
+      ::RubySyncAssociation.create :synchronizable_id=>path, :synchronizable_type=>@model.to_s,
+                                   :context=>association.context, :key=>association.key
     end
 
     def path_for_association association
