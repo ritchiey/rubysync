@@ -1781,3 +1781,15 @@ Migrating to CreateRubySyncAssociations (4)
   [4;36;1mSQL (0.001917)[0m   [0;1mSHOW KEYS FROM people[0m
   [4;35;1mSQL (0.002653)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
   [4;36;1mSQL (0.001256)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.000183)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mRubySyncAssociation Load (0.000597)[0m   [0mSELECT * FROM ruby_sync_associations [0m
+  [4;36;1mPerson Load (0.000665)[0m   [0;1mSELECT * FROM people [0m
+  [4;35;1mPerson Delete all (0.001679)[0m   [0mDELETE FROM people [0m
+  [4;36;1mRubySyncAssociation Delete all (0.001637)[0m   [0;1mDELETE FROM ruby_sync_associations [0m
+  [4;35;1mPerson Load (0.000634)[0m   [0mSELECT * FROM people [0m
+  [4;36;1mRubySyncAssociation Load (0.000835)[0m   [0;1mSELECT * FROM ruby_sync_associations [0m
+  [4;35;1mPerson Load (0.000664)[0m   [0mSELECT * FROM people [0m
+  [4;36;1mRubySyncAssociation Delete all (0.001730)[0m   [0;1mDELETE FROM ruby_sync_associations [0m
+  [4;35;1mPerson Delete all (0.000419)[0m   [0mDELETE FROM people [0m
+  [4;36;1mRubySyncAssociation Load (0.000774)[0m   [0;1mSELECT * FROM ruby_sync_associations [0m
+  [4;35;1mPerson Load (0.000632)[0m   [0mSELECT * FROM people [0m

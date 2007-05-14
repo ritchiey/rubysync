@@ -16,7 +16,7 @@
 
 require 'rubygems'
 
-SPEC = Gem::Specifications.new do |s|
+SPEC = Gem::Specification.new do |s|
   s.name = "RubySync"
   s.version = "0.0.1"
   s.author = "Ritchie Young"
@@ -24,12 +24,14 @@ SPEC = Gem::Specifications.new do |s|
   s.homepage = "http://rubysync.org"
   s.platform = "Gem::Platform::RUBY"
   s.summary = "Event driven identity synchronization"
-  candidates = Dir.glob "{bin,docs,lib,test}/**/*"
+  candidates = Dir.glob "{bin,docs,lib,test,examples}/**/*"
   s.files = candidates.delete_if do |item|
     item.include?("rubysync.tmproj") ||
     item.include?(".svn") ||
     item.include?(".project") ||
-    item.include?('.DS_Store')
+    item.include?('.DS_Store') ||
+    item.include?('tmp') ||
+    item.include?('log')
   end
   s.require_path = 'lib'
   s.autorequire = 'rubysync'
