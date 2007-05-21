@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -41,15 +41,20 @@ module RubySync
           raise Exception.new("#{name}: Association already in use. Add failing.") 
         end
         call_if_exists(:target_transform, event)
-        add event.target_path, event.payload
-        if is_vault?
-          if event.association
-            associate(event.association, event.target_path)
+        if add(event.target_path, event.payload)
+          log.info "Add succeeded"
+          if is_vault?
+            if event.association
+              associate(event.association, event.target_path)
+            else
+              raise Exception.new("#{name}: No association key supplied to add.")
+            end
           else
-            raise Exception.new("#{name}: No association key supplied to add.")
+            return own_association_key_for(event.target_path) 
           end
         else
-          return own_association_key_for(event.target_path) 
+          log.warn "Failed to add '#{event.target_path}' to '#{name}'"
+          return false
         end
       end
 

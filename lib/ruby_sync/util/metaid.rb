@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 
 # This file is extracted from an article published by "why the lucky stiff" at
 # http://whytheluckystiff.net/articles/seeingMetaclassesClearly.html

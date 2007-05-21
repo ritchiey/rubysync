@@ -10,7 +10,9 @@
 
 <h2>DirSync Associations</h2>
 <ul>
-<% @person.ruby_sync_associations.each do |key| %>
-	<li><%= key.value %></li>
+<% @person.ruby_sync_associations.each do |assoc| %>
+	<li><%= "#{assoc.context}:#{assoc.key}" %>
+		<%= link_to "Delete", :action=>:delete%>
+	</li>
 <%end%>
 </ul>	

@@ -1,3 +1,4 @@
+#!/opt/local/bin/ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -24,8 +25,8 @@ class Controller < SimpleConsole::Controller
   
   params :string => {:p => :pipe},
          :string => {:t => :type},
-         :bool =>{:v => :verbose}
-  
+         :int =>{:v => :verbose, :default=>0}
+           
   def default
   end
   
@@ -34,7 +35,9 @@ class Controller < SimpleConsole::Controller
   
   # Run specified pipeline once then exit
   def once
-    log.level = (params[:verbose])? Logger::INFO : Logger::WARN
+    log_levels = [Logger::WARN, Logger::INFO, Logger::DEBUG]
+    verbosity = [(params[:verbose]||0), log_levels.size-1].min
+    log.level = log_levels[verbosity]
     
     pipeline_name = params[:id]
     pipeline = pipeline_called pipeline_name

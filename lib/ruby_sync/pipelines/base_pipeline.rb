@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -112,6 +112,7 @@ module RubySync
       def out_handler(event)
 
         event.retrieve_association(association_context)
+        event.convert_to_modify if event.associated? and event.type == :add
         
         hint = " (#{vault.name} => #{client.name})"
         log.info "Processing out-going #{event.type} event #{hint}"
@@ -121,7 +122,7 @@ module RubySync
         # Remove unwanted attributes
         perform_transform :out_filter, event
 
-        unless event.association
+        unless event.associated?
           if [:delete, :remove_association].include? event.type
             log.info "#{name}: No action for #{event.type} of unassociated entry"
             log.info YAML.dump(event)
@@ -241,10 +242,12 @@ module RubySync
         perform_transform :in_transform, event, hint
         perform_transform :in_filter, event, hint
         
+        # The client can't really know whether its an add or a modify because it doesn't store
+        # the association.
         if event.type == :modify
-          unless event.association and vault.find_associated(event.association)
-            event.convert_to_add
-          end
+          event.convert_to_add unless event.associated? and vault.find_associated(event.association)
+        elsif event.type == :add and event.associated? and vault.find_associated(event.association)
+          event.convert_to_modify
         end
         
         if event.type == :add
@@ -290,7 +293,6 @@ module RubySync
       def map_schema event, map
         return unless map and event.payload
         event.payload.each do |op|
-          # op[1] contains the field name that is the subject of the operation
           op.subject = map[op.subject] || op.subject if op.subject
         end
       end

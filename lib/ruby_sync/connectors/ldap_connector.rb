@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -21,7 +21,7 @@ require 'ruby_sync'
 
 $VERBOSE = false
 require 'net/ldap'
-$VERBOSE = true
+#$VERBOSE = true
 
 class Net::LDAP::Entry
   def to_hash
@@ -66,25 +66,33 @@ module RubySync::Connectors
 
     def self.sample_config
       return <<END
-  # :host,
-  # :port,
-  # :bind_method,
-  # :password,
-  # :username,
-  # :search_filter
-  # :search_base,
-  # :association_attribute
+  options(
+   :host=>'localhost',
+   :port=>10389,
+   :username=>'uid=admin,ou=system',
+   :password=>'secret',
+   :search_filter=>"cn=*",
+   :search_base=>"dc=example,dc=com"
+  # :bind_method=>:simple,
+  )
 END
     end
-      
-    
-    
+
+
+
     def add(path, operations)
-        with_ldap {|ldap| ldap.add :dn=>path, :attributes=>perform_operations(operations)}
+      with_ldap do |ldap|
+        return false unless ldap.add :dn=>path, :attributes=>perform_operations(operations)
+      end
+      return true
+    rescue Net::LdapException
+      log.warning "Exception occurred while adding LDAP record"
+      false
     end
 
     def modify(path, operations)
-      with_ldap {|ldap| ldap.modify :dn=>path, :operations=>operations }
+      log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
+      with_ldap {|ldap| ldap.modify :dn=>path, :operations=>to_ldap_operations(operations) }
     end
 
     def delete(path)
@@ -166,5 +174,11 @@ private
     def auth
       {:method=>@bind_method, :username=>@username, :password=>@password}
     end
+    
+    # Produce an array of operation arrays suitable for the LDAP library
+    def to_ldap_operations operations
+      operations.map {|op| [op.type, op.subject, op.values]}
+    end
+    
   end
 end

@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -78,6 +78,9 @@ module RubySync
       end
     end
     
+    def associated?
+      self.association && self.association.context && self.association.key
+    end
     
     def merge other
       # TODO implement merge
@@ -95,6 +98,11 @@ module RubySync
         payload = full.payload
       end
       @type = :add
+    end
+
+    def convert_to_modify
+      log.info "Converting '#{type}' event to modify"
+      @type = :modify
     end
           
     
@@ -125,11 +133,11 @@ module RubySync
     end
 
     def drop_all_but_changes_to subject
-      subjects = subject.as_array
-      @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject)}
+      subjects = subject.as_array.map {|s| s.to_s}
+      @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject.to_s)}
     end
     
-     # Add a value to a given subject if there are no 
+     # Add a value to a given subject unless it already sets a value
      def add_default field_name, value
        add_value field_name, value unless sets_value? field_name
      end
@@ -177,13 +185,15 @@ module RubySync
   protected
 
   # Try to make a sensible association from the passed in object
-  def make_association o
+  def make_association o  
     if o.kind_of? Array
       return Association.new(o[0],o[1])
     elsif o.kind_of? RubySync::Association
       return o
-    else
+    elsif o
       return Association.new(nil, o)
+    else
+      nil
     end
   end
       

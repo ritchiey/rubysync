@@ -54,6 +54,7 @@ module RubySync
         File.open(output_file_name, 'a') do |file|
           write_record(file, path, operations)
         end
+        return true
       end
 
       # Called to append a given record to an open file.

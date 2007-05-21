@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
