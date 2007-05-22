@@ -265,6 +265,31 @@ module RubySync::Connectors
         return record
       end
 
+
+      # Return an array of possible fields for this connector.
+      # Implementations should override this to query the datasource
+      # for possible fields.
+      def self.fields
+        nil
+      end
+
+      # Ensures that the named connector is loaded and returns its class object
+      def self.class_for connector_name
+        name = class_name_for connector_name
+        (name)? eval("::"+name) : nil
+      end
+
+      # Ensures that the named connector is loaded and returns its class name.
+      def self.class_name_for connector_name
+        filename = "#{connector_name}_connector"
+        class_name = filename.camelize
+        eval "defined? #{class_name}" or
+        $".include?(filename) or
+        require filename or
+        raise Exception.new("Can't find connector '#{filename}'")
+        class_name
+      end
+
 private
 
       def self.options options

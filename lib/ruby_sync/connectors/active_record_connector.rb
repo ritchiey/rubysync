@@ -60,7 +60,12 @@ module RubySync::Connectors
       ActiveRecord::Base.establish_connection(db_config)
     end
 
-
+      
+      def self.fields
+        c = self.new
+        c.ar_class.content_columns.map {|col| col.name }
+      end
+      
       def self.sample_config
           return <<END
           options(
@@ -90,19 +95,19 @@ END
     end
 
 
-    # Override default perform_add because ActiveRecord is different in that the target path is ignored when adding
-    # a record. ActiveRecord determines the id on creation.
+    # Override default perform_add because ActiveRecord is different in that
+    # the target path is ignored when adding a record. ActiveRecord determines
+    # the id on creation.
     def perform_add event
       log.info "Adding '#{event.target_path}' to '#{name}'"
-      @ar_class.new() do |record|
-        populate(record, perform_operations(event.payload))
-        puts(record.inspect)
-        record.save!
-        if is_vault?
-          associate event.association, record.id
-        end
-        record.id
+      record = @ar_class.new()
+      populate(record, perform_operations(event.payload))
+      puts(record.inspect)
+      record.save!
+      if is_vault?
+        associate event.association, record.id
       end
+      record.id
     rescue
       return nil
     end
@@ -142,7 +147,9 @@ END
     end
     
     def associations_for(path)
-      records = ::RubySyncAssociation.find_by_synchronizable_id_and_synchronizable_type(path, @model.to_s)
+      ::RubySyncAssociation.find_by_synchronizable_id_and_synchronizable_type(path, @model.to_s)
+    rescue ActiveRecord::RecordNotFound
+      return nil
     end
     
     def remove_association association

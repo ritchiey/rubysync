@@ -48,28 +48,17 @@ module RubySync
       end
       
       def self.client(connector_name, options={})
+        class_name = RubySync::Connectors::BaseConnector.class_name_for(connector_name)
         options[:name] ||= "#{self.name}(client)"
-        filename = "#{connector_name}_connector"
-        class_name = filename.camelize
-        eval "defined? #{class_name}" or
-        $".include?(filename) or
-        require filename or
-        raise Exception.new("Can't find connector '#{filename}'")
         options[:is_vault] = false
         class_def 'client' do
           @client ||= eval("::#{class_name}").new(options)
         end
       end
       
-      
       def self.vault(connector_name, options={})
+        class_name = RubySync::Connectors::BaseConnector.class_name_for(connector_name)
         options[:name] ||= "#{self.name}(vault)"
-        filename = "#{connector_name}_connector"
-        class_name = filename.camelize
-        eval "defined? #{class_name}" or
-        $".include?(filename) or
-        require filename or
-        raise Exception.new("Can't find connector '#{filename}'")
         options[:is_vault] = true
         class_def 'vault' do
           @vault ||= eval("::" + class_name).new(options)
@@ -106,6 +95,8 @@ module RubySync
           event.transform
         end
       end
+      
+      
       
       # Called by the identity-vault connector in the 'out' thread to process events generated
       # by the identity vault.

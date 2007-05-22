@@ -19,12 +19,17 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'ruby_sync_test'
 
-class MyActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector; end
+class MyActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
+  options(
+    :model=>:person,
+    :application=>"#{File.dirname(__FILE__)}/../examples/ar_webapp"
+    )
+end
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
 
 class TestPipeline < RubySync::Pipelines::BasePipeline
   client :my_memory
-  vault :my_active_record, :model=>:person, :application=>"#{File.dirname(__FILE__)}/../examples/ar_webapp"
+  vault :my_active_record
   
   allow_in :first_name, :last_name
   
@@ -48,12 +53,14 @@ class TestActiveRecordVault < Test::Unit::TestCase
 
   def initialize(test)
     super(test)
-    # Wipe existing database content
-    # TODO: Find out how rails does this.
-    #::RubySyncAssociation.delete :all
-    #::Person.delete :all
   end
     
+    def start
+      # Wipe existing database content
+      # TODO: Find out how rails does this.
+      ::RubySyncAssociation.delete_all
+      ::Person.delete_all
+    end
   
   def test_client_to_vault
     banner "test_client_to_vault"
@@ -79,4 +86,9 @@ class TestActiveRecordVault < Test::Unit::TestCase
   def find_bob
     Person.find_by_first_name "Robert"
   end
+  
+  def test_fields
+    assert_equal(%w{first_name last_name}.sort, ::MyActiveRecordConnector.fields.sort)
+  end
+  
 end

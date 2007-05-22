@@ -30,7 +30,7 @@ module RubySync
         yield
       rescue Exception => exception
         log.warn "#{text}: #{exception.message}"
-        log.debug exception.backtrace[0..10].join("\n")
+        log.debug exception.backtrace.join("\n")
       end
     end    
     
@@ -108,6 +108,8 @@ module RubySync
       end
       return false
     end
+        
+
         
   end
 end

@@ -23,10 +23,12 @@ class Controller < SimpleConsole::Controller
 
   include RubySync::Utilities
   
-  params :string => {:p => :pipe},
-         :string => {:t => :type},
-         :int =>{:v => :verbose, :default=>0}
-           
+  params :string => {:p => :pipe,
+                     :t => :type,
+                     :V => :vault,
+                     :C => :client},
+         :int =>{:v => :verbose}
+
   def default
   end
   
@@ -48,6 +50,7 @@ class Controller < SimpleConsole::Controller
     end
   end
 
+  # Create a Rubysync project directory
   def create
     config_path = params[:id]
     ensure_dir_exists config_path
@@ -55,6 +58,7 @@ class Controller < SimpleConsole::Controller
     ensure_dir_exists config_path + "/connectors"  
   end
   
+  # Create a connector configuration file
   def connector
     name = params[:id]
     type = params[:type]
@@ -70,20 +74,31 @@ class Controller < SimpleConsole::Controller
       puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
     end
   end
+
+  # List the fields that the named connector can detect. This is
+  # a good way to test if a connector config is functional.
+  def fields
+    connector_name = params[:id]
+    connector = (connector_name)? ::RubySync::Connectors::BaseConnector.class_for(connector_name) : nil
+    @field_names = connector && connector.fields || []
+  end
   
   def pipeline
     name = params[:id]
+    vault_name = params[:vault]
+    client_name = params[:client]
     unless name
-      puts "Usage: rubysync pipeline pipeline_name"
+      puts "Usage: rubysync pipeline pipeline_name [-V vault] [-C client]"
       return
     end
     if base_path
       File.open("#{base_path}/pipelines/#{name}_pipeline.rb", "w") do |file|
-        file.puts pipeline_template(name)
+        file.puts pipeline_template(name, vault_name, client_name)
       end
     else
       puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
     end
+    
   end
   
   
@@ -100,8 +115,11 @@ Valid commands are:
 
   create {name}           ; Create a rubysync configuration directory
 
-  connector {name} -t {type} ; Create a connector of the given name in
+  connector {name} -t {type} [--vault {name}] [--client {name}]
+                          ; Create a connector of the given name in
                           ; the current rubysync configuration directory
+                          
+  fields {name}           ; list the fields detected by the named connector
 
   pipeline {name}         ; Create a rubysync pipeline of the given name
                           ; in the current rubysync configuration directory
@@ -109,8 +127,13 @@ Valid commands are:
   once {name}             ; Execute the named pipeline within the current
                           ; configuration directory once and then exit
                           
-  example                 ; Show and example of how this command might be used
+  example                 ; Show an example of how this command might be used
 END
+end
+
+
+def fields
+  puts @field_names.join("\n")
 end
 
 def example
@@ -124,14 +147,16 @@ def example
   $ cd my_ims
   $ rubysync connector corp_directory -t ldap
   $ rubysync connector hr_db -t active_record
-  $ rubysync pipeline hr_import
 
   You would then edit the files:
   
     connectors/corp_directory_connector.rb  ; how to connect to corp ldap
     connectors/hr_db_connector.rb           ; how to connect to HR database
-    pipelines/hr_import_pipeline.rb         ; Policy for synchronizing
-                                            ; between connectors
+
+  $ rubysync pipeline hr_import -C hr_db -V corp_directory
+
+  You would then edit the file "pipelines/hr_import_pipeline.rb" to configure the
+  policy for synchronizing between the two connectors.
                                             
   You may then execute the pipeline in one-shot mode (daemon mode is coming):
   
@@ -159,15 +184,41 @@ end
     end;
   end
   
-  def pipeline_template name
+
+  
+  def pipeline_template name, vault_name, client_name
+    vault = (vault_name)? ::RubySync::Connectors::BaseConnector.class_for(vault_name) : nil
+    vault_fields = vault && vault.fields || %w{allow these fields through}
+    possible_fields = (vault_fields.map {|n| ":#{n}"}).join(", ")
+
+    client = (client_name)? ::RubySync::Connectors::BaseConnector.class_for(client_name) : nil
+    client_fields = client && client.fields || []
+
+    vault_specifier = (vault_name)? "vault :#{vault_name}" : "#vault :vault_connector_name"
+    client_specifier = (client_name)? "client :#{client_name}" : "#client :client_connector_name"
     return <<-"end;"
 class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
 
-  #client :client_connector_name
+  #{client_specifier}
 
-  #vault :vault_connector_name
+  #{vault_specifier}
 
-  #allow_out :allow, :these, :fields
+  # Remove any fields that you don't want to set in the client from the vault
+  allow_out #{possible_fields}
+
+  # Remove any fields that you don't want to set in the vault from the client
+  allow_in #{possible_fields}
+
+  # If the client and vault have different names for the same field, define the
+  # the mapping here. For example, if the vault has a field called "first name" and
+  # the client has a field called givenName you may put:
+  #    'first name' => 'givenName'
+  # separate each mapping with a comma.
+  # The following fields were detected on the client:
+  # #{(client_fields.map {|f| "'#{f}'"}).join(", ")}
+  map_vault_to_client {
+    #{(vault_fields.map {|f| "#'#{f}' => 'a_client_field'"}).join(",\n\t\t")}
+  }
 
   # in means going from client to vault
   #in_transform do
