@@ -68,7 +68,7 @@ class TestCsvConnector < Test::Unit::TestCase
     @pipeline.run_once
     assert_not_nil @vault["bob"], "Bob wasn't created in vault"
     modded_bob={}; @bob_details.each_pair {|k,v| modded_bob[k]=v.as_array}
-    assert_equal modded_bob, @vault["bob"].reject {|k,v| [:modifier,:association].include? k}
+    assert_equal modded_bob, @vault["bob"].reject {|k,v| ['modifier',:association].include? k}
     @pipeline.run_once
   end
   

@@ -126,6 +126,18 @@ module RubySync::Connectors
       def path_for_own_association_key(key)
         key
       end
+      
+      # Returns the entry matching the association key. This is only called on the client.
+      def entry_for_own_association_key(key)
+        self[path_for_own_association_key(key)]
+      end
+      
+      # True if there is an entry matching the association key. Only called on the client.
+      # Override if you have a quicker way of determining whether an entry exists for
+      # given key than retrieving the entry.
+      def has_entry_for_key?(key)
+        entry_for_own_association_key(key)
+      end
 
       # Whether this connector is capable of acting as a vault.
       # The vault is responsible for storing the association key of the client application

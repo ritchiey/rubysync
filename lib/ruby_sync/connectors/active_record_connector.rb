@@ -36,7 +36,7 @@ module RubySync::Connectors
       @db_host ||= 'localhost'
       @db_name ||= "rubysync_#{@rails_env}"
       # Default db_config in case we're not sucking the config out of a rails app
-      db_config = {
+      @db_config = {
         :adapter=>@db_type,
         :host=>@db_host,
         :database=>@db_name
@@ -47,17 +47,22 @@ module RubySync::Connectors
         # Load the database configuration
         rails_app_path = File.expand_path(@application, File.dirname(__FILE__))
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
-        db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[@rails_env]
+        @db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[@rails_env]
         # Require the models
+        log.debug "Loading the models for #{self.class.name}:"
         Dir.chdir(File.join(rails_app_path,'app','models')) do
-          Dir.glob('*.rb') { |filename| require filename }
+          Dir.glob('*.rb') do |filename|
+            log.debug("\t#{filename}")
+            require filename
+            class_name = filename[0..-4].camelize
+            klass = class_name.constantize
+            klass.establish_connection @db_config
+          end
         end
       end
 
       @model ||= :user
-      @ar_class ||= eval("::#{@model.to_s.camelize}")
-
-      ActiveRecord::Base.establish_connection(db_config)
+      @ar_class ||= @model.to_s.camelize.constantize
     end
 
       
@@ -100,15 +105,18 @@ END
     # the id on creation.
     def perform_add event
       log.info "Adding '#{event.target_path}' to '#{name}'"
-      record = @ar_class.new()
-      populate(record, perform_operations(event.payload))
-      puts(record.inspect)
-      record.save!
-      if is_vault?
-        associate event.association, record.id
+      @ar_class.new() do |record|
+        populate(record, perform_operations(event.payload))
+        log.info(record.inspect)
+        record.save!
+        if is_vault?
+          associate event.association, record.id
+        end
+        record.id
       end
-      record.id
-    rescue
+    rescue => ex
+      log.warn ex
+      #puts ex.backtrace.join("\n")
       return nil
     end
 
@@ -128,32 +136,32 @@ END
 
     def associate association, path
       log.debug "Associating '#{association}' with '#{path}'"
-      ::RubySyncAssociation.create :synchronizable_id=>path, :synchronizable_type=>@ar_class.name,
+      ruby_sync_association.create :synchronizable_id=>path, :synchronizable_type=>@ar_class.name,
                                    :context=>association.context, :key=>association.key
     end
 
     def find_associated association
-      ::RubySyncAssociation.find_by_context_and_key association.context, association.key
+      ruby_sync_association.find_by_context_and_key association.context, association.key
     end
 
     def path_for_association association
-      assoc = ::RubySyncAssociation.find_by_context_and_key association.context, association.key
+      assoc = ruby_sync_association.find_by_context_and_key association.context, association.key
       (assoc)? assoc.synchronizable_id : nil
     end
 
     def association_key_for context, path
-      record = ::RubySyncAssociation.find_by_synchronizable_id_and_synchronizable_type_and_context path, @model.to_s, context
+      record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context path, @model.to_s, context
       record and record.key
     end
     
     def associations_for(path)
-      ::RubySyncAssociation.find_by_synchronizable_id_and_synchronizable_type(path, @model.to_s)
+      ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path, @model.to_s)
     rescue ActiveRecord::RecordNotFound
       return nil
     end
     
     def remove_association association
-       ::RubySyncAssociation.find_by_context_and_key(association.context, association.key).destroy
+       ruby_sync_association.find_by_context_and_key(association.context, association.key).destroy
     rescue ActiveRecord::RecordNotFound
        return nil
     end
@@ -167,9 +175,17 @@ END
 
 private
 
+    def ruby_sync_association
+      unless @ruby_sync_association
+        @ruby_sync_association = ::RubySyncAssociation
+        ::RubySyncAssociation.establish_connection(@db_config)
+      end
+      @ruby_sync_association
+    end
+
     def populate record, content
       @ar_class.content_columns.each do |c|
-        record[c.name] = content[c.name.to_sym][0] if content[c.name.to_sym]
+        record[c.name] = content[c.name][0] if content[c.name]
       end
     end
 
@@ -177,7 +193,7 @@ private
       operations = record.class.content_columns.map do |col|
         key = col.name
         value = record.send key
-        RubySync::Operation.new(:add, key, value) if key and value
+        RubySync::Operation.new(:add, key.to_s, value) if key and value
       end
       operations.compact
     end

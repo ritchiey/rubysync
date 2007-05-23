@@ -68,11 +68,15 @@ module RubySync
       def self.map_client_to_vault mappings
         remove_method :client_to_vault_map if method_defined? :client_to_vault_map
         class_def 'client_to_vault_map' do
-          @client_to_vault_map ||= mappings
+          unless @client_to_vault_map
+            @client_to_vault_map = {}
+            mappings.each {|k,v| @client_to_vault_map[k.to_s] = v.to_s}
+          end
+          @client_to_vault_map
         end
         unless method_defined? :vault_to_client_map
           class_def 'vault_to_client_map' do
-            @vault_to_client_map ||= mappings.invert
+            @vault_to_client_map ||= client_to_vault_map.invert
           end
         end
       end
@@ -80,11 +84,15 @@ module RubySync
       def self.map_vault_to_client mappings
         remove_method :vault_to_client_map if method_defined? :vault_to_client_map
         class_def 'vault_to_client_map' do
-          @vault_to_client_map ||= mappings
+          unless @vault_to_client_map
+            @vault_to_client_map = {}
+            mappings.each {|k,v| @vault_to_client_map[k.to_s] = v.to_s}
+          end
+          @vault_to_client_map
         end
         unless method_defined? :client_to_vault_map
           class_def 'client_to_vault_map' do
-            @client_to_vault_map ||= mappings.invert
+            @client_to_vault_map ||= vault_to_client_map.invert
           end
         end
       end
@@ -119,7 +127,12 @@ module RubySync
             log.info YAML.dump(event)
             return
           end
-          event.convert_to_add if event.type == :modify
+        end
+
+        if event.type == :modify
+          unless event.associated? and client.has_entry_for_key?(event.association.key)
+            event.convert_to_add
+          end
         end
 
         if event.type == :add
@@ -301,7 +314,7 @@ module RubySync
       # If nil (the default), all fields are allowed. 
       def self.allow_in *fields
         class_def 'allowed_in' do
-          fields
+          fields.map {|f| f.to_s}
         end
       end
       
@@ -323,7 +336,7 @@ module RubySync
       # If nil (the default), all fields are allowed. 
       def self.allow_out *fields
         class_def 'allowed_out' do
-          fields
+          fields.map {|f| f.to_s }
         end
       end
       

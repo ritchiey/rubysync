@@ -37,10 +37,10 @@ module HashlikeTests
     assert_nil @vault[vault_path], "Vault already contains bob"
     @pipeline.run_once
     assert_not_nil @vault[vault_path], "#{vault_path} wasn't created on the vault"
-    assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:association].include? k}
+    assert_equal @bob_details, @vault[vault_path].reject {|k,v| ['modifier',:association].include? k}
     if @client.respond_to? :delete
       @client.delete client_path
-      assert_equal @bob_details, @vault[vault_path].reject {|k,v| [:modifier,:association].include? k}
+      assert_equal @bob_details, @vault[vault_path].reject {|k,v| ['modifier',:association].include? k}
       assert_nil @client[client_path], "Bob wasn't deleted from the client"
       @pipeline.run_once
       assert_nil @client[client_path], "Bob reappeared on the client"
@@ -105,6 +105,6 @@ module HashlikeTests
       RubySync::Operation.new(:add, :name, 'Fred'),
       RubySync::Operation.new(:add, :email, 'fred@test.com')
       ]
-    assert_equal({:name=>['Fred'], :email=>['fred@test.com']}, result)
+    assert_equal({'name'=>['Fred'], 'email'=>['fred@test.com']}, result)
   end
 end

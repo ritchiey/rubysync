@@ -35,8 +35,8 @@ module RubySync
       
   
     def initialize type, subject, values
-      self.type = type
-      self.subject = subject
+      self.type = type.to_sym
+      self.subject = subject.to_s
       self.values = values
     end
   

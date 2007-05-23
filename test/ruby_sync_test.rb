@@ -25,9 +25,9 @@ module RubySyncTest
 
   def initialize(test)
     super(test)
-    @bob_details = {:givenName=>['Robert'],
-                    :sn=>['Smith'],
-                    :interests=>['music', 'makeup']
+    @bob_details = {'givenName'=>['Robert'],
+                    'sn'=>['Smith'],
+                    'interests'=>['music', 'makeup']
     }
   end
   
