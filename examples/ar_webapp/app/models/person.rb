@@ -4,4 +4,6 @@ class Person < ActiveRecord::Base
   has_many :interests
   has_many :hobbies, :through=>:interests
 
+
+
 end

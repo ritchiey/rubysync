@@ -56,7 +56,7 @@ module RubySync::Connectors
             require filename
             class_name = filename[0..-4].camelize
             klass = class_name.constantize
-            klass.establish_connection @db_config
+            klass.establish_connection @db_config if defined? klass.establish_connection
           end
         end
       end
@@ -79,26 +79,23 @@ module RubySync::Connectors
           )
 END
       end
-
-    # Passes a modify event to the passed-in block once for each record
-    # added or modified since the last synchronization timestamp for this connector.
-    # Passes a delete event for each RubySyncAssociation without a matching
-    # record. It then deletes the RubySyncAssociation. In other words, the
-    # RubySyncAssociation serves as a tombstone for the deleted record.
+      
+      
+    # Process each RubySyncEvent and then delete it from the db.
     def check
-      log.info "Checking '#{ar_class.name}'"
-      # TODO: Change to only send through recent changes
-      ar_class.find(:all).each do |record|
-        log.info "Creating modify event for #{record.id}"
-        # create an event from the record
-        association = (is_vault?)? nil : record.id
-        operations = create_operations_for_active_record record
-        yield RubySync::Event.modify(self, record.id,  association, operations)
+      ::RubySyncEvent.find(:all).each do |rse|
+        event = RubySync::Event.new(rse.event_type, self, rse.trackable_id, nil, to_payload(rse))
+        yield event
+        ::RubySyncEvent.delete rse
       end
-      # TODO: Find orphaned RubySyncAssociations and generate delete events for
-      # them then delete them.
     end
 
+    # Create a hash suitable to use as rubysync event payload
+    def to_payload ar_event
+      ar_event.operations.map do |op|
+        RubySync::Operation.new(op.operation.to_sym, op.field_name, op.values.map {|v| v.value})
+      end
+    end
 
     # Override default perform_add because ActiveRecord is different in that
     # the target path is ignored when adding a record. ActiveRecord determines

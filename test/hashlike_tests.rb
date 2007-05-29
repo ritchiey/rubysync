@@ -33,7 +33,8 @@ module HashlikeTests
   
   def test_client_to_vault
     banner "test_client_to_vault"
-    @client.add client_path, @client.create_operations_for(@bob_details)
+    assoc_key = @client.add client_path, @client.create_operations_for(@bob_details)
+    assert_not_nil @client.entry_for_own_association_key(assoc_key)
     assert_nil @vault[vault_path], "Vault already contains bob"
     @pipeline.run_once
     assert_not_nil @vault[vault_path], "#{vault_path} wasn't created on the vault"

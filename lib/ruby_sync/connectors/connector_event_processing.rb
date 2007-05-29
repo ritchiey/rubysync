@@ -62,7 +62,7 @@ module RubySync
         raise Exception.new("#{name}: Delete of unassociated object. No action taken.") unless event.association
         path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
         log.info "Deleting '#{path}' from '#{name}'"
-        raise Exception.new("#{name}: Attempted to delete non-existent entry '#{path}'") unless delete(path)
+        delete(path) or log.warn("#{name}: Attempted to delete non-existent entry '#{path}'\nMay be an echo of a delete from this connector, ignoring.")
         return nil # don't want to create any new associations
       end
 

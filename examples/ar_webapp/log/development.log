@@ -3923,3 +3923,929 @@ Rendering people/show
   [4;36;1mRubySyncAssociation Load (0.000932)[0m   [0;1mSELECT * FROM ruby_sync_associations WHERE (ruby_sync_associations.synchronizable_id = 77 AND ruby_sync_associations.synchronizable_type = 'Person') [0m
   [4;35;1mRubySyncAssociation Columns (0.002659)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
 Completed in 0.03456 (28 reqs/sec) | Rendering: 0.01886 (54%) | DB: 0.00814 (23%) | 200 OK [http://localhost/people/show/77]
+  [4;36;1mSQL (0.075820)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.014088)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000578)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000257)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000256)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000269)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.000242)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000530)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000317)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000309)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000273)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000328)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.157324)[0m   [0;1mCREATE TABLE ruby_sync_events (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time DEFAULT NULL, `type` varchar(1) DEFAULT NULL, `trackable_id` int(11) DEFAULT NULL, `trackable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.081022)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events (`timestamp`)[0m
+  [4;36;1mSQL (0.070712)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000427)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.002236)[0m   [0;1mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `type` varchar(1) DEFAULT NULL, `sequence_number` int(11) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.006404)[0m   [0mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;36;1mSQL (0.000369)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000301)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (0.002751)[0m   [0;1mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000382)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000288)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000339)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000477)[0m   [0;1mSELECT * FROM schema_info[0m
+  [4;35;1mSQL (0.027369)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.043910)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.014888)[0m   [0mSHOW KEYS FROM hobbies[0m
+  [4;36;1mSQL (0.003933)[0m   [0;1mSHOW FIELDS FROM interests[0m
+  [4;35;1mSQL (0.001775)[0m   [0mSHOW KEYS FROM interests[0m
+  [4;36;1mSQL (0.020771)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.001208)[0m   [0mSHOW KEYS FROM people[0m
+  [4;36;1mSQL (0.036959)[0m   [0;1mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.002370)[0m   [0mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.005110)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.002042)[0m   [0mSHOW KEYS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.002437)[0m   [0;1mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.001899)[0m   [0mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.005128)[0m   [0;1mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;35;1mSQL (0.001959)[0m   [0mSHOW KEYS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.000184)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.002324)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000225)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.016416)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('Dupe', 'Me')[0m
+  [4;36;1mSQL (0.048799)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000218)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000298)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('Dupe', 'Me')[0m
+  [4;35;1mSQL (0.001280)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000202)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.003087)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000167)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000300)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('Dupe', 'Me')[0m
+  [4;36;1mSQL (0.000755)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000251)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000388)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('Dupe', 'Me')[0m
+  [4;35;1mSQL (0.001310)[0m   [0mROLLBACK[0m
+  [4;36;1mPerson Columns (0.003073)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000161)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000258)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('Dupe', 'Me')[0m
+  [4;35;1mSQL (0.000552)[0m   [0mCOMMIT[0m
+  [4;36;1mPerson Columns (0.002952)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.001010)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000274)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('Dupe', 'Me')[0m
+  [4;35;1mSQL (0.000644)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000191)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.028483)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.002642)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000390)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('And', 'Again')[0m
+  [4;36;1mSQL (0.131035)[0m   [0;1mCOMMIT[0m
+  [4;35;1mPerson Columns (0.003268)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.002399)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000295)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('And', 'Again')[0m
+  [4;36;1mSQL (0.000693)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000231)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000286)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('One', 'Again')[0m
+  [4;35;1mSQL (0.001165)[0m   [0mCOMMIT[0m
+  [4;36;1mPerson Columns (0.002752)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000552)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000398)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('One', 'Again2')[0m
+  [4;35;1mSQL (0.000554)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000185)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.002602)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001057)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000267)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES(NULL, NULL)[0m
+  [4;36;1mSQL (0.000623)[0m   [0;1mCOMMIT[0m
+  [4;35;1mPerson Load (0.000700)[0m   [0mSELECT * FROM people LIMIT 1[0m
+  [4;36;1mSQL (0.000191)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.002603)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001156)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000421)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES(NULL, NULL)[0m
+  [4;36;1mRubySyncEvent Columns (0.002082)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.001448)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000183)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.127331)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000270)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000273)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES(NULL, NULL)[0m
+  [4;36;1mRubySyncEvent Columns (0.002374)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.001555)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000196)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.002915)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000218)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000325)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES(NULL, NULL)[0m
+  [4;36;1mRubySyncEvent Columns (0.002609)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.054911)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `type`, `trackable_id`) VALUES('2007-05-28 15:11:34', 'Person', NULL, 91)[0m
+  [4;36;1mSQL (0.038536)[0m   [0;1mCOMMIT[0m
+  [4;35;1mRubySyncEvent Load (0.000864)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mSQL (0.000225)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Load (0.000881)[0m   [0mSELECT * FROM people [0m
+  [4;36;1mPerson Delete all (0.075483)[0m   [0;1mDELETE FROM people WHERE (`id` IN (86)) [0m
+  [4;35;1mPerson Load (0.000762)[0m   [0mSELECT * FROM people [0m
+  [4;36;1mRubySyncEvent Load (0.000662)[0m   [0;1mSELECT * FROM ruby_sync_events [0m
+  [4;35;1mPerson Columns (0.117829)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001597)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000331)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('Blah', 'Williams')[0m
+  [4;36;1mRubySyncEvent Columns (0.002322)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.001505)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `type`, `trackable_id`) VALUES('2007-05-28 16:05:26', 'Person', NULL, 92)[0m
+  [4;36;1mSQL (0.000775)[0m   [0;1mCOMMIT[0m
+  [4;35;1mRubySyncEvent Load (0.000764)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mSQL (0.000242)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.367491)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000355)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000447)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000272)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000760)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000307)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.033478)[0m   [0mDROP TABLE ruby_sync_values[0m
+  [4;36;1mSQL (0.000450)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000338)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.177470)[0m   [0;1mDROP INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations[0m
+  [4;35;1mSQL (0.001329)[0m   [0mDROP TABLE ruby_sync_operations[0m
+  [4;36;1mSQL (0.000305)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000336)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.001980)[0m   [0;1mDROP TABLE ruby_sync_events[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S02Table 'rubysync_development.ruby_sync_events' doesn't exist: DROP INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events[0m
+  [4;36;1mSQL (0.000242)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000409)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000263)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000252)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000253)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000252)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000250)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;35;1mSQL (0.008095)[0m   [0mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `type` varchar(1) DEFAULT NULL, `sequence_number` int(11) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.026752)[0m   [0;1mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;35;1mSQL (0.000348)[0m   [0mUPDATE schema_info SET version = 6[0m
+  [4;36;1mSQL (0.000315)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.002155)[0m   [0mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000284)[0m   [0;1mUPDATE schema_info SET version = 7[0m
+  [4;35;1mSQL (0.000302)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;36;1mSQL (0.000236)[0m   [0;1mUPDATE schema_info SET version = 8[0m
+  [4;35;1mSQL (0.000269)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.001622)[0m   [0;1mCREATE TABLE ruby_sync_states (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000295)[0m   [0mUPDATE schema_info SET version = 9[0m
+  [4;36;1mSQL (0.000364)[0m   [0;1mSELECT * FROM schema_info[0m
+  [4;35;1mSQL (0.000684)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.001911)[0m   [0;1mSHOW FIELDS FROM hobbies[0m
+  [4;35;1mSQL (0.002296)[0m   [0mSHOW KEYS FROM hobbies[0m
+  [4;36;1mSQL (0.001790)[0m   [0;1mSHOW FIELDS FROM interests[0m
+  [4;35;1mSQL (0.002092)[0m   [0mSHOW KEYS FROM interests[0m
+  [4;36;1mSQL (0.001947)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.001077)[0m   [0mSHOW KEYS FROM people[0m
+  [4;36;1mSQL (0.001820)[0m   [0;1mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.001996)[0m   [0mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.002377)[0m   [0;1mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.001259)[0m   [0mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.001879)[0m   [0;1mSHOW FIELDS FROM ruby_sync_states[0m
+  [4;35;1mSQL (0.005412)[0m   [0mSHOW KEYS FROM ruby_sync_states[0m
+  [4;36;1mSQL (0.005490)[0m   [0;1mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;35;1mSQL (0.001223)[0m   [0mSHOW KEYS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.000227)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000339)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000365)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000438)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.002292)[0m   [0;1mDROP TABLE ruby_sync_states[0m
+  [4;35;1mSQL (0.000354)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000342)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000289)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000314)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.001387)[0m   [0mDROP TABLE ruby_sync_values[0m
+  [4;36;1mSQL (0.000322)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000330)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.004814)[0m   [0;1mDROP INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations[0m
+  [4;35;1mSQL (0.001525)[0m   [0mDROP TABLE ruby_sync_operations[0m
+  [4;36;1mSQL (0.000353)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000348)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S02Table 'rubysync_development.ruby_sync_events' doesn't exist: DROP INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events[0m
+  [4;36;1mSQL (0.000250)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000399)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000348)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000549)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000410)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000315)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000312)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000406)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S02Unknown table 'ruby_sync_events': DROP TABLE ruby_sync_events[0m
+  [4;36;1mSQL (0.000244)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000419)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000315)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000556)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000423)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000313)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000397)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000309)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.000373)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000326)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (0.045702)[0m   [0;1mDROP INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations[0m
+  [4;35;1mSQL (0.006579)[0m   [0mDROP INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations[0m
+  [4;36;1mSQL (0.001625)[0m   [0;1mDROP TABLE ruby_sync_associations[0m
+  [4;35;1mSQL (0.000298)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000311)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.022126)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000329)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000297)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.001551)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000394)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000312)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.008940)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000308)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000386)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000555)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000326)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000800)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.034630)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000438)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000359)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.013709)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000518)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000372)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.003844)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000467)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000359)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.003658)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.016735)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.012564)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000391)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000355)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.009625)[0m   [0;1mCREATE TABLE ruby_sync_events (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time DEFAULT NULL, `type` varchar(8) DEFAULT NULL, `trackable_id` int(11) DEFAULT NULL, `trackable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.005862)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events (`timestamp`)[0m
+  [4;36;1mSQL (0.000399)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000363)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.002304)[0m   [0;1mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `type` varchar(1) DEFAULT NULL, `sequence_number` int(11) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.013001)[0m   [0mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;36;1mSQL (0.000375)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000415)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (0.003076)[0m   [0;1mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000452)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000324)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000265)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000316)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.002060)[0m   [0mCREATE TABLE ruby_sync_states (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000347)[0m   [0;1mUPDATE schema_info SET version = 9[0m
+  [4;35;1mSQL (0.000340)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000697)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002270)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.001123)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.002445)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.059009)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.011549)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001300)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.004240)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.001464)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.003393)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.001245)[0m   [0;1mSHOW KEYS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.003845)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.001278)[0m   [0;1mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.001686)[0m   [0mSHOW FIELDS FROM ruby_sync_states[0m
+  [4;36;1mSQL (0.001538)[0m   [0;1mSHOW KEYS FROM ruby_sync_states[0m
+  [4;35;1mSQL (0.002032)[0m   [0mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.001633)[0m   [0;1mSHOW KEYS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.000185)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Load (0.000467)[0m   [0mSELECT * FROM people [0m
+  [4;36;1mPerson Columns (0.003716)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000252)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000348)[0m   [0;1mINSERT INTO people (`first_name`, `last_name`) VALUES('Ritchie', 'Young')[0m
+  [4;35;1mRubySyncEvent Columns (0.002741)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.001122)[0m   [0;1mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `type`, `trackable_id`) VALUES('2007-05-29 09:36:35', 'Person', NULL, 1)[0m
+  [4;35;1mSQL (0.000564)[0m   [0mCOMMIT[0m
+  [4;36;1mPerson Load (0.000742)[0m   [0;1mSELECT * FROM people WHERE (people.`id` = 1) [0m
+  [4;35;1mRubySyncEvent Load (0.000858)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mPerson Delete all (0.001718)[0m   [0;1mDELETE FROM people WHERE (`id` IN (1)) [0m
+  [4;35;1mRubySyncEvent Load (0.000866)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mSQL (0.000186)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000381)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000277)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000520)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.104676)[0m   [0;1mDROP TABLE ruby_sync_states[0m
+  [4;35;1mSQL (0.000459)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000450)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000353)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000415)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.152056)[0m   [0mDROP TABLE ruby_sync_values[0m
+  [4;36;1mSQL (0.000435)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000423)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.028721)[0m   [0;1mDROP INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations[0m
+  [4;35;1mSQL (0.001842)[0m   [0mDROP TABLE ruby_sync_operations[0m
+  [4;36;1mSQL (0.000438)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000396)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.006785)[0m   [0;1mDROP INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events[0m
+  [4;35;1mSQL (0.002112)[0m   [0mDROP TABLE ruby_sync_events[0m
+  [4;36;1mSQL (0.000420)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000393)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (0.006206)[0m   [0;1mDROP INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations[0m
+  [4;35;1mSQL (0.006031)[0m   [0mDROP INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations[0m
+  [4;36;1mSQL (0.001831)[0m   [0;1mDROP TABLE ruby_sync_associations[0m
+  [4;35;1mSQL (0.000371)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000378)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.002130)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000396)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000326)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.001547)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000372)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000424)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.001607)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000357)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000413)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000623)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000197)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000448)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.003420)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000418)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000441)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.002120)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000617)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000401)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002627)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000365)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000419)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.002615)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.009490)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.006403)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000338)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000329)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.002784)[0m   [0;1mCREATE TABLE ruby_sync_events (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time DEFAULT NULL, `event_type` varchar(1) DEFAULT NULL, `trackable_id` int(11) DEFAULT NULL, `trackable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.006885)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events (`timestamp`)[0m
+  [4;36;1mSQL (0.000422)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000444)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.002626)[0m   [0;1mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `type` varchar(1) DEFAULT NULL, `sequence_number` int(11) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.007402)[0m   [0mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;36;1mSQL (0.000356)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000400)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (0.002261)[0m   [0;1mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000332)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000378)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000319)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000341)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.002463)[0m   [0mCREATE TABLE ruby_sync_states (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000381)[0m   [0;1mUPDATE schema_info SET version = 9[0m
+  [4;35;1mSQL (0.000527)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000876)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.005629)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.003629)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.003092)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.045065)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.002824)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001412)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002835)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.001649)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.002797)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.001420)[0m   [0;1mSHOW KEYS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.002899)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.001423)[0m   [0;1mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.002148)[0m   [0mSHOW FIELDS FROM ruby_sync_states[0m
+  [4;36;1mSQL (0.001329)[0m   [0;1mSHOW KEYS FROM ruby_sync_states[0m
+  [4;35;1mSQL (0.002447)[0m   [0mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.001298)[0m   [0;1mSHOW KEYS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.000219)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.003295)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000209)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000352)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('ritchie', 'Young')[0m
+  [4;36;1mRubySyncEvent Columns (0.002688)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.000359)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES('2007-05-29 09:48:24', 'Person', 'A', 1)[0m
+  [4;36;1mSQL (0.000920)[0m   [0;1mCOMMIT[0m
+  [4;35;1mRubySyncEvent Load (0.000901)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mPerson Load (0.000658)[0m   [0;1mSELECT * FROM people [0m
+  [4;35;1mPerson Columns (0.003724)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mPerson Load (0.000663)[0m   [0;1mSELECT * FROM people WHERE (people.`id` = 1) [0m
+  [4;35;1mSQL (0.000198)[0m   [0mBEGIN[0m
+  [4;36;1mRubySyncAssociation Load (0.032295)[0m   [0;1mSELECT * FROM ruby_sync_associations WHERE (ruby_sync_associations.synchronizable_id = 1 AND ruby_sync_associations.synchronizable_type = 'Person') [0m
+  [4;35;1mPerson Destroy (0.000357)[0m   [0m DELETE FROM people
+ WHERE `id` = 1
+[0m
+  [4;36;1mSQL (0.000864)[0m   [0;1mCOMMIT[0m
+  [4;35;1mPerson Load (0.000680)[0m   [0mSELECT * FROM people [0m
+  [4;36;1mRubySyncEvent Load (0.000799)[0m   [0;1mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mSQL (0.000186)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000349)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000274)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000360)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.001751)[0m   [0;1mDROP TABLE ruby_sync_states[0m
+  [4;35;1mSQL (0.000414)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000445)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000379)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000409)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.058575)[0m   [0mDROP TABLE ruby_sync_values[0m
+  [4;36;1mSQL (0.000401)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000413)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.046603)[0m   [0;1mDROP INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations[0m
+  [4;35;1mSQL (0.001734)[0m   [0mDROP TABLE ruby_sync_operations[0m
+  [4;36;1mSQL (0.000409)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000489)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.006600)[0m   [0;1mDROP INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events[0m
+  [4;35;1mSQL (0.001514)[0m   [0mDROP TABLE ruby_sync_events[0m
+  [4;36;1mSQL (0.000365)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000386)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (0.005568)[0m   [0;1mDROP INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations[0m
+  [4;35;1mSQL (0.005933)[0m   [0mDROP INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations[0m
+  [4;36;1mSQL (0.001670)[0m   [0;1mDROP TABLE ruby_sync_associations[0m
+  [4;35;1mSQL (0.000396)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000442)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.001575)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000381)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000434)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.001573)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000357)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000390)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.002062)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000370)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000406)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000614)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000187)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000406)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.003081)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000417)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000440)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.093924)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000449)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000454)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002435)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000390)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000442)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.002944)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.007074)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.007302)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000404)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000446)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.002660)[0m   [0;1mCREATE TABLE ruby_sync_events (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time DEFAULT NULL, `event_type` varchar(1) DEFAULT NULL, `trackable_id` int(11) DEFAULT NULL, `trackable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.006566)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events (`timestamp`)[0m
+  [4;36;1mSQL (0.000413)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000384)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.002056)[0m   [0;1mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation` varchar(1) DEFAULT NULL, `sequence_number` int(11) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.005766)[0m   [0mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;36;1mSQL (0.000326)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000328)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (0.002328)[0m   [0;1mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `ruby_sync_operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000366)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000426)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000332)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000405)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.002767)[0m   [0mCREATE TABLE ruby_sync_states (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000368)[0m   [0;1mUPDATE schema_info SET version = 9[0m
+  [4;35;1mSQL (0.000448)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000856)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002523)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.001668)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.002873)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.046664)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.002483)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001066)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002308)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.001251)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.002278)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.001094)[0m   [0;1mSHOW KEYS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.002473)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.001128)[0m   [0;1mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.001923)[0m   [0mSHOW FIELDS FROM ruby_sync_states[0m
+  [4;36;1mSQL (0.000998)[0m   [0;1mSHOW KEYS FROM ruby_sync_states[0m
+  [4;35;1mSQL (0.002108)[0m   [0mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.001003)[0m   [0;1mSHOW KEYS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.000184)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.003413)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mRubySyncEvent Columns (0.003589)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.000181)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mRubySyncEvent Columns (0.003434)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.000185)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000349)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000275)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000357)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.002330)[0m   [0;1mDROP TABLE ruby_sync_states[0m
+  [4;35;1mSQL (0.000399)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000403)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000308)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000361)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.082678)[0m   [0mDROP TABLE ruby_sync_values[0m
+  [4;36;1mSQL (0.000470)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000452)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.006880)[0m   [0;1mDROP INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations[0m
+  [4;35;1mSQL (0.001600)[0m   [0mDROP TABLE ruby_sync_operations[0m
+  [4;36;1mSQL (0.000399)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000426)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.006214)[0m   [0;1mDROP INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events[0m
+  [4;35;1mSQL (0.001541)[0m   [0mDROP TABLE ruby_sync_events[0m
+  [4;36;1mSQL (0.000391)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000435)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (0.006946)[0m   [0;1mDROP INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations[0m
+  [4;35;1mSQL (0.006506)[0m   [0mDROP INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations[0m
+  [4;36;1mSQL (0.001693)[0m   [0;1mDROP TABLE ruby_sync_associations[0m
+  [4;35;1mSQL (0.000394)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000391)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.001615)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000368)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000368)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.001535)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000330)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000367)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.001813)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000309)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000400)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000545)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000186)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000412)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.002889)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000419)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000439)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.002584)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000362)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000449)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002110)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000371)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000424)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.003022)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.007175)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.006926)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000365)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000382)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.002274)[0m   [0;1mCREATE TABLE ruby_sync_events (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time DEFAULT NULL, `event_type` varchar(1) DEFAULT NULL, `trackable_id` int(11) DEFAULT NULL, `trackable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.008149)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events (`timestamp`)[0m
+  [4;36;1mSQL (0.000425)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000451)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.002646)[0m   [0;1mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation` varchar(1) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.007272)[0m   [0mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;36;1mSQL (0.000403)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000440)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (0.002529)[0m   [0;1mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `ruby_sync_operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000389)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000434)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000333)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000407)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.002703)[0m   [0mCREATE TABLE ruby_sync_states (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000401)[0m   [0;1mUPDATE schema_info SET version = 9[0m
+  [4;35;1mSQL (0.000483)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000865)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002328)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.002119)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.001950)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.044315)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.002337)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001960)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002220)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.001283)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.002670)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.001469)[0m   [0;1mSHOW KEYS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.002617)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.001428)[0m   [0;1mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.002183)[0m   [0mSHOW FIELDS FROM ruby_sync_states[0m
+  [4;36;1mSQL (0.001285)[0m   [0;1mSHOW KEYS FROM ruby_sync_states[0m
+  [4;35;1mSQL (0.002417)[0m   [0mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.001315)[0m   [0;1mSHOW KEYS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.000192)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Load (0.000463)[0m   [0mSELECT * FROM people [0m
+  [4;36;1mRubySyncEvent Load (0.000758)[0m   [0;1mSELECT * FROM ruby_sync_events [0m
+  [4;35;1mPerson Columns (0.003871)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000224)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000332)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('Ritchie', 'Young')[0m
+  [4;36;1mRubySyncValue Columns (0.002242)[0m   [0;1mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;35;1mRubySyncOperation Columns (0.002262)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mRubySyncEvent Columns (0.002231)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.000306)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES('2007-05-29 12:17:06', 'Person', 'A', 2)[0m
+  [4;36;1mSQL (0.000300)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('A', 'first_name', 1)[0m
+  [4;35;1mSQL (0.000216)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Ritchie', 1)[0m
+  [4;36;1mSQL (0.000196)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('A', 'last_name', 1)[0m
+  [4;35;1mSQL (0.000183)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Young', 2)[0m
+  [4;36;1mSQL (0.000647)[0m   [0;1mCOMMIT[0m
+  [4;35;1mRubySyncEvent Load (0.000876)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mHobby Load (0.000517)[0m   [0;1mSELECT * FROM hobbies [0m
+  [4;35;1mHobby Columns (0.003684)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.000277)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000440)[0m   [0mINSERT INTO hobbies (`name`) VALUES('Bouncing')[0m
+  [4;36;1mSQL (0.001424)[0m   [0;1mCOMMIT[0m
+  [4;35;1mRubySyncEvent Load (0.000860)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mSQL (0.000225)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mRubySyncEvent Columns (0.002396)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.000222)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000310)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES(NULL, NULL, NULL, NULL)[0m
+  [4;36;1mSQL (0.033678)[0m   [0;1mCOMMIT[0m
+  [4;36;1mSQL (0.000197)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.018439)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000387)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000382)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.018319)[0m   [0;1mDROP TABLE ruby_sync_states[0m
+  [4;35;1mSQL (0.019001)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000367)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000313)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000266)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.061938)[0m   [0mDROP TABLE ruby_sync_values[0m
+  [4;36;1mSQL (0.000475)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000365)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.038436)[0m   [0;1mDROP INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations[0m
+  [4;35;1mSQL (0.001399)[0m   [0mDROP TABLE ruby_sync_operations[0m
+  [4;36;1mSQL (0.000383)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000349)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.006265)[0m   [0;1mDROP INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events[0m
+  [4;35;1mSQL (0.001273)[0m   [0mDROP TABLE ruby_sync_events[0m
+  [4;36;1mSQL (0.000274)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000359)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (0.006495)[0m   [0;1mDROP INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations[0m
+  [4;35;1mSQL (0.008213)[0m   [0mDROP INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations[0m
+  [4;36;1mSQL (0.006112)[0m   [0;1mDROP TABLE ruby_sync_associations[0m
+  [4;35;1mSQL (0.000409)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000342)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.018153)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000415)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000296)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.021254)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.001049)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000661)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.002482)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000695)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000407)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000502)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000190)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000487)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.002981)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000324)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000348)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.001901)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000391)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000280)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002237)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000268)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000377)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.001837)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.005898)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.006071)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000301)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000356)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.003189)[0m   [0;1mCREATE TABLE ruby_sync_events (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time DEFAULT NULL, `event_type` varchar(8) DEFAULT NULL, `trackable_id` int(11) DEFAULT NULL, `trackable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.006107)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events (`timestamp`)[0m
+  [4;36;1mSQL (0.000385)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000301)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.002290)[0m   [0;1mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation` varchar(1) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.007572)[0m   [0mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;36;1mSQL (0.000490)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000306)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (0.002630)[0m   [0;1mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `ruby_sync_operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000281)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000312)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000236)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000262)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.001892)[0m   [0mCREATE TABLE ruby_sync_states (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000293)[0m   [0;1mUPDATE schema_info SET version = 9[0m
+  [4;35;1mSQL (0.000445)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000773)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002153)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.001072)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.002195)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.053032)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.002316)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001185)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002563)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.001387)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.003034)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.001174)[0m   [0;1mSHOW KEYS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.002392)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.001287)[0m   [0;1mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.001744)[0m   [0mSHOW FIELDS FROM ruby_sync_states[0m
+  [4;36;1mSQL (0.001224)[0m   [0;1mSHOW KEYS FROM ruby_sync_states[0m
+  [4;35;1mSQL (0.002525)[0m   [0mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.001139)[0m   [0;1mSHOW KEYS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.000235)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mRubySyncEvent Columns (0.002960)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.000156)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000338)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES(NULL, NULL, '--- :add\n', NULL)[0m
+  [4;36;1mSQL (0.000748)[0m   [0;1mCOMMIT[0m
+  [4;35;1mRubySyncEvent Load (0.000731)[0m   [0mSELECT * FROM ruby_sync_events WHERE (ruby_sync_events.`event_type` = '--- :add\n') LIMIT 1[0m
+  [4;36;1mRubySyncEvent Load (0.000721)[0m   [0;1mSELECT * FROM ruby_sync_events WHERE (ruby_sync_events.`event_type` = 'add') LIMIT 1[0m
+  [4;35;1mRubySyncEvent Load (0.001369)[0m   [0mSELECT * FROM ruby_sync_events WHERE (ruby_sync_events.`event_type` = ':add') LIMIT 1[0m
+  [4;36;1mRubySyncEvent Load (0.000755)[0m   [0;1mSELECT * FROM ruby_sync_events WHERE (event_type = '--- :add\n') [0m
+  [4;35;1mRubySyncEvent Load (0.000741)[0m   [0mSELECT * FROM ruby_sync_events WHERE (event_type = 'add') [0m
+  [4;36;1mRubySyncEvent Load (0.000738)[0m   [0;1mSELECT * FROM ruby_sync_events WHERE (event_type = ':add') [0m
+  [4;35;1mRubySyncEvent Load (0.000000)[0m   [0mMysql::Error: #42000You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ':add)' at line 1: SELECT * FROM ruby_sync_events WHERE (event_type = :add) [0m
+  [4;36;1mRubySyncEvent Load (0.001367)[0m   [0;1mSELECT * FROM ruby_sync_events WHERE (event_type = ":add") [0m
+  [4;35;1mRubySyncEvent Load (0.000754)[0m   [0mSELECT * FROM ruby_sync_events WHERE (event_type = "add") [0m
+  [4;36;1mRubySyncEvent Load (0.000760)[0m   [0;1mSELECT * FROM ruby_sync_events WHERE (event_type = "add") [0m
+  [4;35;1mRubySyncEvent Load (0.000709)[0m   [0mSELECT * FROM ruby_sync_events [0m
+  [4;36;1mSQL (0.000208)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.018001)[0m   [0;1mSELECT version FROM schema_info[0m
+  [4;35;1mSQL (0.000349)[0m   [0mSELECT version FROM schema_info[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000415)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.019605)[0m   [0;1mDROP TABLE ruby_sync_states[0m
+  [4;35;1mSQL (0.027095)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000589)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000535)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000625)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.002412)[0m   [0mDROP TABLE ruby_sync_values[0m
+  [4;36;1mSQL (0.000711)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000672)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.019282)[0m   [0;1mDROP INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations[0m
+  [4;35;1mSQL (0.001457)[0m   [0mDROP TABLE ruby_sync_operations[0m
+  [4;36;1mSQL (0.000364)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000328)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.023304)[0m   [0;1mDROP INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events[0m
+  [4;35;1mSQL (0.002131)[0m   [0mDROP TABLE ruby_sync_events[0m
+  [4;36;1mSQL (0.000406)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000451)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (0.006875)[0m   [0;1mDROP INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations[0m
+  [4;35;1mSQL (0.005690)[0m   [0mDROP INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations[0m
+  [4;36;1mSQL (0.001511)[0m   [0;1mDROP TABLE ruby_sync_associations[0m
+  [4;35;1mSQL (0.000308)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000345)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.006336)[0m   [0mDROP TABLE hobbies[0m
+  [4;36;1mSQL (0.000379)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000297)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (0.001682)[0m   [0;1mDROP TABLE interests[0m
+  [4;35;1mSQL (0.000549)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000358)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.001637)[0m   [0mDROP TABLE people[0m
+  [4;36;1mSQL (0.000254)[0m   [0;1mUPDATE schema_info SET version = 0[0m
+  [4;35;1mSQL (0.000318)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.015344)[0m   [0;1mSHOW TABLES[0m
+  [4;36;1mSQL (0.000189)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000000)[0m   [0mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;36;1mSQL (0.000000)[0m   [0;1mMysql::Error: #42S01Table 'schema_info' already exists: CREATE TABLE schema_info (version int(11))[0m
+  [4;35;1mSQL (0.000411)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.002944)[0m   [0;1mCREATE TABLE people (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000287)[0m   [0mUPDATE schema_info SET version = 1[0m
+  [4;36;1mSQL (0.000297)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.001934)[0m   [0mCREATE TABLE interests (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11) DEFAULT NULL, `hobby_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000296)[0m   [0;1mUPDATE schema_info SET version = 2[0m
+  [4;35;1mSQL (0.000304)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (0.002191)[0m   [0;1mCREATE TABLE hobbies (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000312)[0m   [0mUPDATE schema_info SET version = 3[0m
+  [4;36;1mSQL (0.000277)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.001796)[0m   [0mCREATE TABLE ruby_sync_associations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255) DEFAULT NULL, `key` varchar(255) DEFAULT NULL, `synchronizable_id` int(11) DEFAULT NULL, `synchronizable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.295872)[0m   [0;1mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON ruby_sync_associations (`context`, `key`)[0m
+  [4;35;1mSQL (0.005934)[0m   [0mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON ruby_sync_associations (`synchronizable_id`)[0m
+  [4;36;1mSQL (0.000348)[0m   [0;1mUPDATE schema_info SET version = 4[0m
+  [4;35;1mSQL (0.000341)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (0.002433)[0m   [0;1mCREATE TABLE ruby_sync_events (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time DEFAULT NULL, `event_type` varchar(8) DEFAULT NULL, `trackable_id` int(11) DEFAULT NULL, `trackable_type` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.183471)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON ruby_sync_events (`timestamp`)[0m
+  [4;36;1mSQL (0.000383)[0m   [0;1mUPDATE schema_info SET version = 5[0m
+  [4;35;1mSQL (0.000374)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.031158)[0m   [0;1mCREATE TABLE ruby_sync_operations (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation` varchar(8) DEFAULT NULL, `field_name` varchar(255) DEFAULT NULL, `ruby_sync_event_id` int(11) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.007405)[0m   [0mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON ruby_sync_operations (`ruby_sync_event_id`)[0m
+  [4;36;1mSQL (0.000605)[0m   [0;1mUPDATE schema_info SET version = 6[0m
+  [4;35;1mSQL (0.000447)[0m   [0mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (0.002198)[0m   [0;1mCREATE TABLE ruby_sync_values (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `ruby_sync_operation_id` int(11) DEFAULT NULL, `value` varchar(255) DEFAULT NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000330)[0m   [0mUPDATE schema_info SET version = 7[0m
+  [4;36;1mSQL (0.000295)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.000233)[0m   [0mUPDATE schema_info SET version = 8[0m
+  [4;36;1mSQL (0.000294)[0m   [0;1mSELECT version FROM schema_info[0m
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.002073)[0m   [0mCREATE TABLE ruby_sync_states (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000442)[0m   [0;1mUPDATE schema_info SET version = 9[0m
+  [4;35;1mSQL (0.000422)[0m   [0mSELECT * FROM schema_info[0m
+  [4;36;1mSQL (0.000846)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.001907)[0m   [0mSHOW FIELDS FROM hobbies[0m
+  [4;36;1mSQL (0.001237)[0m   [0;1mSHOW KEYS FROM hobbies[0m
+  [4;35;1mSQL (0.002562)[0m   [0mSHOW FIELDS FROM interests[0m
+  [4;36;1mSQL (0.051852)[0m   [0;1mSHOW KEYS FROM interests[0m
+  [4;35;1mSQL (0.002214)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.001326)[0m   [0;1mSHOW KEYS FROM people[0m
+  [4;35;1mSQL (0.002139)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.001321)[0m   [0;1mSHOW KEYS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.002059)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.001138)[0m   [0;1mSHOW KEYS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.002325)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mSQL (0.001289)[0m   [0;1mSHOW KEYS FROM ruby_sync_operations[0m
+  [4;35;1mSQL (0.001817)[0m   [0mSHOW FIELDS FROM ruby_sync_states[0m
+  [4;36;1mSQL (0.001015)[0m   [0;1mSHOW KEYS FROM ruby_sync_states[0m
+  [4;35;1mSQL (0.001912)[0m   [0mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;36;1mSQL (0.001047)[0m   [0;1mSHOW KEYS FROM ruby_sync_values[0m

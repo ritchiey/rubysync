@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 4) do
+ActiveRecord::Schema.define(:version => 9) do
 
   create_table "hobbies", :force => true do |t|
     t.column "name", :string
@@ -27,5 +27,30 @@ ActiveRecord::Schema.define(:version => 4) do
 
   add_index "ruby_sync_associations", ["context", "key"], :name => "index_ruby_sync_associations_on_context_and_key", :unique => true
   add_index "ruby_sync_associations", ["synchronizable_id"], :name => "index_ruby_sync_associations_on_synchronizable_id"
+
+  create_table "ruby_sync_events", :force => true do |t|
+    t.column "timestamp",      :time
+    t.column "event_type",     :string,  :limit => 8
+    t.column "trackable_id",   :integer
+    t.column "trackable_type", :string
+  end
+
+  add_index "ruby_sync_events", ["timestamp"], :name => "index_ruby_sync_events_on_timestamp"
+
+  create_table "ruby_sync_operations", :force => true do |t|
+    t.column "operation",          :string,  :limit => 8
+    t.column "field_name",         :string
+    t.column "ruby_sync_event_id", :integer
+  end
+
+  add_index "ruby_sync_operations", ["ruby_sync_event_id"], :name => "index_ruby_sync_operations_on_ruby_sync_event_id"
+
+  create_table "ruby_sync_states", :force => true do |t|
+  end
+
+  create_table "ruby_sync_values", :force => true do |t|
+    t.column "ruby_sync_operation_id", :integer
+    t.column "value",                  :string
+  end
 
 end

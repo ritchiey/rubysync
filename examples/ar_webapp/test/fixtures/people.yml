@@ -1,5 +1,9 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-one:
+bob:
   id: 1
-two:
+  first_name: Bob
+  last_name: Roberts
+sean:
   id: 2
+  first_name: Sean
+  last_name: Connery

@@ -57,7 +57,7 @@ module RubySync
     end
 
     def initialize type, source, source_path=nil, association=nil, payload=nil
-      self.type = type
+      self.type = type.to_sym
       self.source = source
       self.source_path = source_path
       self.association = make_association(association)
@@ -119,7 +119,7 @@ module RubySync
     def sets_value? subject, value=nil
       return false if @payload == nil
       @payload.reverse_each do |op|
-        return true if op.subject == subject && (value == nil || op.values == value.as_array)
+        return true if op.subject == subject.to_s && (value == nil || op.values == value.as_array)
       end
       return false
     end
