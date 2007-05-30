@@ -95,11 +95,11 @@ class Controller < SimpleConsole::Controller
          :int =>{:v => :verbose}
 
   def default
-    RDoc::usage 'Usage'
+    #RDoc::usage 'Usage'
   end
   
   def example
-    RDoc::usage 'Example'
+    #RDoc::usage 'Example'
   end
   
   # Run specified pipeline once then exit
@@ -179,6 +179,61 @@ end
 class View < SimpleConsole::View
 
 
+def default
+puts <<"END"
+Usage:
+  
+    rubysync command name [options]
+  
+ Valid commands are:
+  * create {name}:            Create a rubysync configuration directory
+
+  * connector {name} -t {type} [--vault {name}] [--client {name}]
+                          ; Create a connector of the given name in
+                          ; the current rubysync configuration directory
+                        
+  * fields {name}         ; list the fields detected by the named connector
+
+  * pipeline {name}       ; Create a rubysync pipeline of the given name
+                          ; in the current rubysync configuration directory
+                        
+  * once {name}             
+                          ; Execute the named pipeline within the current
+                          ; configuration directory once and then exit
+                        
+  * example               ; Show an example of how this command might be used
+
+END
+end
+
+
+def example
+puts <<"END"
+  This sets up the skeleton of a configuration for importing comma delimeted
+  text files into a database. Note, if the application happens to be a Rails
+  app then it can also export changes.
+
+    $ rubysync create db_demo
+    $ cd db_demo
+    $ rubysync connector my_csv -t csv_file
+    $ rubysync connector my_db -t active_record
+  
+  You would then edit the files:
+
+    connectors/my_csv_connector.rb   ;where to get CSV files, field names, etc
+    connectors/my_db_connector.rb    ;how to connect to your DB or Rails app.
+
+  And enter:
+    $ rubysync pipeline my_pipeline -C my_csv -V my_db
+
+  You would then edit the file +pipelines/my_pipeline.rb+ to configure the
+  policy for synchronizing between the two connectors.
+                                        
+  You may then execute the pipeline in one-shot mode (daemon mode is coming):
+
+    $ rubysync once my_pipeline
+END
+end
 
 def fields
   puts @field_names.join("\n")
