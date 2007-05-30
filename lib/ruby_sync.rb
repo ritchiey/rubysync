@@ -30,7 +30,7 @@ class Object
   def log
     unless defined? @@log
       @@log = Logger.new(STDOUT)
-      @@log.level = Logger::DEBUG
+      #@@log.level = Logger::DEBUG
       @@log.datetime_format = "%H:%M:%S"
     end
     @@log

@@ -20,7 +20,7 @@ module RubySync
       attr_accessor :path_field # The name of the field to use as the source_path
       
 
-      def initialize options
+      def initialize options={}
         super options
         @in_glob ||= '*.csv'
         @out_extension ||= '.csv'
@@ -46,6 +46,25 @@ module RubySync
         end
       end
 
+      def self.sample_config
+          return <<END
+          options(
+            :field_names=>['names', 'of', 'the', 'columns'],
+            :path_field=>'name_of_field_to_use_as_the_id',
+            :in_path=>'/directory/to/read/files/from',
+            :out_path=>'/directory/to/write/files/to',
+            :in_glob=>'*.csv',
+            :out_extension=>'.csv'
+          )
+END
+      end
+            
+      def self.fields
+        c = self.new
+        c.field_names and !c.field_names.empty? or
+          log.warn "Please set the field names in the connector config."
+        c.field_names || []
+      end
 
       def write_record file, path, operations
         record = perform_operations operations

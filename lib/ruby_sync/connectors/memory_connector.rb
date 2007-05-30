@@ -37,9 +37,8 @@ module RubySync::Connectors
       event.sets_value?(:modifier, 'rubysync')
     end
 
-
-
     def associate(association, path)
+      path = normalize(path)
       log.info "Associating '#{association}' with '#{path}'"
       entry = @data[path]
       if entry
@@ -50,10 +49,11 @@ module RubySync::Connectors
 
     def path_for_association(association)
       context = @association_index[association.context] || {}
-      context[association.key]
+      context[association.key.to_s]
     end
 
     def association_key_for(context, path)
+      path = normalize(path)
       log.debug "Retrieving association key for '#{path}' within '#{context}'"
       entry = @data[path]
       unless entry
@@ -68,6 +68,7 @@ module RubySync::Connectors
     end
     
     def associations_for path
+      path = normalize path
       entry = @data[path]
       (entry[:association] || {}).map do |context, key|
         RubySync::Association.new(context, key)
@@ -102,6 +103,7 @@ module RubySync::Connectors
     # In other words, we're simply simulating an undesirable behaviour for testing
     # purposes. 
     def add id, operations
+      id = normalize id
       raise Exception.new("Item already exists") if @data[id]
       log.debug "Adding new record with key '#{id}'"
       @data[id] = perform_operations operations
@@ -112,6 +114,7 @@ module RubySync::Connectors
     end
 
     def modify id, operations
+      id = normalize id
       raise Exception.new("Attempting to modify non-existent record '#{id}'") unless @data[id]
       perform_operations operations, @data[id]
       association_key = (is_vault?)? nil : [nil, own_association_key_for(id)]
@@ -131,6 +134,7 @@ module RubySync::Connectors
 
 
     def delete id
+      id = normalize id
       unless @data[id]
          log.warn "Can't delete non-existent item '#{id}'"
          return
@@ -163,11 +167,17 @@ module RubySync::Connectors
     end
   
     def [](key)
-      @data[key]
+      @data[normalize(key)]
     end
       
     def []=(key, value)
-      @data[key] = value
+      @data[normalize(key)] = value
+    end
+
+private
+
+    def normalize(identifier)
+      identifier.to_s
     end
 
   end

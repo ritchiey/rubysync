@@ -50,6 +50,14 @@ module RubySync::Connectors
         end
       end
     end
+    
+    # Runs the query specified by the config, gets the objectclass of the first
+    # returned object and returns a list of its allowed attributes
+    def self.fields
+      log.warn "Fields method not yet implemented for LDAP - Sorry."
+      log.warn "Returning a likely sample set."
+      %w{ cn givenName sn }
+    end
 
     
     def stopped

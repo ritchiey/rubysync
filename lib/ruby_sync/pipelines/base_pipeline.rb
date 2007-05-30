@@ -136,7 +136,7 @@ module RubySync
         end
 
         if event.type == :add
-          match = out_match(event, client) 
+          match = out_match(event) 
           log.info "Attempting to match"
           if match # exactly one event record on the client matched
             log.info "Match found, merging"
@@ -169,8 +169,9 @@ module RubySync
       # end
       
       # Override to implement some kind of matching
-      def out_match event, client
-        log.debug "Default matching rule - no match"
+      def out_match event
+        log.debug "Default matching rule - source path exists on client?"
+        client.respond_to?(:'[]') and client[event.source_path]
         false
       end
       
@@ -255,7 +256,7 @@ module RubySync
         end
         
         if event.type == :add
-          match = in_match(event, vault) # exactly one event record in the vault matched
+          match = in_match(event) # exactly one event record in the vault matched
           if match
             event.merge(match)
             return
@@ -278,9 +279,9 @@ module RubySync
         @client.association_context
       end
       
-      def in_match(event, client)
-        log.debug "Default match returning false"
-        return false
+      def in_match event
+        log.debug "Default match rule - source path exists in vault"
+        vault.respond_to?(:'[]') and vault[event.source_path]
       end
       
       # If client_to_vault_map is defined (usually by map_client_to_vault)
