@@ -5315,3 +5315,204 @@ Processing PeopleController#index (for 127.0.0.1 at 2007-05-30 14:59:40) [GET]
   [4;35;1mPerson Load (0.000531)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
 Rendering layouts/application
 Completed in 0.01108 (90 reqs/sec) | Rendering: 0.00103 (9%) | DB: 0.00381 (34%) | 200 OK [http://localhost/people]
+  [4;36;1mSQL (0.000245)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-06-05 15:43:24) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.065031)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.154060)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000741)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.25087 (3 reqs/sec) | Rendering: 0.00126 (0%) | DB: 0.22008 (87%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#destroy (for 127.0.0.1 at 2007-06-05 15:43:35) [POST]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"destroy", "id"=>"58", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002748)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mPerson Load (0.002175)[0m   [0mSELECT * FROM people WHERE (people.`id` = 58) [0m
+  [4;36;1mSQL (0.000213)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubySyncAssociation Load (0.001054)[0m   [0mSELECT * FROM ruby_sync_associations WHERE (ruby_sync_associations.synchronizable_id = 58 AND ruby_sync_associations.synchronizable_type = 'Person') [0m
+  [4;36;1mRubySyncAssociation Columns (0.002861)[0m   [0;1mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;35;1mRubySyncAssociation Destroy (0.002369)[0m   [0m DELETE FROM ruby_sync_associations
+ WHERE `id` = 52
+[0m
+  [4;36;1mPerson Destroy (0.014856)[0m   [0;1m DELETE FROM people
+ WHERE `id` = 58
+[0m
+  [4;35;1mRubySyncEvent Columns (0.002741)[0m   [0mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;36;1mSQL (0.000322)[0m   [0;1mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES('2007-06-05 15:43:35', 'Person', 'delete', 58)[0m
+  [4;35;1mSQL (0.000741)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.04677 (21 reqs/sec) | DB: 0.03008 (64%) | 302 Found [http://localhost/people/destroy/58]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-06-05 15:43:35) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002298)[0m   [0;1mSHOW FIELDS FROM people[0m
+  [4;35;1mSQL (0.000408)[0m   [0mSELECT count(*) AS count_all FROM people [0m
+  [4;36;1mPerson Load (0.000707)[0m   [0;1mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01292 (77 reqs/sec) | Rendering: 0.00103 (7%) | DB: 0.00341 (26%) | 200 OK [http://localhost/people/list]
+RubySyncAssociationsController: missing default helper path ruby_sync_associations_helper
+
+
+Processing RubySyncAssociationsController#index (for 127.0.0.1 at 2007-06-05 15:45:12) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"index", "controller"=>"ruby_sync_associations"}
+  [4;35;1mRubySyncAssociation Columns (0.002796)[0m   [0mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;36;1mSQL (0.013847)[0m   [0;1mSELECT count(*) AS count_all FROM ruby_sync_associations [0m
+  [4;35;1mRubySyncAssociation Load (0.025903)[0m   [0mSELECT * FROM ruby_sync_associations LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.05466 (18 reqs/sec) | Rendering: 0.00101 (1%) | DB: 0.04255 (77%) | 200 OK [http://localhost/ruby_sync_associations]
+  [4;36;1mSQL (0.000189)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mRubySyncAssociation Delete all (0.474532)[0m   [0mDELETE FROM ruby_sync_associations [0m
+  [4;36;1mPerson Delete all (0.001420)[0m   [0;1mDELETE FROM people [0m
+RubySyncAssociationsController: missing default helper path ruby_sync_associations_helper
+
+
+Processing RubySyncAssociationsController#index (for 127.0.0.1 at 2007-06-05 15:46:55) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"index", "controller"=>"ruby_sync_associations"}
+  [4;36;1mRubySyncAssociation Columns (0.002920)[0m   [0;1mSHOW FIELDS FROM ruby_sync_associations[0m
+  [4;35;1mSQL (0.000384)[0m   [0mSELECT count(*) AS count_all FROM ruby_sync_associations [0m
+  [4;36;1mRubySyncAssociation Load (0.000606)[0m   [0;1mSELECT * FROM ruby_sync_associations LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.01052 (95 reqs/sec) | Rendering: 0.00101 (9%) | DB: 0.00391 (37%) | 200 OK [http://localhost/ruby_sync_associations]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2007-06-05 15:46:58) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002687)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000374)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000396)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.00793 (126 reqs/sec) | Rendering: 0.00100 (12%) | DB: 0.00346 (43%) | 200 OK [http://localhost/people]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2007-06-05 15:46:59) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002870)[0m   [0;1mSHOW FIELDS FROM people[0m
+Rendering layouts/application
+Completed in 0.00783 (127 reqs/sec) | Rendering: 0.00105 (13%) | DB: 0.00287 (36%) | 200 OK [http://localhost/people/new]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#create (for 127.0.0.1 at 2007-06-05 15:47:08) [POST]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"commit"=>"Create", "Person"=>{"first_name"=>"Ritchie", "last_name"=>"Young"}, "action"=>"create", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002761)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000190)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000681)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('Ritchie', 'Young')[0m
+  [4;36;1mRubySyncValue Columns (0.001960)[0m   [0;1mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;35;1mRubySyncOperation Columns (0.002029)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mRubySyncEvent Columns (0.001971)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.000315)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES('2007-06-05 15:47:08', 'Person', 'add', 61)[0m
+  [4;36;1mSQL (0.000263)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('add', 'first_name', 25)[0m
+  [4;35;1mSQL (0.000231)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Ritchie', 45)[0m
+  [4;36;1mSQL (0.000223)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('add', 'last_name', 25)[0m
+  [4;35;1mSQL (0.000213)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Young', 46)[0m
+  [4;36;1mSQL (0.000775)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.03694 (27 reqs/sec) | DB: 0.01161 (31%) | 302 Found [http://localhost/people/create]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-06-05 15:47:08) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002279)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000376)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000428)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.00863 (115 reqs/sec) | Rendering: 0.00105 (12%) | DB: 0.00308 (35%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2007-06-05 15:47:19) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002936)[0m   [0;1mSHOW FIELDS FROM people[0m
+Rendering layouts/application
+Completed in 0.00770 (129 reqs/sec) | Rendering: 0.00101 (13%) | DB: 0.00294 (38%) | 200 OK [http://localhost/people/new]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#create (for 127.0.0.1 at 2007-06-05 15:47:28) [POST]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"commit"=>"Create", "Person"=>{"first_name"=>"Amy", "last_name"=>"Young"}, "action"=>"create", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002944)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000181)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000319)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('Amy', 'Young')[0m
+  [4;36;1mRubySyncValue Columns (0.002214)[0m   [0;1mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;35;1mRubySyncOperation Columns (0.003182)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mRubySyncEvent Columns (0.002246)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.000325)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES('2007-06-05 15:47:28', 'Person', 'add', 62)[0m
+  [4;36;1mSQL (0.000250)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('add', 'first_name', 26)[0m
+  [4;35;1mSQL (0.000228)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Amy', 47)[0m
+  [4;36;1mSQL (0.000232)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('add', 'last_name', 26)[0m
+  [4;35;1mSQL (0.000221)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Young', 48)[0m
+  [4;36;1mSQL (0.023282)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.12937 (7 reqs/sec) | DB: 0.03562 (27%) | 302 Found [http://localhost/people/create]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-06-05 15:47:28) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002306)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000396)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000456)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.00958 (104 reqs/sec) | Rendering: 0.00114 (11%) | DB: 0.00316 (32%) | 200 OK [http://localhost/people/list]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2007-06-05 16:01:56) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.002932)[0m   [0;1mSHOW FIELDS FROM people[0m
+Rendering layouts/application
+Completed in 0.00782 (127 reqs/sec) | Rendering: 0.00102 (13%) | DB: 0.00293 (37%) | 200 OK [http://localhost/people/new]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#create (for 127.0.0.1 at 2007-06-05 16:02:08) [POST]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"commit"=>"Create", "Person"=>{"first_name"=>"Joanna", "last_name"=>"Young"}, "action"=>"create", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002767)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000437)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000303)[0m   [0mINSERT INTO people (`first_name`, `last_name`) VALUES('Joanna', 'Young')[0m
+  [4;36;1mRubySyncValue Columns (0.002206)[0m   [0;1mSHOW FIELDS FROM ruby_sync_values[0m
+  [4;35;1mRubySyncOperation Columns (0.002019)[0m   [0mSHOW FIELDS FROM ruby_sync_operations[0m
+  [4;36;1mRubySyncEvent Columns (0.002075)[0m   [0;1mSHOW FIELDS FROM ruby_sync_events[0m
+  [4;35;1mSQL (0.000300)[0m   [0mINSERT INTO ruby_sync_events (`timestamp`, `trackable_type`, `event_type`, `trackable_id`) VALUES('2007-06-05 16:02:08', 'Person', 'add', 63)[0m
+  [4;36;1mSQL (0.000300)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('add', 'first_name', 27)[0m
+  [4;35;1mSQL (0.000219)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Joanna', 49)[0m
+  [4;36;1mSQL (0.000230)[0m   [0;1mINSERT INTO ruby_sync_operations (`operation`, `field_name`, `ruby_sync_event_id`) VALUES('add', 'last_name', 27)[0m
+  [4;35;1mSQL (0.000212)[0m   [0mINSERT INTO ruby_sync_values (`value`, `ruby_sync_operation_id`) VALUES('Young', 50)[0m
+  [4;36;1mSQL (0.000857)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/list
+Completed in 0.03717 (26 reqs/sec) | DB: 0.01192 (32%) | 302 Found [http://localhost/people/create]
+PeopleController: missing default helper path people_helper
+
+
+Processing PeopleController#list (for 127.0.0.1 at 2007-06-05 16:02:08) [GET]
+  Session ID: 318e26034bb7cadb93a68635017bf4b6
+  Parameters: {"action"=>"list", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.003011)[0m   [0mSHOW FIELDS FROM people[0m
+  [4;36;1mSQL (0.000430)[0m   [0;1mSELECT count(*) AS count_all FROM people [0m
+  [4;35;1mPerson Load (0.000499)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
+Rendering layouts/application
+Completed in 0.07913 (12 reqs/sec) | Rendering: 0.00107 (1%) | DB: 0.00394 (4%) | 200 OK [http://localhost/people/list]

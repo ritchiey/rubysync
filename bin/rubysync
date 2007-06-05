@@ -224,14 +224,14 @@ puts <<"END"
     connectors/my_db_connector.rb    ;how to connect to your DB or Rails app.
 
   And enter:
-    $ rubysync pipeline my_pipeline -C my_csv -V my_db
+    $ rubysync pipeline my -C my_csv -V my_db
 
-  You would then edit the file +pipelines/my_pipeline.rb+ to configure the
+  You would then edit the file pipelines/my_pipeline.rb to configure the
   policy for synchronizing between the two connectors.
                                         
   You may then execute the pipeline in one-shot mode (daemon mode is coming):
 
-    $ rubysync once my_pipeline
+    $ rubysync once my
 END
 end
 

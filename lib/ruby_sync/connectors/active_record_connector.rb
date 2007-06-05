@@ -74,8 +74,8 @@ module RubySync::Connectors
       def self.sample_config
           return <<END
 
-  #  :application '/path/to/a/rails/application',
-  #  :model 'name_of_model_to_sync'
+    application '/path/to/a/rails/application'
+    model 'name_of_model_to_sync'
 
 END
       end
