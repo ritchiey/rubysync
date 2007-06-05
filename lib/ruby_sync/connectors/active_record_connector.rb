@@ -27,27 +27,27 @@ module RubySync::Connectors
   class ActiveRecordConnector < RubySync::Connectors::BaseConnector
 
 
-    attr_accessor :ar_class, :model, :application, :rails_env, :db_type, :db_host, :db_name
+    option :ar_class, :model, :application, :rails_env, :db_type, :db_host, :db_name, :db_config
+    rails_env 'development'
+    db_type 'mysql'
+    db_host 'localhost'
+    db_name "rubysync_#{@@rails_env}"
+    # Default db_config in case we're not sucking the config out of a rails app
+    db_config(
+      :adapter=>@@db_type,
+      :host=>@@db_host,
+      :database=>@@db_name
+    )
     
     def initialize options={}
       super options
-      @rails_env ||= 'development'
-      @db_type ||= 'mysql'
-      @db_host ||= 'localhost'
-      @db_name ||= "rubysync_#{@rails_env}"
-      # Default db_config in case we're not sucking the config out of a rails app
-      @db_config = {
-        :adapter=>@db_type,
-        :host=>@db_host,
-        :database=>@db_name
-      }
 
       # Rails app specified, use it to configure
-      if defined? @application
+      if defined? @@application
         # Load the database configuration
-        rails_app_path = File.expand_path(@application, File.dirname(__FILE__))
+        rails_app_path = File.expand_path(@@application, File.dirname(__FILE__))
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
-        @db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[@rails_env]
+        @@db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[@@rails_env]
         # Require the models
         log.debug "Loading the models for #{self.class.name}:"
         Dir.chdir(File.join(rails_app_path,'app','models')) do
@@ -56,13 +56,13 @@ module RubySync::Connectors
             require filename
             class_name = filename[0..-4].camelize
             klass = class_name.constantize
-            klass.establish_connection @db_config if defined? klass.establish_connection
+            klass.establish_connection @@db_config if defined? klass.establish_connection
           end
         end
       end
 
-      @model ||= :user
-      @ar_class ||= @model.to_s.camelize.constantize
+      @@model ||= :user
+      @@ar_class ||= @@model.to_s.camelize.constantize
     end
 
       
@@ -73,10 +73,10 @@ module RubySync::Connectors
       
       def self.sample_config
           return <<END
-          options(
-            #:application=>'/path/to/a/rails/application',
-            #:model=>'name_of_model_to_sync'
-          )
+
+  #  :application '/path/to/a/rails/application',
+  #  :model 'name_of_model_to_sync'
+
 END
       end
       
@@ -102,7 +102,7 @@ END
     # the id on creation.
     def perform_add event
       log.info "Adding '#{event.target_path}' to '#{name}'"
-      @ar_class.new() do |record|
+      @@ar_class.new() do |record|
         populate(record, perform_operations(event.payload))
         log.info(record.inspect)
         record.save!
@@ -119,21 +119,21 @@ END
 
       
     def modify(path, operations)
-      @ar_class.find(path) do |record|
+      @@ar_class.find(path) do |record|
         populate(record, perform_operations(operations))
         record.save
       end
     end
     
     def delete(path)
-      @ar_class.destroy path
+      @@ar_class.destroy path
     end
   
     # Implement vault functionality
 
     def associate association, path
       log.debug "Associating '#{association}' with '#{path}'"
-      ruby_sync_association.create :synchronizable_id=>path, :synchronizable_type=>@ar_class.name,
+      ruby_sync_association.create :synchronizable_id=>path, :synchronizable_type=>@@ar_class.name,
                                    :context=>association.context, :key=>association.key
     end
 
@@ -147,12 +147,12 @@ END
     end
 
     def association_key_for context, path
-      record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context path, @model.to_s, context
+      record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context path, @@model.to_s, context
       record and record.key
     end
     
     def associations_for(path)
-      ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path, @model.to_s)
+      ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path, @@model.to_s)
     rescue ActiveRecord::RecordNotFound
       return nil
     end
@@ -165,7 +165,7 @@ END
 
 
     def [](path)
-      @ar_class.find(path)
+      @@ar_class.find(path)
     rescue ActiveRecord::RecordNotFound
       return nil
     end
@@ -175,13 +175,13 @@ private
     def ruby_sync_association
       unless @ruby_sync_association
         @ruby_sync_association = ::RubySyncAssociation
-        ::RubySyncAssociation.establish_connection(@db_config)
+        ::RubySyncAssociation.establish_connection(@@db_config)
       end
       @ruby_sync_association
     end
 
     def populate record, content
-      @ar_class.content_columns.each do |c|
+      @@ar_class.content_columns.each do |c|
         record[c.name] = content[c.name][0] if content[c.name]
       end
     end

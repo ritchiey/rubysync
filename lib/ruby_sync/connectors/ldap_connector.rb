@@ -32,18 +32,28 @@ end
 module RubySync::Connectors
   class LdapConnector < RubySync::Connectors::BaseConnector
     
-    attr_accessor :host, :port, :bind_method, :username, :password,
-                  :search_filter, :search_base,
-                  :association_attribute # name of the attribute in which to store the association key(s)
-    
+    option  :host,
+            :port,
+            :bind_method,
+            :username,
+            :password,
+            :search_filter,
+            :search_base,
+            :association_attribute # name of the attribute in which to store the association key(s)
+        
+    association_attribute 'RubySyncAssociation'
+    bind_method           :simple
+    host                  'localhost'
+    port                  389
+    search_filter         "cn=*"
+
     def started
       #TODO: If vault, check the schema to make sure that the association_attribute is there
-      @association_attribute ||= 'RubySyncAssociation'
     end
     
     def check
-      Net::LDAP.open(:host=>@host, :port=>@port, :auth=>auth) do |ldap|
-        ldap.search :base => @search_base, :filter => @search_filter do |entry|
+      Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
+        ldap.search :base => search_base, :filter => search_filter do |entry|
           operations = operations_for_entry(entry)
           association_key = (is_vault?)? nil : entry.dn
           yield RubySync::Event.add(self, entry.dn, association_key, operations)
@@ -63,25 +73,17 @@ module RubySync::Connectors
     def stopped
     end
     
-    def initialize options
-      super options
-      @bind_method ||= :simple
-      @host ||= 'localhost'
-      @port ||= 389
-      @search_filter ||= "cn=*"
-    end
 
 
     def self.sample_config
       return <<END
-  options(
-   :host=>'localhost',
-   :port=>10389,
-   :username=>'uid=admin,ou=system',
-   :password=>'secret',
-   :search_filter=>"cn=*",
-   :search_base=>"dc=example,dc=com"
-  # :bind_method=>:simple,
+   host           'localhost'
+   port           10389
+   username       'uid=admin,ou=system'
+   password       'secret'
+   search_filter  "cn=*"
+   search_base    "dc=example,dc=com"
+   #:bind_method  :simple
   )
 END
     end
@@ -122,7 +124,7 @@ END
 
     def associate_with_foreign_key key, path
       with_ldap do |ldap|
-        ldap.add_attribute(path, @association_attribute, key.to_s)
+        ldap.add_attribute(path, association_attribute, key.to_s)
       end
     end
     
@@ -140,7 +142,7 @@ END
       with_ldap do |ldap|
         entry = entry_for_foreign_key key
         if entry
-          modify :dn=>entry.dn, :operations=>[ [:delete, @association_attribute, key] ]
+          modify :dn=>entry.dn, :operations=>[ [:delete, association_attribute, key] ]
         end
       end
     end
@@ -164,7 +166,7 @@ private
 
     def entry_for_foreign_key key
       with_ldap do |ldap|
-        result = ldap.search :base=>@search_base, :filter=>"#{@association_attribute}=#{key}"
+        result = ldap.search :base=>search_base, :filter=>"#{association_attribute}=#{key}"
         return nil if !result or result.size == 0
         result[0]
       end
@@ -173,14 +175,14 @@ private
 
     def with_ldap
       result = nil
-      Net::LDAP.open(:host=>@host, :port=>@port, :auth=>auth) do |ldap|
+      Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
         result = yield ldap
       end
       result
     end
     
     def auth
-      {:method=>@bind_method, :username=>@username, :password=>@password}
+      {:method=>bind_method, :username=>username, :password=>password}
     end
     
     # Produce an array of operation arrays suitable for the LDAP library

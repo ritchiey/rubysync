@@ -16,13 +16,6 @@
 
 require "yaml"
 
-class Object
-  
-  # If not already an array, slip into one
-  def as_array
-    (instance_of? Array)? self : [self]
-  end
-end
 
 module RubySync::Connectors
   class MemoryConnector < RubySync::Connectors::BaseConnector

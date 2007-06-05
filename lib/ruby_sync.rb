@@ -24,9 +24,14 @@ require 'ruby_sync/util/utilities'
 require 'ruby_sync/operation'
 require 'ruby_sync/event'
 
-# Make the log method globally available
 class Object
 
+  # If not already an array, slip into one
+  def as_array
+    (instance_of? Array)? self : [self]
+  end
+
+  # Make the log method globally available
   def log
     unless defined? @@log
       @@log = Logger.new(STDOUT)
@@ -35,6 +40,16 @@ class Object
     end
     @@log
   end
+
+  # Add an option that will be defined by a class method, stored in a class variable
+  # and accessible as an instance method
+  def self.option *names
+    names.each do |name|
+      class_eval("def self.#{name}(value) @@#{name} = value; end")
+      class_eval("def #{name}() @@#{name}; end")
+    end
+  end
+
 end  
 
 class Configuration

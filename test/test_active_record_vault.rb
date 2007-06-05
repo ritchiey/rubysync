@@ -20,11 +20,10 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 require 'ruby_sync_test'
 
 class MyActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
-  options(
-    :model=>:person,
-    :application=>"#{File.dirname(__FILE__)}/../examples/ar_webapp"
-    )
+    model :person
+    application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
 end
+
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
 
 class TestPipeline < RubySync::Pipelines::BasePipeline

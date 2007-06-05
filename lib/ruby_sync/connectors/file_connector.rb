@@ -14,16 +14,16 @@ module RubySync
     # and/or write received events to a file.
     class FileConnector < RubySync::Connectors::BaseConnector
       
-      attr_accessor :in_path  # scan this directory for suitable files
-      attr_accessor :out_path # write received events to this directory
-      attr_accessor :out_extension # the file extension of files written to out_path
-      attr_accessor :in_glob # The filename glob for incoming files
+      option  :in_path,  # scan this directory for suitable files
+              :out_path, # write received events to this directory
+              :out_extension, # the file extension of files written to out_path
+              :in_glob # The filename glob for incoming files
       
+      out_extension     ".out"
       
       def started
-        ensure_dir_exists @in_path
-        ensure_dir_exists @out_path
-        @out_extension ||= ".out"
+        ensure_dir_exists in_path
+        ensure_dir_exists out_path
       end
       
       def check(&blk)
@@ -66,7 +66,7 @@ module RubySync
       
       # Generate a unique and appropriate filename within the given path 
       def output_file_name
-       File.join(@out_path, Time.now.strftime('%Y%m%d%H%M%S') + @out_extension)
+       File.join(out_path, Time.now.strftime('%Y%m%d%H%M%S') + out_extension)
       end
             
     end

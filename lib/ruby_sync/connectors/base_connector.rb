@@ -23,7 +23,6 @@ module RubySync::Connectors
       
       attr_accessor :once_only, :name, :is_vault
       
-      
       def initialize options={}
         options = self.class.default_options.merge(options)
         once_only = false

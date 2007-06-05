@@ -23,18 +23,20 @@ require 'ruby_sync/connectors/ldap_connector'
 require 'ruby_sync/connectors/memory_connector'
 
 
-class MyLdapConnector < RubySync::Connectors::LdapConnector; end
+class MyLdapConnector < RubySync::Connectors::LdapConnector
+  host          'localhost'
+  port          10389
+  username      'uid=admin,ou=system'
+  password      'secret'
+  search_filter "cn=*"
+  search_base   "dc=example,dc=com"
+end
+
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
 
 class TestPipeline < RubySync::Pipelines::BasePipeline
   
-  client :my_ldap,
-        :host=>'localhost',
-        :port=>10389,
-        :username=>'uid=admin,ou=system',
-        :password=>'secret',
-        :search_filter=>"cn=*",
-        :search_base=>"dc=example,dc=com"
+  client :my_ldap
 
   vault :my_memory
   
