@@ -39,19 +39,73 @@ module RubySync::Connectors
             :password,
             :search_filter,
             :search_base,
-            :association_attribute # name of the attribute in which to store the association key(s)
-        
+            :association_attribute, # name of the attribute in which to store the association key(s)
+            :changelog_dn
+            
     association_attribute 'RubySyncAssociation'
     bind_method           :simple
     host                  'localhost'
     port                  389
     search_filter         "cn=*"
+    changelog_dn          "cn=changelog"
+
+    def initialize options={}
+      super options 
+      @last_change_number = 1
+    end
+
 
     def started
       #TODO: If vault, check the schema to make sure that the association_attribute is there
     end
     
-    def check
+    
+    # Look for changelog entries. This is not supported by all LDAP servers
+    # you may need to subclass for OpenLDAP and Active Directory
+    # Changelog entries have these attributes
+    # targetdn
+    # changenumber
+    # objectclass
+    # changes
+    # changetime
+    # changetype
+    # dn
+
+    def each_change
+      with_ldap do |ldap|
+        log.debug "@last_change_number = #{@last_change_number}"
+        filter = "(changenumber>=#{@last_change_number})"
+        first = true
+        @full_refresh_required = false
+        ldap.search :base => changelog_dn, :filter =>filter do |change|
+          change_number = change.changenumber[0].to_i
+          if first
+            first = false
+            if change_number != @last_change_number
+              log.warn "Earliest change number (#{change_number}) differs from that recorded (#{@last_change_number})."
+              log.warn "A full refresh is required."
+              @full_refresh_required = true
+              break
+            end
+          else
+            @last_change_number = change_number if change_number > @last_change_number
+            # todo: A proper DN object would be nice instead of string manipulation
+            target_dn = change.targetdn[0].gsub(/\s*,\s*/,',')
+            if target_dn =~ /#{search_base}$/oi
+              change_type = change.changetype[0]
+              log.debug "Found #{change_type} in scope '#{target_dn}'"
+              #TODO: Build payload from change.changes (LDIF format) 
+              puts change.changes[0] if change.attribute_names.include? :changes
+              payload = nil
+              event = RubySync::Event.new change_type, self, target_dn, nil, payload
+              yield event
+            end
+          end
+        end
+      end
+    end
+    
+    def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
         ldap.search :base => search_base, :filter => search_filter do |entry|
           operations = operations_for_entry(entry)
@@ -156,7 +210,6 @@ END
 private
 
     def operations_for_entry entry
-      # TODO: This could probably be done better by mixing Enumerable into Entry and then calling collect
       ops = []
       entry.each do |name, values|
         ops << RubySync::Operation.add(name, values)

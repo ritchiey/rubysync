@@ -38,6 +38,12 @@ class B < A
   just_one RIGHT
 end
 
+class C < A
+  pet WRONG
+  with_default WRONG
+  just_one WRONG
+end
+
 
 class TestUtilities < Test::Unit::TestCase
 
@@ -47,6 +53,11 @@ class TestUtilities < Test::Unit::TestCase
     assert_equal RIGHT, b.just_default
     assert_equal RIGHT, b.with_default
     assert_equal RIGHT, b.just_one
+    c = C.new
+    assert_equal WRONG, c.pet
+    assert_equal RIGHT, c.just_default
+    assert_equal WRONG, c.with_default
+    assert_equal WRONG, c.just_one
   end
   
 end

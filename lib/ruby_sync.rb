@@ -19,6 +19,7 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 require 'rubygems'
 require 'active_support'
 require 'ruby_sync/util/utilities'
+require 'ruby_sync/util/metaid'
 #require 'ruby_sync/connectors/base_connector'
 #require 'ruby_sync/pipelines/base_pipeline'
 require 'ruby_sync/operation'
@@ -40,17 +41,24 @@ class Object
     end
     @@log
   end
+end
 
+class Module
   # Add an option that will be defined by a class method, stored in a class variable
   # and accessible as an instance method
-  def self.option *names
+  def option *names
     names.each do |name|
-      class_eval("def self.#{name}(value) @@#{name} = value; end")
-      class_eval("def #{name}() @@#{name}; end")
+      meta_def name do |value|
+        class_def name do
+          value
+        end
+        meta_def "get_#{name}" do
+          value
+        end
+      end
     end
   end
-
-end  
+end
 
 class Configuration
 

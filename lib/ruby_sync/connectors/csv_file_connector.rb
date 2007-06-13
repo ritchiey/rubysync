@@ -22,11 +22,11 @@ module RubySync
       in_glob       '*.csv'
       out_extension '.csv'
       field_names   []
-      path_field    (@@field_names.empty?)? 'field_0': @@field_names[0]
+      path_field    (get_field_names.empty?)? 'field_0': @field_names[0]
       
       # Called for each filename matching in_glob in in_path
       # Yields a modify event for each row found in the file.
-      def check_file(filename)
+      def each_file_change(filename)
         CSV.open(filename, 'r') do |row|
           if defined? field_name &&row.length > field_names.length
             log.warn "#{name}: Row in file #{filename} exceeds defined field_names"

@@ -20,10 +20,14 @@ require "yaml"
 module RubySync::Connectors
   class MemoryConnector < RubySync::Connectors::BaseConnector
 
-    def check
+    def each_change
       while event = @events.shift
         yield event
       end
+    end
+
+    def each_entry
+      # todo implement
     end
 
     def is_echo? event

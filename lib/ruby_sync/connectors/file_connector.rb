@@ -26,7 +26,7 @@ module RubySync
         ensure_dir_exists out_path
       end
       
-      def check(&blk)
+      def each_change(&blk)
         unless in_glob
           log.error "in_glob not set on file connector. No files will be processed"
           return
@@ -35,14 +35,14 @@ module RubySync
         Dir.chdir(in_path) do |path|
           Dir.glob(in_glob) do |filename|
             log.info "#{name}: Processing '#{filename}'"
-            check_file filename, &blk
+            each_file_change filename, &blk
             FileUtils.mv filename, "#{filename}.bak"
           end
         end
       end
       
       # Called for each filename matching in_glob in in_path
-      def check_file(filename,&blk)
+      def each_file_change(filename,&blk)
       end
 
 

@@ -51,18 +51,24 @@ module RubySync::Connectors
       def started; end
       
       # Subclasses must override this to
-      # interface with the external system and generate events.
+      # interface with the external system and generate events for every
+      # entry in the scope.
       # These events are yielded to the passed in block to process.
       # This method will be called repeatedly until the connector is
       # stopped.
-      def check; end
+      def each_entry; end
+
+      # Subclasses must override this to interface with the external system
+      # and generate an event for every change that affects items within
+      # the scope of this connector.
+      def each_change; end
       
       # Override this to perform actions that must be performed when
       # the connector exits (eg closing network conections).
       def stopped; end
 
 
-      # Call check repeatedly (or once if in once_only mode)
+      # Call each_change repeatedly (or once if in once_only mode)
       # to generate events.
       # Should generally only be called by the pipeline to which it is attached.
       def start
@@ -70,7 +76,7 @@ module RubySync::Connectors
         @running = true
         started()
         while @running
-          check do |event|
+          each_change do |event|
             if is_delete_echo?(event) || is_echo?(event)
               log.debug "Ignoring echoed event"
             else

@@ -111,10 +111,10 @@ module RubySync
        
     # Make and instance method _name_ that returns the value set by the
     # class method _name_.
-    def self.class_option name
-      self.class_eval "def #{name}() self.class.instance_variable_get :#{name}; end"
-      self.instance_eval "def #{name}(value) @#{name}=value; end"
-    end
+    # def self.class_option name
+    #   self.class_eval "def #{name}() self.class.instance_variable_get :#{name}; end"
+    #   self.instance_eval "def #{name}(value) @#{name}=value; end"
+    # end
         
   end
 end
