@@ -58,13 +58,16 @@ module Net
       end
       @data ||= []
       case @mod_spec
-      when 'add': @data << [:add, name, value]
+      when 'add':
+        @data << [:add, name, value]
+      end
     end
     
     def add_moddn_value(name, value)
       #TODO: implement
       #raise Exception.new("Sorry, not yet implemented")
     end
+
 
     def add_content(key, value)
       @data ||= {}
