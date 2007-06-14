@@ -20,46 +20,88 @@ module Net
   class ParsingError < StandardError; end
     
 
+  
+  # Represents a mod-spec structure from RFC2849
+  class LDIFModSpec # :nodoc:
+    attr_accessor :type, :attribute, :values
+    def initialize(type, attribute)
+      self.type = type
+      self.attribute = attribute
+      self.values = nil
+    end
+
+    def add_change name, value
+      if @values
+        if @values.kind_of? Array
+          @values << value
+        else
+          @values = [@values, value]
+        end
+      else
+        @values = value
+      end
+    end
+
+    def changes() [@type.to_sym, @attribute, @values] end
+  end
+
+  # Represents an LDIF change record as defined in RFC2849.
+  # The RFC specifies that an LDIF file can contain either
+  # attrval records (which are just content) or change records
+  # which represent changes to the content.
+  # This parser puts both types into the change record structure
+  # Ldif attrval records simply become change records of type
+  # 'add'.
   class ChangeRecord
     attr_accessor :dn, :changetype, :data
     
-    def [](index)
-      return nil unless @data
-      @data[index]
-    end
-    
-    def initialize(dn, changetype)
+    def initialize(dn, changetype='add')
       self.dn = dn
       self.changetype = changetype
+      @mod_spec = nil
+      @data = nil
     end
     
-    def add_value(name, value)
+    
+    def add_value(name, value) # :nodoc:
+      # Changetype specified before any other fields
+      if name == 'changetype' and !@data
+        @changetype = value
+        return
+      end
+
+      if name == '-' and @changetype != 'modify'
+          raise ParsingError.new("'-' is only valid in LDIF change records when changetype is modify")
+      end
+      
+      # Just an ordinary name value pair
       case changetype
-      when 'add'
-        add_content(name, value)
-      when 'delete'
+      when 'add': add_content(name, value)
+      when 'delete':  
         raise ParsingError.new("Didn't expect content when changetype was 'delete', (#{name}:#{value})")
-      when 'modify'
-        add_modification(name, value)
-      when 'modrdn'
-        add_moddn_value(name,value)
-      when 'moddn'
-        add_moddn_value(name, value)
+      when 'modify': add_modification(name, value)
+      when 'modrdn': add_moddn_value(name,value)
+      when 'moddn': add_moddn_value(name, value)
       else
         raise ParsingError.new("Unknown changetype: '#{changetype}'")
       end
-        
     end
+
     
     def add_modification(name, value)
-      if name == '-'
-        
-        @mod_spec = nil
-      end
       @data ||= []
-      case @mod_spec
-      when 'add':
-        @data << [:add, name, value]
+      if name == '-'
+        @mod_spec or
+          raise ParsingError.new("'-' in LDIF modify record before any actual changes")
+        @data << @mod_spec.changes
+        @mod_spec = nil
+        return
+      end
+      
+      if @mod_spec
+        @mod_spec.add_change name,value
+      elsif %w{add delete replace}.include? name
+        @mod_spec = LDIFModSpec.new(name, value)
       end
     end
     
@@ -67,7 +109,6 @@ module Net
       #TODO: implement
       #raise Exception.new("Sorry, not yet implemented")
     end
-
 
     def add_content(key, value)
       @data ||= {}
@@ -82,8 +123,8 @@ module Net
       end
     end
 
-    
-  end
+  end # of class ChangeRecord
+
 
   class URLForValue < String # :nodoc:
     def to_s
@@ -93,9 +134,7 @@ module Net
   end
 
   class Base64EncodedString < String # :nodoc:
-    def to_s
-      Base64.decode64 self
-    end
+    def to_s() Base64.decode64 self; end
   end
 
   class LDIF
@@ -108,14 +147,13 @@ module Net
     BASE64_STRING = '[\x2b\x2f\x30-\x39\x3d\x41-\x5a\x61-\x7a]*'
 
 
-    # If stream contains content records, yields Net::ChangeRecord objects.
-    # if stream contains change records, yields Net::AttrValueRecord objects. 
+    # Yields Net::ChangeRecord for each LDIF record in the file.
+    # If the file contains attr-val (content) records, they are
+    # yielded as Net::ChangeRecords of type 'add'.
     def parse(stream)
       type = nil
       record_number = 0
       record = nil
-      dn = nil
-      mod_spec = nil
       tokenize(stream) do |name, value|
 
         # version-spec
@@ -135,37 +173,13 @@ module Net
         if name == 'dn'
           # Process existing record
           yield(record) if record
-          record = nil # don't know what type it will be yet
-          dn = value
+          record = ChangeRecord.new(value)
           next
         end
         
-        # Changetype
-        if !record and dn and name == 'changetype'
-          record = ChangeRecord.new(dn, value)
-          next
-        end
-        
-        if name == '-'
-          record.instance_of?(ChangeRecord) or
-            raise ParsingError.new("'-' is only valid in LDIF change records")
-          record.changetype == 'modify' or
-            raise ParsingError.new("'-' is only valid in LDIF change records when changetype is modify")
-          mod_spec or
-            raise ParsingError.new("'-' in LDIF modify record before any actual changes")
-          record.add mod_spec
-          mod_spec = nil
-          next
-        end
-        
-        
-        # Ordinary Name value pair
-        if dn and !record
-          record = AttrValRecord.new(dn)
-        end
-        record.add_value(name, value)        
-
-      end
+        record or raise ParsingException.new("Expecting a dn, got #{name}: #{value}")        
+        record.add_value name, value
+      end # of tokens
       yield(record) if record
     end
 
@@ -255,7 +269,7 @@ module Net
         end
 
         raise ParsingError.new("Unexpected LDIF at line: #{line_number}")
-      end
+      end # of file
       yield(name, value.to_s) if name
       line_number
     end

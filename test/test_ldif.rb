@@ -60,19 +60,21 @@ class TestLDIF < Test::Unit::TestCase
     assert_equal 2, c.length
     assert_equal 'add', c[0].changetype
     assert_equal 'cn=Barbara Jensen, ou=Product Development, dc=airius, dc=com', c[0].dn
-    assert_equal ['top','person','organizationalPerson'], c[0]['objectclass']
-    assert_equal ['Barbara Jensen','Barbara J Jensen','Babs Jensen'], c[0]['cn']
-    assert_equal 'Jensen', c[0]['sn']
-    assert_equal 'A big sailing fan.', c[0]['description']
+    assert_equal ['top','person','organizationalPerson'], c[0].data['objectclass']
+    assert_equal ['Barbara Jensen','Barbara J Jensen','Babs Jensen'], c[0].data['cn']
+    assert_equal 'Jensen', c[0].data['sn']
+    assert_equal 'A big sailing fan.', c[0].data['description']
     
     assert_equal 'add', c[1].changetype
     assert_equal "cn=Bjorn Jensen, ou=Accounting, dc=airius, dc=com", c[1].dn
-    assert_equal '+1 408 555 1212', c[1]['telephonenumber']
+    assert_equal '+1 408 555 1212', c[1].data['telephonenumber']
   end
 
   def test_parse_change_records
     c = changes_for("example6.ldif")
-    assert_equals 6, c.length
+    assert_equal 6, c.length
+    puts c.inspect
+    # TODO: Add more tests
   end
 
 private

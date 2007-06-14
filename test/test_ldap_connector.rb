@@ -111,7 +111,8 @@ class TestLdapConnector < Test::Unit::TestCase
       RubySync::Operation.replace('mail', "bob@fischer.com"),
       RubySync::Operation.add('givenName', "Robert")
       ])
-    assert_event :modify, c, path
+    event = assert_event :modify, c, path
+    puts event.payload.inspect
     
     c.delete(path)
     assert_event :delete, c, path
@@ -130,13 +131,16 @@ private
 
   def assert_event type, connector, path
     events = 0
+    the_event=nil
     connector.each_change do |event|
+      the_event = event
       events += 1
       assert_equal type.to_sym, event.type
       assert_equal connector, event.source
       assert_equal path, event.source_path
     end
     assert_equal 1, events, "wrong number of events on #{type.to_s}"
+    the_event
   end
 
 end
