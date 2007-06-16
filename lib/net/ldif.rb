@@ -62,6 +62,11 @@ module Net
       @data = nil
     end
     
+    def to_s
+      "#{@dn}\n#{@changetype}\n" +
+      @data.inspect
+    end
+      
     
     def add_value(name, value) # :nodoc:
       # Changetype specified before any other fields
@@ -140,7 +145,7 @@ module Net
   class LDIF
 
     #FILL = '\s*'
-    ATTRIBUTE_DESCRIPTION = '[a-zA-Z;]'
+    ATTRIBUTE_DESCRIPTION = '[a-zA-Z0-9.;-]+'
     SAFE_INIT_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x1f\x21-\x39\x3b\x3d-\x7f]'
     SAFE_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x7f]'
     SAFE_STRING = "#{SAFE_INIT_CHAR}#{SAFE_CHAR}*"
@@ -150,7 +155,8 @@ module Net
     # Yields Net::ChangeRecord for each LDIF record in the file.
     # If the file contains attr-val (content) records, they are
     # yielded as Net::ChangeRecords of type 'add'.
-    def parse(stream)
+    def self.parse(stream)
+      return parse_to_array(stream) unless block_given?
       type = nil
       record_number = 0
       record = nil
@@ -183,6 +189,13 @@ module Net
       yield(record) if record
     end
 
+    def self.parse_to_array(stream)
+      changes = []
+      parse(stream) do |change|
+        changes << change
+      end
+      changes
+    end
 
     # Yields a series of pairs of the form name, value found in the
     # given stream. Comments (lines starting with #) are removed,
@@ -192,7 +205,7 @@ module Net
     # value="-" pair.
     # Values specified as file:// urls as described in RFC2849 are
     # replaced with the contents of the specified file. 
-    def tokenize(stream)
+    def self.tokenize(stream)
 
       foldable = false
       comment = false
@@ -226,7 +239,7 @@ module Net
         end
 
         # Base64 Encoded name:value pair
-        if line =~ /^(#{ATTRIBUTE_DESCRIPTION}+)::\s*(#{BASE64_STRING})/oi
+        if line =~ /^(#{ATTRIBUTE_DESCRIPTION})::\s*(#{BASE64_STRING})/oi
           yield(name, value.to_s) if name
           name  = $1
           value = Base64EncodedString.new($2)
@@ -236,7 +249,8 @@ module Net
         end
         
         # URL value
-        if line =~ /^(#{ATTRIBUTE_DESCRIPTION}+):<\s*(#{SAFE_STRING})/oi
+        if line =~ /^(#{ATTRIBUTE_DESCRIPTION}):<\s*(#{SAFE_STRING})/oi
+            yield(name, value.to_s) if name
             name  = $1
             value = URLForValue.new($2)
             comment = false
@@ -245,7 +259,7 @@ module Net
           end
         
         # Name:Value pair
-        if line =~ /^(#{ATTRIBUTE_DESCRIPTION}+):\s*(#{SAFE_STRING})/oi
+        if line =~ /^(#{ATTRIBUTE_DESCRIPTION}):\s*(#{SAFE_STRING})/oi
           yield(name, value.to_s) if name
           name = $1; value = $2
           foldable = true

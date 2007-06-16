@@ -24,7 +24,7 @@ require 'test/unit'
 class TestLDIF < Test::Unit::TestCase
   
   def setup
-    @ldif = Net::LDIF.new    
+    @ldif = Net::LDIF    
   end
   
   def test_tokenizer
@@ -52,7 +52,9 @@ class TestLDIF < Test::Unit::TestCase
   def test_tokenize_hyphens
     a = array_for_file "example6.ldif"
     #a.each_index {|i| puts "#{i}\t#{a[i][0]}:#{a[i][1]}"}
-    [29,32,36,39,46].each {|i| assert_equal ["-","-"], a[i]}
+    assert_equal ["telephonenumber","+1 408 555 1212"], a[9]
+    [30,33,37,40,45,47].each {|i| assert_equal ["-","-"], a[i]}
+    
   end
   
   def test_parse_simple_content
@@ -73,8 +75,14 @@ class TestLDIF < Test::Unit::TestCase
   def test_parse_change_records
     c = changes_for("example6.ldif")
     assert_equal 6, c.length
-    puts c.inspect
-    # TODO: Add more tests
+    #puts c.join("\n---\n")
+    assert_equal "cn=Fiona Jensen, ou=Marketing, dc=airius, dc=com", c[0].dn
+    assert_equal 'add', c[0].changetype
+    assert_equal ['top', 'person', 'organizationalPerson'], c[0].data['objectclass']
+
+    assert_equal "Fiona Jensen", c[0].data['cn']
+    assert_equal "+1 408 555 1212", c[0].data['telephonenumber']
+    
   end
 
 private

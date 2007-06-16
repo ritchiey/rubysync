@@ -18,7 +18,7 @@ lib_path = File.dirname(__FILE__) + '/..'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
 require 'ruby_sync'
-
+require 'net/ldif'
 $VERBOSE = false
 require 'net/ldap'
 #$VERBOSE = true
@@ -94,8 +94,11 @@ module RubySync::Connectors
             if target_dn =~ /#{search_base}$/oi
               change_type = change.changetype[0]
               log.debug "Found #{change_type} in scope '#{target_dn}'"
-              #TODO: Build payload from change.changes (LDIF format) 
-              puts change.changes[0] if change.attribute_names.include? :changes
+              if change.attribute_names.include? :changes
+                #puts change.changes[0]
+                change_records = Net::LDIF.parse("dn: #{target_dn}\nchangetype: #{change_type}\n#{change.changes[0]}")
+                puts change_records[0]
+              end
               payload = nil
               event = RubySync::Event.new change_type, self, target_dn, nil, payload
               yield event
