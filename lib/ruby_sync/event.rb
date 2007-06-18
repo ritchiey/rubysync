@@ -34,6 +34,11 @@ module RubySync
 
   end  
   
+  
+  # Represents a change of some type to a record in the source datastore.
+  # If the event type is :add or :modify then the payload will be an
+  # array of RubySync::Operations describing changes to the attributes of the
+  # record.
   class Event
 
     attr_accessor :type,        # delete, add, modify ...
@@ -199,7 +204,7 @@ module RubySync
       
 
 
-    # Yield to block for each operation in the payload for which the the subject is
+    # Yield to block for each operation in the payload for which the subject is
     # the specified subject
     def each_operation_on subject
       return unless payload

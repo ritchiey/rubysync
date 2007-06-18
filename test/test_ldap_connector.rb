@@ -99,11 +99,12 @@ class TestLdapConnector < Test::Unit::TestCase
   def test_get_changes
     banner "test_get_changes"
     c = ChangeLogConnector.new
+    path = "cn=bob,#{c.search_base}"
+    c.delete(path) if c[path]
     c.each_change do |event|
     end # Ignore up til now
 
-    path = "cn=bob,#{c.search_base}"
-
+    
     c.add(path, c.create_operations_for(ldap_attr))
     assert_event :add, c, path
     

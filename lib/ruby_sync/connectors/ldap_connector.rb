@@ -70,7 +70,8 @@ module RubySync::Connectors
     # changetime
     # changetype
     # dn
-
+    #
+    # TODO: Detect presence/location of changelog from root DSE
     def each_change
       with_ldap do |ldap|
         log.debug "@last_change_number = #{@last_change_number}"
@@ -81,6 +82,7 @@ module RubySync::Connectors
           change_number = change.changenumber[0].to_i
           if first
             first = false
+            # TODO: Persist the change_number so that we don't do a full resync everytime rubysync starts
             if change_number != @last_change_number
               log.warn "Earliest change number (#{change_number}) differs from that recorded (#{@last_change_number})."
               log.warn "A full refresh is required."
@@ -93,14 +95,7 @@ module RubySync::Connectors
             target_dn = change.targetdn[0].gsub(/\s*,\s*/,',')
             if target_dn =~ /#{search_base}$/oi
               change_type = change.changetype[0]
-              log.debug "Found #{change_type} in scope '#{target_dn}'"
-              if change.attribute_names.include? :changes
-                #puts change.changes[0]
-                change_records = Net::LDIF.parse("dn: #{target_dn}\nchangetype: #{change_type}\n#{change.changes[0]}")
-                puts change_records[0]
-              end
-              payload = nil
-              event = RubySync::Event.new change_type, self, target_dn, nil, payload
+              event = event_for_changelog_entry(change)
               yield event
             end
           end
@@ -108,6 +103,7 @@ module RubySync::Connectors
       end
     end
     
+
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
         ldap.search :base => search_base, :filter => search_filter do |entry|
@@ -211,6 +207,29 @@ END
     
 
 private
+
+    def event_for_changelog_entry cle
+      payload = nil
+      dn = cle.targetdn[0]
+      changetype = cle.changetype[0]
+      if cle.attribute_names.include? :changes
+        payload = []
+        cr = Net::LDIF.parse("dn: #{dn}\nchangetype: #{changetype}\n#{cle.changes[0]}")[0]
+        if  changetype.to_sym == :add
+          # cr.data will be a hash of arrays or strings (attr-name=>[value1, value2, ...])
+          cr.data.each do |name, values|
+            payload << RubySync::Operation.add(name, values)
+          end
+        else
+          # cr.data will be an array of arrays of form [:action, :subject, [values]]
+          cr.data.each do |record|
+            payload << RubySync::Operation.new(record[0], record[1], record[2])
+          end
+        end
+      end
+      RubySync::Event.new(changetype, self, dn, nil, payload)
+    end
+    
 
     def operations_for_entry entry
       ops = []

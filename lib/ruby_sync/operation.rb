@@ -43,7 +43,7 @@ module RubySync
     remove_method :type=
     def type=(type)
       unless [:add, :delete, :replace].include? type.to_sym
-        raise Exception.new("Invalid operation type '#{value}'")
+        raise Exception.new("Invalid operation type '#{type}'")
       end
       @type = type
     end

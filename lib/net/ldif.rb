@@ -145,6 +145,7 @@ module Net
   class LDIF
 
     #FILL = '\s*'
+    # TODO: Attribute description should be more structured than this
     ATTRIBUTE_DESCRIPTION = '[a-zA-Z0-9.;-]+'
     SAFE_INIT_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x1f\x21-\x39\x3b\x3d-\x7f]'
     SAFE_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x7f]'
@@ -155,6 +156,8 @@ module Net
     # Yields Net::ChangeRecord for each LDIF record in the file.
     # If the file contains attr-val (content) records, they are
     # yielded as Net::ChangeRecords of type 'add'.
+    # If no block is given, then returns an array of the
+    # Net::ChangeRecord objects.
     def self.parse(stream)
       return parse_to_array(stream) unless block_given?
       type = nil
