@@ -23,6 +23,9 @@ $VERBOSE = false
 require 'net/ldap'
 #$VERBOSE = true
 
+RUBYSYNC_ASSOCIATION_ATTRIBUTE = "RubySyncAssociation"
+RUBYSYNC_ASSOCIATION_CLASS = "RubySyncSynchable"
+
 class Net::LDAP::Entry
   def to_hash
     return @myhash.dup
@@ -103,6 +106,17 @@ module RubySync::Connectors
       end
     end
     
+    
+    def skip_existing_changelog_entries
+      with_ldap do |ldap|
+        filter = "(changenumber>=#{@last_change_number})"
+        @full_refresh_required = false
+        ldap.search :base => changelog_dn, :filter =>filter do |change|
+          change_number = change.changenumber[0].to_i
+          @last_change_number = change_number if change_number > @last_change_number
+        end
+      end
+    end
 
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
@@ -130,6 +144,7 @@ module RubySync::Connectors
 
     def self.sample_config
       return <<END
+      
    host           'localhost'
    port           10389
    username       'uid=admin,ou=system'
@@ -137,7 +152,6 @@ module RubySync::Connectors
    search_filter  "cn=*"
    search_base    "dc=example,dc=com"
    #:bind_method  :simple
-  )
 END
     end
 
@@ -145,7 +159,7 @@ END
 
     def add(path, operations)
       with_ldap do |ldap|
-        return false unless ldap.add :dn=>path, :attributes=>perform_operations(operations)
+        ldap.add :dn=>path, :attributes=>perform_operations(operations)
       end
       return true
     rescue Net::LdapException
@@ -171,40 +185,90 @@ END
     end
     
     def target_transform event
-      event.add_default 'objectclass', 'inetOrgUser'
-      # TODO: Add modifier and timestamp unless LDAP dir does this automatically
+      #event.add_default 'objectclass', 'inetOrgUser'
+      #is_vault? and event.add_value 'objectclass', RUBYSYNC_ASSOCIATION_CLASS
     end
 
-    def associate_with_foreign_key key, path
+    def associate association, path
       with_ldap do |ldap|
-        ldap.add_attribute(path, association_attribute, key.to_s)
+        # todo: check and warn if path is outside of search_base
+        ldap.modify :dn=>path, :operations=>[
+          [:add, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s]
+          ]
       end
     end
     
-    def path_for_foreign_key key
-      entry = entry_for_foreign_key key
-      (entry)? entry.dn : nil
-    end
-    
-    def foreign_key_for path
-        entry = self[path]
-        (entry)? entry.dn : nil # TODO: That doesn't look right. Should return an association key, not a path.
-    end
-
-    def remove_foreign_key key
+    def path_for_association association
       with_ldap do |ldap|
-        entry = entry_for_foreign_key key
-        if entry
-          modify :dn=>entry.dn, :operations=>[ [:delete, association_attribute, key] ]
+        filter = "#{RUBYSYNC_ASSOCIATION_ATTRIBUTE}=#{association.to_s}"
+        log.debug "Searching with filter: #{filter}"
+        results = ldap.search :base=>@search_base,
+                    :filter=>filter,
+                    :attributes=>[]
+        results or return nil
+        case results.length
+        when 0: return nil
+        when 1: return results[0].dn
+        else
+          raise Exception.new("Duplicate association found for #{association.to_s}")
         end
       end
     end
-
-    def find_associated foreign_key
-      entry = entry_for_foreign_key key
-      (entry)? operations_for_entry(entry) : nil
+    
+    def associations_for path
+      with_ldap do |ldap|
+        results = ldap.search :base=>path,
+                    :scope=>Net::LDAP::SearchScope_BaseObject,
+                    :attributes=>[RUBYSYNC_ASSOCIATION_ATTRIBUTE]
+        unless results and results.length > 0
+          log.warn "Attempted association lookup on non-existent LDAP entry '#{path}'"
+          return []
+        end
+        associations = results[0][RUBYSYNC_ASSOCIATION_ATTRIBUTE]
+        return (associations)? associations.as_array : []
+      end
     end
     
+    def remove_association association
+      path = path_for_association association
+      with_ldap do |ldap|
+        ldap.modify :dn=>path, :modifications=>[
+          [:delete, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s]
+          ]
+      end
+    end
+
+
+    # def associate_with_foreign_key key, path
+    #   with_ldap do |ldap|
+    #     ldap.add_attribute(path, association_attribute, key.to_s)
+    #   end
+    # end
+    # 
+    # def path_for_foreign_key key
+    #   entry = entry_for_foreign_key key
+    #   (entry)? entry.dn : nil
+    # end
+    # 
+    # def foreign_key_for path
+    #     entry = self[path]
+    #     (entry)? entry.dn : nil # TODO: That doesn't look right. Should return an association key, not a path.
+    # end
+    # 
+    # def remove_foreign_key key
+    #   with_ldap do |ldap|
+    #     entry = entry_for_foreign_key key
+    #     if entry
+    #       modify :dn=>entry.dn, :operations=>[ [:delete, association_attribute, key] ]
+    #     end
+    #   end
+    # end
+    # 
+    # def find_associated foreign_key
+    #   entry = entry_for_foreign_key key
+    #   (entry)? operations_for_entry(entry) : nil
+    # end
+
 
 private
 

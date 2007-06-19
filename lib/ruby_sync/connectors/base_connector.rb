@@ -161,9 +161,7 @@ module RubySync::Connectors
         defined? associations_for
       end
 
-      # TODO: These method signatures need to change to include a connector or pipeline id so that
-      # we can distinguish between foreign keys for the same record but different
-      # connectors/pipelines.
+      # Implement these if you want your connector to be able to act as a vault
 
       # def associate association, path
       # end
@@ -171,14 +169,22 @@ module RubySync::Connectors
       # def path_for_association association
       # end
       # 
-      # def association_key_for context, path
-      # end
       #
       # def associations_for path
       # end
       #
       # def remove_association association
       # end
+
+
+      def association_key_for context, path
+        raise "#{name} is not a vault." unless is_vault?
+        associations_for(path).each do |assoc|
+          (c, key) = assoc.split(RubySync::Association.delimiter, 2)
+          return key if c == context 
+        end
+        return nil
+      end
       
       # Return the association object given the association context and path.
       # This should only be called on the vault.

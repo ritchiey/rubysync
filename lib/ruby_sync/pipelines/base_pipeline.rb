@@ -104,6 +104,12 @@ module RubySync
         end
       end
       
+      def self.in_transform &blk
+        define_method :in_transform do |event|
+          event.meta_def :transform, &blk
+          event.transform
+        end
+      end
       
       
       # Called by the identity-vault connector in the 'out' thread to process events generated

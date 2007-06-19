@@ -17,11 +17,14 @@
 
 module RubySync
   
-  class Association
+   class Association
     attr_accessor :context, # many associations will share the same context
                             # it is a function of pipeline and the client connector
                             # to which the association applies
                   :key      # the key is unique within the context and vault
+    
+    
+    def self.delimiter; '$'; end
     
     def initialize(context, key)
       @context = context
@@ -29,7 +32,7 @@ module RubySync
     end
     
     def to_s
-      "#{context}:#{key}"
+      "#{context}#{self.class.delimiter}#{key}"
     end
 
   end  
