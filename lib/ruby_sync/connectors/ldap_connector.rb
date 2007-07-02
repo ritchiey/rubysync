@@ -55,6 +55,8 @@ module RubySync::Connectors
     def initialize options={}
       super options 
       @last_change_number = 1
+      # TODO: Persist the current CSN, for now we'll just skip to the end of the changelog
+      skip_existing_changelog_entries
     end
 
 
@@ -180,8 +182,18 @@ END
       with_ldap do |ldap|
         result = ldap.search :base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*'
         return nil if !result or result.size == 0
-        result[0].to_hash
+        answer = {}
+        result[0].attribute_names.each do |name|
+          answer[name.to_s] = result[0][name]
+        end
+        answer
       end
+    end
+    
+    # Called by unit tests to inject data
+    def test_add id, details
+      details << RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson', 'organizationalPerson', 'person', 'top', 'RubySyncSynchable'])
+      add id, details
     end
     
     def target_transform event

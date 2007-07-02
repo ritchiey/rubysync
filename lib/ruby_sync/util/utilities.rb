@@ -115,6 +115,20 @@ module RubySync
     #   self.class_eval "def #{name}() self.class.instance_variable_get :#{name}; end"
     #   self.instance_eval "def #{name}(value) @#{name}=value; end"
     # end
-        
+    
+    def get_preference(name, file_name=nil)
+      class_name ||= get_preference_file
+    end
+    
+    def set_preference(name)
+      
+    end
+    
+    def get_preference_file_path name
+      dir = "#{ENV[HOME]}/.rubysync"
+      Dir.mkdir(dir)
+      "#{dir}#{file}"
+    end
+    
   end
 end
