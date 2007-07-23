@@ -51,6 +51,9 @@ module RubySync
                   :target_path,
                   :association
 
+    def self.force_resync source
+      self.new(:force_resync, source)
+    end
     
     def self.delete source, source_path, association=nil
       self.new(:delete, source, source_path, association)

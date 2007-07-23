@@ -50,15 +50,17 @@ module RubySync
     
     
     # Ensure that a given path exists as a directory
-    def ensure_dir_exists path
-      raise Exception.new("Can't create nil directory") unless path
-      if File.exist? path
-        unless File.directory? path
-          raise Exception.new("'#{path}' exists but is not a directory")
+    def ensure_dir_exists paths
+      paths.as_array.each do |path|
+        raise Exception.new("Can't create nil directory") unless path
+        if File.exist? path
+          unless File.directory? path
+            raise Exception.new("'#{path}' exists but is not a directory")
+          end
+        else
+          log.info "Creating directory '#{path}'"
+          FileUtils.mkpath path
         end
-      else
-        log.info "Creating directory '#{path}'"
-        FileUtils.mkpath path
       end
     end
     

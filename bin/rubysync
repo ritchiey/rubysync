@@ -116,9 +116,17 @@ class Controller < SimpleConsole::Controller
   # Create a Rubysync project directory
   def create
     config_path = params[:id]
-    ensure_dir_exists config_path
-    ensure_dir_exists config_path + "/pipelines"
-    ensure_dir_exists config_path + "/connectors"  
+    ensure_dir_exists(
+      config_path,
+      "#{config_path}/pipelines",
+      "#{config_path}/connectors",
+      "#{config_path}/shared",
+      "#{config_path}/shared/pipelines",
+      "#{config_path}/shared/connectors",
+      "#{config_path}/shared/lib",
+      "#{config_path}/log",
+      "#{config_path}/tmp"
+    )
   end
   
   # Create a connector configuration file

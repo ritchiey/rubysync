@@ -61,6 +61,9 @@ module RubySync::Connectors
       # Subclasses must override this to interface with the external system
       # and generate an event for every change that affects items within
       # the scope of this connector.
+      # todo: Make the default behaviour to build a database of the key of
+      # each entry with a hash of the contents of the entry. Then to compare
+      # that against each entry to see if it has changed.
       def each_change; end
       
       # Override this to perform actions that must be performed when
@@ -71,12 +74,16 @@ module RubySync::Connectors
       # Call each_change repeatedly (or once if in once_only mode)
       # to generate events.
       # Should generally only be called by the pipeline to which it is attached.
-      def start
+      def start &blk
         log.info "#{name}: Started"
         @running = true
         started()
         while @running
           each_change do |event|
+            if event.type == :force_resync
+              each_entry &blk
+              next
+            end
             if is_delete_echo?(event) || is_echo?(event)
               log.debug "Ignoring echoed event"
             else

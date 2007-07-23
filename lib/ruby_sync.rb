@@ -67,10 +67,15 @@ class Configuration
   def initialize
     include_in_search_path "#{base_path}/pipelines"
     include_in_search_path "#{base_path}/connectors"
+    include_in_search_path "#{base_path}/shared/connectors"
+    include_in_search_path "#{base_path}/shared/pipelines"    
+    include_in_search_path "#{base_path}/shared/lib"
 
     lib_path = File.dirname(__FILE__)
     require_all_in_dir "#{lib_path}/ruby_sync/connectors", "*_connector.rb"
+    require_all_in_dir "#{base_path}/shared/connectors", "*_connector.rb"
     require_all_in_dir "#{lib_path}/ruby_sync/pipelines", "*_pipeline.rb"
+    require_all_in_dir "#{base_path}/shared/pipelines", "*_pipeline.rb"
   end
 
   # We find the first directory in the search path that is a parent of the specified
