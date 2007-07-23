@@ -92,7 +92,7 @@ module RubySync
     
     def merge other
       # TODO implement merge
-      log.warning "Event.merge not yet implemented"
+      log.warn "Event.merge not yet implemented"
     end
     
     # Retrieves all known values for the record affected by this event and
