@@ -83,6 +83,8 @@ class Configuration
   # that duplicate requires will be recognised.
   def require_all_in_dir(dir, glob="*.rb")
     expanded = File.expand_path dir
+    return unless File.directory? expanded
+    
     base = $:.detect do |path_dir|
       expanded_pd = File.expand_path(path_dir)
       expanded[0, expanded_pd.length] == expanded_pd

@@ -24,12 +24,17 @@ require 'hashlike_tests'
 require 'ruby_sync/connectors/memory_connector'
 
 
-class TestConnector < RubySync::Connectors::MemoryConnector
+class TestAConnector < RubySync::Connectors::MemoryConnector
+  dbm_path "/tmp/rubysync_a"
+end
+
+class TestBConnector < RubySync::Connectors::MemoryConnector
+  dbm_path "/tmp/rubysync_b"
 end
 
 class TestPipeline < RubySync::Pipelines::BasePipeline
-  client :test
-  vault :test
+  client :test_a
+  vault :test_b
 end
 
 class TestMemoryConnectors < Test::Unit::TestCase

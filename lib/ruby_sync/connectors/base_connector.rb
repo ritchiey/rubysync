@@ -14,6 +14,7 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 require 'ruby_sync/connectors/connector_event_processing'
+require 'dbm'
 
 module RubySync::Connectors
     class BaseConnector
@@ -22,6 +23,26 @@ module RubySync::Connectors
       include ConnectorEventProcessing
       
       attr_accessor :once_only, :name, :is_vault
+      option  :dbm_path
+      
+      # set a default dbm path
+      def dbm_path() "#{base_path}/db/#{name}"; end
+
+      # Stores association keys indexed by path:association_context
+      def path_to_association_dbm_filename
+        dbm_path + "_path_to_assoc"
+      end
+      
+      # Stores paths indexed by association_context:association_key
+      def association_to_path_dbm_filename
+        dbm_path + "_assoc_to_path"
+      end
+      
+      # Stores a hash for each entry so we can tell when
+      # entries are added, deleted or modified
+      def mirror_dbm_filename
+        dbm_path + "_mirror"
+      end
       
       def initialize options={}
         options = self.class.default_options.merge(options)
@@ -48,15 +69,20 @@ module RubySync::Connectors
       
       # Override this to perform actions that must be performed the
       # when the connector starts running. (Eg, opening network connections)
-      def started; end
+      def started
+      end
       
       # Subclasses must override this to
-      # interface with the external system and generate events for every
+      # interface with the external system and generate add events for every
       # entry in the scope.
       # These events are yielded to the passed in block to process.
       # This method will be called repeatedly until the connector is
       # stopped.
-      def each_entry; end
+      # Note that the hash method for the event must remain unchanged if the
+      # record itself is the same.
+      def each_entry
+        # todo: Throw a not implemented exception by default
+      end
 
       # Subclasses must override this to interface with the external system
       # and generate an event for every change that affects items within
@@ -64,7 +90,25 @@ module RubySync::Connectors
       # todo: Make the default behaviour to build a database of the key of
       # each entry with a hash of the contents of the entry. Then to compare
       # that against each entry to see if it has changed.
-      def each_change; end
+      def each_change
+        DBM.open(self.mirror_dbm_filename) do |dbm|
+          # scan existing entries to see if any new or modified
+          each_entry do |event|
+            unless stored_hash = dbm[event.source_path.to_s] and event.hash.to_s == stored_hash
+              yield event # either new or modified
+              dbm[event.source_path.to_s] = event.hash.to_s
+            end
+          end
+          
+          # scan dbm to find deleted
+          dbm.each do |key, stored_hash|
+            unless self[key]
+              yield RubySync::Event.delete(self, key)
+              dbm.delete key
+            end
+          end
+        end        
+      end
       
       # Override this to perform actions that must be performed when
       # the connector exits (eg closing network conections).
@@ -168,37 +212,76 @@ module RubySync::Connectors
         defined? associations_for
       end
 
-      # Implement these if you want your connector to be able to act as a vault
 
-      # def associate association, path
-      # end
-      # 
-      # def path_for_association association
-      # end
-      # 
-      #
-      # def associations_for path
-      # end
-      #
-      # def remove_association association
-      # end
+      # Store association for the given path
+      def associate association, path
+        DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs_string = dbm[path.to_s]
+          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
+          assocs[association.context] = association.key
+          dbm[path.to_s] = Marshal.dump(assocs)
+        end
+        DBM.open(association_to_path_dbm_filename) do |dbm|
+          dbm[association.to_s] = path
+        end
+      end
+      
+      def path_for_association association
+        DBM.open(association_to_path_dbm_filename) do |dbm|
+          dbm[association.to_s]
+        end
+      end
+      
+      # Default implementation does nothing
+      def associations_for path
+        DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs_string = dbm[path.to_s]
+          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
+          assocs.values
+        end
+      end
 
+      # Default implementation does nothing
+      def remove_association association
+        path = nil
+        DBM.open(association_to_path_dbm_filename) do |dbm|
+          return unless path =dbm.delete(association.to_s)
+        end
+        DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs_string = dbm[path]
+          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
+          assocs.delete(association.context) and dbm[path.to_s] = Marshal.dump(assocs)
+        end
+      end
+
+      # Could be more efficient for the default case where the
+      # associations are actually stored as a serialized hash but
+      # then it wouldn't be as generic and other implementations would
+      # have to reimplement it.
+      # def association_key_for context, path
+      #   raise "#{name} is not a vault." unless is_vault?
+      #   associations_for(path).each do |assoc|
+      #     (c, key) = assoc.split(RubySync::Association.delimiter, 2)
+      #     return key if c == context 
+      #   end
+      #   return nil
+      # end
 
       def association_key_for context, path
-        raise "#{name} is not a vault." unless is_vault?
-        associations_for(path).each do |assoc|
-          (c, key) = assoc.split(RubySync::Association.delimiter, 2)
-          return key if c == context 
+        DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs_string = dbm[path.to_s]
+          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
+          assocs[context.to_s]
         end
-        return nil
       end
+
       
       # Return the association object given the association context and path.
       # This should only be called on the vault.
       def association_for(context, path)
         raise "#{name} is not a vault." unless is_vault?
         key = association_key_for context, path
-        RubySync::Association.new(context, key)
+        key and RubySync::Association.new(context, key)
       end
 
       # Should only be called on the vault. Returns the entry associated with
@@ -207,14 +290,28 @@ module RubySync::Connectors
       # association.
       def find_associated association
         path = path_for_association association
-        self[path]
+        path and self[path]
       end
       
       # The context to be used to for all associations created where this
       # connector is the client.
       def association_context
         self.name
-      end      
+      end
+      
+      def remove_mirror
+        File.delete(mirror_dbm_filename) if File.exist?(mirror_dbm_filename) 
+      end
+      
+      def remove_associations
+        File.delete(association_to_path_dbm_filename) if File.exist?(association_to_path_dbm_filename)
+        File.delete(path_to_association_dbm_filename) if File.exist?(path_to_association_dbm_filename)
+      end
+
+      def clean
+        remove_associations
+        remove_mirror
+      end
       
       # Attempts to delete non-existent items may occur due to echoing. Many systems won't be able to record
       # the fact that an entry has been deleted by rubysync because after the delete, there is no entry left to

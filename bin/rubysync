@@ -125,7 +125,7 @@ class Controller < SimpleConsole::Controller
       "#{config_path}/shared/connectors",
       "#{config_path}/shared/lib",
       "#{config_path}/log",
-      "#{config_path}/tmp"
+      "#{config_path}/db"
     )
   end
   

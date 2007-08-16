@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -18,36 +18,32 @@ lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
 require 'ruby_sync'
-require 'test/unit'
-
-module RubySyncTest
 
 
-  def initialize(test)
-    super(test)
-    @bob_details = {'givenName'=>['Robert'],
-                    'sn'=>['Smith'],
-                    'interests'=>['music', 'makeup']
-    }
+module RubySync::Connectors
+  class XmlConnector < RubySync::Connectors::BaseConnector
+
+    option :filename
+
+    def each_entry
+    end
+    
+    def add id, operations
+    end
+    
+    def modify id, operations
+    end
+    
+    def delete id
+    end
+    
+    def []
+    end
+    
+    def []=
+    end
+
+private
+
   end
-  
-
-  def setup
-    @pipeline = TestPipeline.new
-    @client = @pipeline.client
-    @vault = @pipeline.vault
-    @client.delete(client_path) if @client[client_path]
-    @vault.delete(vault_path) if @vault[vault_path]
-  end
-  
-  def teardown
-    @vault.clean
-    @client.clean
-  end
-
-  def banner(label)
-    puts '*' * 10 + " #{label} " + '*' * 10
-  end
-  
-  
 end

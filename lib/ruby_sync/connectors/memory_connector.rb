@@ -20,68 +20,70 @@ require "yaml"
 module RubySync::Connectors
   class MemoryConnector < RubySync::Connectors::BaseConnector
 
-    def each_change
-      while event = @events.shift
-        yield event
-      end
-    end
+    # def each_change
+    #   while event = @events.shift
+    #     yield event
+    #   end
+    # end
 
     def each_entry
-      # todo implement
+      @data.each do |key, entry|
+        yield RubySync::Event.add(self, key, nil, create_operations_for(entry))
+      end
     end
 
     def is_echo? event
       event.sets_value?(:modifier, 'rubysync')
     end
 
-    def associate(association, path)
-      path = normalize(path)
-      log.info "Associating '#{association}' with '#{path}'"
-      entry = @data[path]
-      if entry
-        (@association_index[association.context] ||= {})[association.key] = path
-        (entry[:association] ||= {})[association.context] = association.key
-      end
-    end
-
-    def path_for_association(association)
-      context = @association_index[association.context] || {}
-      context[association.key.to_s]
-    end
-
-    def association_key_for(context, path)
-      path = normalize(path)
-      log.debug "Retrieving association key for '#{path}' within '#{context}'"
-      entry = @data[path]
-      unless entry
-        p @data
-      end
-      if entry && entry[:association] && key = entry[:association][context]
-        return key
-      end
-      log.info "No association found."
-      log.debug entry.inspect
-      return nil
-    end
-    
-    def associations_for path
-      path = normalize path
-      entry = @data[path]
-      (entry[:association] || {}).map do |context, key|
-        RubySync::Association.new(context, key)
-      end
-    end
-    
-    def remove_association(association)
-      path = path_for_association association
-      context = @association_index[association.context]
-      context.delete(association.key) if context
-      entry = @data[path]
-      if entry
-        entry_context = (entry[:association] || {})[association.context]
-        entry_context.delete(association.key) if entry_context
-      end
-    end
+    # def associate(association, path)
+    #   path = normalize(path)
+    #   log.info "Associating '#{association}' with '#{path}'"
+    #   entry = @data[path]
+    #   if entry
+    #     (@association_index[association.context] ||= {})[association.key] = path
+    #     (entry[:association] ||= {})[association.context] = association.key
+    #   end
+    # end
+    # 
+    # def path_for_association(association)
+    #   context = @association_index[association.context] || {}
+    #   context[association.key.to_s]
+    # end
+    # 
+    # def association_key_for(context, path)
+    #   path = normalize(path)
+    #   log.debug "Retrieving association key for '#{path}' within '#{context}'"
+    #   entry = @data[path]
+    #   unless entry
+    #     p @data
+    #   end
+    #   if entry && entry[:association] && key = entry[:association][context]
+    #     return key
+    #   end
+    #   log.info "No association found."
+    #   log.debug entry.inspect
+    #   return nil
+    # end
+    # 
+    # def associations_for path
+    #   path = normalize path
+    #   entry = @data[path]
+    #   (entry[:association] || {}).map do |context, key|
+    #     RubySync::Association.new(context, key)
+    #   end
+    # end
+    # 
+    # def remove_association(association)
+    #   path = path_for_association association
+    #   context = @association_index[association.context]
+    #   context.delete(association.key) if context
+    #   entry = @data[path]
+    #   if entry
+    #     entry_context = (entry[:association] || {})[association.context]
+    #     entry_context.delete(association.key) if entry_context
+    #   end
+    # end
 
 
     def initialize options
