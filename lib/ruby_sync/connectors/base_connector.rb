@@ -76,15 +76,12 @@ module RubySync::Connectors
       end
       
       # Subclasses must override this to
-      # interface with the external system and generate add events for every
-      # entry in the scope.
-      # These events are yielded to the passed in block to process.
+      # interface with the external system and generate entries for every
+      # entry in the scope passing the entry path (id) and its data (as a hash of arrays).
       # This method will be called repeatedly until the connector is
       # stopped.
-      # Note that the hash method for the event must remain unchanged if the
-      # record itself is the same.
       def each_entry
-        # todo: Throw a not implemented exception by default
+        raise "Not implemented"
       end
 
       # Subclasses must override this to interface with the external system
@@ -96,12 +93,13 @@ module RubySync::Connectors
       def each_change
         DBM.open(self.mirror_dbm_filename) do |dbm|
           # scan existing entries to see if any new or modified
-          each_entry do |event|
-            hash = calc_hash(event)
-            unless stored_hash = dbm[event.source_path.to_s] and hash == stored_hash
-              puts "Event: #{event.source_path}\nHash: #{hash}, Stored: #{stored_hash}\n"
-              yield event # either new or modified
-              dbm[event.source_path.to_s] = hash
+          each_entry do |path, entry|
+            digest = digest(entry)
+            #puts "each_change calculating digest for:\n#{entry.inspect}"
+            unless stored_digest = dbm[path.to_s] and digest == stored_digest
+              operations = create_operations_for(entry)
+              yield RubySync::Event.add(self, path, nil, operations) 
+              dbm[path.to_s] = digest
             end
           end
           
@@ -115,7 +113,7 @@ module RubySync::Connectors
         end        
       end
       
-      def calc_hash(o)
+      def digest(o)
         Digest::MD5.hexdigest(Marshal.dump(o))
       end
       

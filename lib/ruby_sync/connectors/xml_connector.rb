@@ -27,14 +27,12 @@ $VERBOSE = false
 module RubySync::Connectors
   class XmlConnector < RubySync::Connectors::BaseConnector
 
-#    attr_accessor :data
     option :filename
 
     def each_entry
       with_xml(:read_only=>true) do |content|
         content.each do |entry|
-          operations = create_operations_for(entry[1][0])
-          yield RubySync::Event.add(self, entry[0], nil, operations)
+          yield entry[0], entry[1][0]
         end
       end
     end
@@ -47,7 +45,7 @@ module RubySync::Connectors
     
     def modify id, operations
       with_xml do |content|
-        existing = content[id][0] || {}
+        existing = content[id] && content[id][0] || {}
         content[id] = perform_operations(operations, existing)
       end
     end
@@ -61,7 +59,7 @@ module RubySync::Connectors
     def [](id)
       value = nil
       with_xml(:read_only=>true) do |content|
-        value = content[id]
+        value = content[id] && content[id][0]
       end
       value
     end
@@ -76,8 +74,9 @@ module RubySync::Connectors
     def self.sample_config
           return <<END
           #
-          # filename should be the full name of the file containing
-          # the xml representation of the synchronized content
+          # "filename" should be the full name of the file containing
+          # the xml representation of the synchronized content.
+          # You probably want to change this:
           #
           filename "/tmp/rubysync.xml"
 END

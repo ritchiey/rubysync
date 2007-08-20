@@ -43,6 +43,7 @@ module RubySync
         call_if_exists(:target_transform, event)
         if add(event.target_path, event.payload)
           log.info "Add succeeded"
+          update_mirror event.target_path
           if is_vault?
             if event.association
               associate(event.association, event.target_path)
@@ -63,7 +64,14 @@ module RubySync
         path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
         log.info "Deleting '#{path}' from '#{name}'"
         delete(path) or log.warn("#{name}: Attempted to delete non-existent entry '#{path}'\nMay be an echo of a delete from this connector, ignoring.")
+        delete_from_mirror event
         return nil # don't want to create any new associations
+      end
+      
+      def delete_from_mirror path
+        DBM.open(self.mirror_dbm_filename) do |dbm|
+          dbm.delete(path)
+        end
       end
 
       def perform_modify event
@@ -71,8 +79,19 @@ module RubySync
         raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
         call_if_exists(:target_transform, event)
         modify path, event.payload
+        update_mirror path
         return (is_vault?)? nil : own_association_key_for(event.target_path)
       end
+      
+      def update_mirror path
+        if entry = self[path]
+          DBM.open(self.mirror_dbm_filename) do |dbm|
+            #puts "update_mirror calculating digest for:\n#{entry.inspect}"
+            dbm[path.to_s] = digest(entry)
+          end
+        end
+      end
+      
     end
   end
 end
