@@ -116,7 +116,7 @@ class Controller < SimpleConsole::Controller
   # Create a Rubysync project directory
   def create
     config_path = params[:id]
-    ensure_dir_exists(
+    ensure_dir_exists([
       config_path,
       "#{config_path}/pipelines",
       "#{config_path}/connectors",
@@ -126,7 +126,7 @@ class Controller < SimpleConsole::Controller
       "#{config_path}/shared/lib",
       "#{config_path}/log",
       "#{config_path}/db"
-    )
+    ])
   end
   
   # Create a connector configuration file
@@ -300,9 +300,9 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
   # separate each mapping with a comma.
   # The following fields were detected on the client:
   # #{(client_fields.map {|f| "'#{f}'"}).join(", ")}
-  map_vault_to_client(
+  map_vault_to_client({
     #{(vault_fields.map {|f| "#'#{f}' => 'a_client_field'"}).join(",\n\t\t")}
-  )
+  })
 
   # "in" means going from client to vault
   #in_transform do

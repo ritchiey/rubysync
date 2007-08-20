@@ -89,7 +89,8 @@ class Configuration
       expanded_pd = File.expand_path(path_dir)
       expanded[0, expanded_pd.length] == expanded_pd
     end
-    prefix = (base)? expanded[File.expand_path(base).length+1, expanded.length]+"/" : ""
+    
+    prefix = (base && File.expand_path(base) != expanded)? expanded[File.expand_path(base).length+1, expanded.length]+"/" : ""
 
     # puts $:.join "\n"
     # puts "expanded = '#{expanded}'"

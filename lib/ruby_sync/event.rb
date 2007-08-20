@@ -114,6 +114,9 @@ module RubySync
     def convert_to_modify
       log.info "Converting '#{type}' event to modify"
       @type = :modify
+      @payload.each do |op|
+        op.type = :replace
+      end
     end
           
     

@@ -84,6 +84,9 @@ END
         nil
       end
       
+      def delete(path)
+        log.warn "Delete on CSV driver ignored for #{path}"
+      end
       
     end
   end

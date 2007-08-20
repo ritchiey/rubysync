@@ -44,4 +44,5 @@ SPEC = Gem::Specification.new do |s|
   s.add_dependency "activesupport", ">=1.4.0"
   s.add_dependency "activerecord", ">=1.15.3"
   s.add_dependency "simpleconsole", ">=0.1.1"
+  s.add_dependency "xmlsimple", ">=1.0.11"
 end

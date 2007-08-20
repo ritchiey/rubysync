@@ -23,6 +23,7 @@ require 'irb'
 module RubySync
   module Utilities
     
+    @@base_path=nil
 
     # Perform an action and rescue any exceptions thrown, display the exception with the specified text
     def with_rescue text
@@ -90,8 +91,8 @@ module RubySync
     
     # Return the base_path 
     def base_path
-      @base_path = find_base_path unless defined? @base_path
-      @base_path
+      @@base_path = find_base_path unless @@base_path
+      @@base_path or raise "Base path not found"
     end
 
     # Locate a configuration directory by checking the current directory and
@@ -99,14 +100,14 @@ module RubySync
     # directory.
     # Returns false if no suitable directory was found
     def find_base_path
-      base_path = File.expand_path(".")
+      bp = File.expand_path(".")
       last = nil
       # Keep going up until we start repeating ourselves
-      while File.directory?(base_path) && base_path != last && base_path != "/"
-        return base_path if File.directory?("#{base_path}/pipelines") &&
-                            File.directory?("#{base_path}/connectors")
-        last = base_path
-        base_path = File.expand_path("#{base_path}/..")
+      while File.directory?(bp) && bp != last && bp != "/"
+        return bp if File.directory?("#{bp}/pipelines") &&
+                            File.directory?("#{bp}/connectors")
+        last = bp
+        bp = File.expand_path("#{bp}/..")
       end
       return false
     end

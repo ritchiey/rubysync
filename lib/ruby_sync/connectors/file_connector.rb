@@ -31,6 +31,7 @@ module RubySync
           log.error "in_glob not set on file connector. No files will be processed"
           return
         end
+        base_path # Call it before changing directory
         log.info "#{name}: Scanning #{in_path} for #{in_glob} files..."
         Dir.chdir(in_path) do |path|
           Dir.glob(in_glob) do |filename|

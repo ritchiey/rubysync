@@ -15,6 +15,7 @@
 
 require 'ruby_sync/connectors/connector_event_processing'
 require 'dbm'
+require 'digest/md5'
 
 module RubySync::Connectors
     class BaseConnector
@@ -45,6 +46,8 @@ module RubySync::Connectors
       end
       
       def initialize options={}
+        base_path # call this once to get the working directory before anything else
+                  # in the connector changes the cwd
         options = self.class.default_options.merge(options)
         once_only = false
         self.name = options[:name]
@@ -94,9 +97,11 @@ module RubySync::Connectors
         DBM.open(self.mirror_dbm_filename) do |dbm|
           # scan existing entries to see if any new or modified
           each_entry do |event|
-            unless stored_hash = dbm[event.source_path.to_s] and event.hash.to_s == stored_hash
+            hash = calc_hash(event)
+            unless stored_hash = dbm[event.source_path.to_s] and hash == stored_hash
+              puts "Event: #{event.source_path}\nHash: #{hash}, Stored: #{stored_hash}\n"
               yield event # either new or modified
-              dbm[event.source_path.to_s] = event.hash.to_s
+              dbm[event.source_path.to_s] = hash
             end
           end
           
@@ -108,6 +113,10 @@ module RubySync::Connectors
             end
           end
         end        
+      end
+      
+      def calc_hash(o)
+        Digest::MD5.hexdigest(Marshal.dump(o))
       end
       
       # Override this to perform actions that must be performed when
@@ -370,9 +379,8 @@ module RubySync::Connectors
           when :add
             if record[op.subject]
               existing = record[op.subject].as_array
-              unless (existing & op.values).empty?
+              (existing & op.values).empty? or
                 raise Exception.new("Attempt to add duplicate elements to #{name}")
-              end
               record[op.subject] =  existing + op.values
             else
               record[op.subject] = op.values
