@@ -95,7 +95,6 @@ module RubySync::Connectors
           # scan existing entries to see if any new or modified
           each_entry do |path, entry|
             digest = digest(entry)
-            #puts "each_change calculating digest for:\n#{entry.inspect}"
             unless stored_digest = dbm[path.to_s] and digest == stored_digest
               operations = create_operations_for(entry)
               yield RubySync::Event.add(self, path, nil, operations) 

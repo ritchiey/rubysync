@@ -92,7 +92,7 @@ module RubySync
     # Return the base_path 
     def base_path
       @@base_path = find_base_path unless @@base_path
-      @@base_path or raise "Base path not found"
+      @@base_path
     end
 
     # Locate a configuration directory by checking the current directory and

@@ -24,7 +24,7 @@ require 'ruby_sync/connectors/memory_connector'
 
 
 class ChangeLogConnector < RubySync::Connectors::LdapConnector
-  host        '10.1.1.4'
+  host        'changelog_ldap'
   port        389
   username    'cn=directory manager'
   password    'password'
@@ -34,7 +34,7 @@ class ChangeLogConnector < RubySync::Connectors::LdapConnector
 end
 
 class MyLdapConnector < RubySync::Connectors::LdapConnector
-  host          'localhost'
+  host          'any_ldap'
   port          10389
   username      'uid=admin,ou=system'
   password      'secret'
@@ -93,55 +93,9 @@ class TestLdapConnector < Test::Unit::TestCase
   end
 
 
-  # Add various types of record and verifies that the appropriate
-  # changelog entries appear.
-  # Other activity on the LDAP server may interfere with this test.
-  def test_get_changes
-    banner "test_get_changes"
-    c = ChangeLogConnector.new
-    path = "cn=bob,#{c.search_base}"
-    c.delete(path) if c[path]
-    c.each_change do |event|
-    end # Ignore up til now
-
-    
-    c.add(path, c.create_operations_for(ldap_attr))
-    assert_event :add, c, path
-    
-    c.modify(path, [
-      RubySync::Operation.replace('mail', "bob@fischer.com"),
-      RubySync::Operation.add('givenName', "Robert")
-      ])
-    event = assert_event :modify, c, path
-    puts event.payload.inspect
-    
-    c.delete(path)
-    assert_event :delete, c, path
-  end
 
 private
 
-  def ldap_attr
-    {
-      "objectclass"=>['inetOrgPerson'],
-      "cn"=>'bob',
-      "sn"=>'roberts',
-      "mail"=>"bob@roberts.com"
-    }
-  end
 
-  def assert_event type, connector, path
-    events = 0
-    the_event=nil
-    connector.each_change do |event|
-      the_event = event
-      events += 1
-      assert_equal type.to_sym, event.type
-      assert_equal connector, event.source
-      assert_equal path, event.source_path
-    end
-    assert_equal 1, events, "wrong number of events on #{type.to_s}"
-    the_event
-  end
 
 end

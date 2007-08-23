@@ -66,6 +66,7 @@ module RubySync::Connectors
       self.class.ar_class model.to_s.camelize.constantize
     end
 
+
       
       def self.fields
         c = self.new
@@ -84,25 +85,11 @@ END
     
     def each_entry
       ar_class.find :all do |record|
-        yield RubySync::Event.add(self, record.id, nil, create_operations_for_active_record(record))
+        yield entry_from_active_record(record)
       end
     end
       
-    # # Process each RubySyncEvent and then delete it from the db.
-    # def each_change
-    #   ::RubySyncEvent.find(:all).each do |rse|
-    #     event = RubySync::Event.new(rse.event_type, self, rse.trackable_id, nil, to_payload(rse))
-    #     yield event
-    #     ::RubySyncEvent.delete rse
-    #   end
-    # end
 
-    # Create a hash suitable to use as rubysync event payload
-    def to_payload ar_event
-      ar_event.operations.map do |op|
-        RubySync::Operation.new(op.operation.to_sym, op.field_name, op.values.map {|v| v.value})
-      end
-    end
 
     # Override default perform_add because ActiveRecord is different in that
     # the target path is ignored when adding a record. ActiveRecord determines
@@ -113,6 +100,7 @@ END
         populate(record, perform_operations(event.payload))
         log.info(record.inspect)
         record.save!
+        update_mirror record.id
         if is_vault?
           associate event.association, record.id
         end
@@ -120,7 +108,6 @@ END
       end
     rescue => ex
       log.warn ex
-      #puts ex.backtrace.join("\n")
       return nil
     end
 
@@ -135,57 +122,14 @@ END
     def delete(path)
       ar_class.destroy path
     end
-  
-    # Implement vault functionality
-
-    # def associate association, path
-    #   log.debug "Associating '#{association}' with '#{path}'"
-    #   ruby_sync_association.create :synchronizable_id=>path, :synchronizable_type=>ar_class.name,
-    #                                :context=>association.context, :key=>association.key
-    # end
-    # 
-    # def find_associated association
-    #   ruby_sync_association.find_by_context_and_key association.context, association.key
-    # end
-    # 
-    # def path_for_association association
-    #   assoc = ruby_sync_association.find_by_context_and_key association.context, association.key
-    #   (assoc)? assoc.synchronizable_id : nil
-    # end
-    # 
-    # def association_key_for context, path
-    #   record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context path, model.to_s, context
-    #   record and record.key
-    # end
-    # 
-    # def associations_for(path)
-    #   ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path, model.to_s)
-    # rescue ActiveRecord::RecordNotFound
-    #   return nil
-    # end
-    # 
-    # def remove_association association
-    #    ruby_sync_association.find_by_context_and_key(association.context, association.key).destroy
-    # rescue ActiveRecord::RecordNotFound
-    #    return nil
-    # end
-
 
     def [](path)
-      ar_class.find(path)
+      entry_from_active_record(ar_class.find(path))
     rescue ActiveRecord::RecordNotFound
       return nil
     end
 
 private
-
-    def ruby_sync_association
-      unless @ruby_sync_association
-        @ruby_sync_association = ::RubySyncAssociation
-        ::RubySyncAssociation.establish_connection(db_config)
-      end
-      @ruby_sync_association
-    end
 
     def populate record, content
       ar_class.content_columns.each do |c|
@@ -193,13 +137,15 @@ private
       end
     end
 
-    def create_operations_for_active_record record
-      operations = record.class.content_columns.map do |col|
+    def entry_from_active_record record
+      entry = {}
+      record.class.content_columns.each do |col|
         key = col.name
         value = record.send key
-        RubySync::Operation.new(:add, key.to_s, value) if key and value
+        entry[key.to_s] = value if key and value
       end
-      operations.compact
+      entry
     end
+    
   end
 end

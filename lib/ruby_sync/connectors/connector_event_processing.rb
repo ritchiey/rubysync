@@ -86,7 +86,6 @@ module RubySync
       def update_mirror path
         if entry = self[path]
           DBM.open(self.mirror_dbm_filename) do |dbm|
-            #puts "update_mirror calculating digest for:\n#{entry.inspect}"
             dbm[path.to_s] = digest(entry)
           end
         end
