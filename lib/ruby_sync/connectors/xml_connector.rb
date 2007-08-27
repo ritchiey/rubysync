@@ -41,6 +41,7 @@ module RubySync::Connectors
       with_xml do |content|
         content[id] = perform_operations(operations)
       end
+      id
     end
     
     def modify id, operations
@@ -48,12 +49,14 @@ module RubySync::Connectors
         existing = content[id] && content[id][0] || {}
         content[id] = perform_operations(operations, existing)
       end
+      id
     end
     
     def delete id
       with_xml do |content|
         content.delete(id)
       end
+      id
     end
     
     def [](id)

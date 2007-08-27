@@ -163,12 +163,6 @@ module RubySync::Connectors
       def is_vault?
         @is_vault
       end
-      
-      # Returns the correct id for the given association 
-      def path_for_association(association)
-        (is_vault?)?
-          path_for_foreign_key(association) : path_for_own_association_key(association.key)
-      end
 
 
       # Returns the association key for the given path. Called if this connector is
@@ -233,6 +227,7 @@ module RubySync::Connectors
       end
       
       def path_for_association association
+        is_vault? or return path_for_own_association_key(association.key)
         DBM.open(association_to_path_dbm_filename) do |dbm|
           dbm[association.to_s]
         end
@@ -306,12 +301,11 @@ module RubySync::Connectors
       end
       
       def remove_mirror
-        File.delete(mirror_dbm_filename) if File.exist?(mirror_dbm_filename) 
+        File.delete_if_exists(["#{mirror_dbm_filename}.db"])
       end
       
       def remove_associations
-        File.delete(association_to_path_dbm_filename) if File.exist?(association_to_path_dbm_filename)
-        File.delete(path_to_association_dbm_filename) if File.exist?(path_to_association_dbm_filename)
+        File.delete_if_exists(["#{association_to_path_dbm_filename}.db","#{path_to_association_dbm_filename}.db"])
       end
 
       def clean

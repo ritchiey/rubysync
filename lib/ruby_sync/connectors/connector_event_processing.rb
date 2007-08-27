@@ -64,7 +64,7 @@ module RubySync
         path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
         log.info "Deleting '#{path}' from '#{name}'"
         delete(path) or log.warn("#{name}: Attempted to delete non-existent entry '#{path}'\nMay be an echo of a delete from this connector, ignoring.")
-        delete_from_mirror event
+        delete_from_mirror path
         return nil # don't want to create any new associations
       end
       

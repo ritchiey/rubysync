@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-require 'test/unit'
-#require 'test_csv_file_connector'
-require 'test_memory_connectors'
-require 'test_ldif'
-require 'test_base_pipeline'
-#require 'test_ldap_connector'
-#require 'test_active_record_connector'
+
+class Rubysync
+  VERSION = '0.0.3'
+end

@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -13,8 +13,14 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
+
+lib_path = File.dirname(__FILE__) + '/../lib'
+$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
+
+require 'ruby_sync'
 require 'test/unit'
-#require 'test_csv_file_connector'
+
+require 'test_csv_file_connector'
 require 'test_memory_connectors'
 require 'test_ldif'
 require 'test_base_pipeline'

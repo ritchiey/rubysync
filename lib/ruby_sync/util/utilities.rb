@@ -18,6 +18,14 @@ require 'fileutils'
 require 'irb'
 
 
+class ::File
+  def self.delete_if_exists(files)
+    files.kind_of?(Array) or files = [files]
+    files.each do |file|
+      File.delete(file) if File.exist?(file)
+    end
+  end
+end
 
 # Generally useful methods
 module RubySync

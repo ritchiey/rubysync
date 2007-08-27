@@ -13,10 +13,35 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-require 'test/unit'
-#require 'test_csv_file_connector'
-require 'test_memory_connectors'
-require 'test_ldif'
-require 'test_base_pipeline'
-#require 'test_ldap_connector'
-#require 'test_active_record_connector'
+#
+# Performs end-to-end tests of the memory based testing connectors.
+#
+[File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)].each do |lib_path|
+  $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
+end
+require 'ruby_sync_test'
+require 'hashlike_tests'
+require 'ruby_sync/connectors/xml_connector'
+
+
+class TestAConnector < RubySync::Connectors::XmlConnector
+  dbm_path "/tmp/rubysync_a"
+  filename "/tmp/rubysync_a.xml"
+end
+
+class TestBConnector < RubySync::Connectors::XmlConnector
+  dbm_path "/tmp/rubysync_b"
+  filename "/tmp/rubysync_b.xml"
+end
+
+class TestPipeline < RubySync::Pipelines::BasePipeline
+  client :test_a
+  vault :test_b
+end
+
+class TestMemoryConnectors < Test::Unit::TestCase
+  
+  include RubySyncTest
+  include HashlikeTests
+
+end
