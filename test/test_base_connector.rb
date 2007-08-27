@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -20,36 +20,19 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 require 'ruby_sync'
 require 'test/unit'
 
-module RubySyncTest
-
-
-  def initialize(test)
-    super(test)
-    @bob_details = {'givenName'=>['Robert'],
-                    'sn'=>['Smith'],
-                    'interests'=>['music', 'makeup']
-    }
-  end
+class MyConnector < RubySync::Connectors::BaseConnector
   
+end
 
+class TestBaseConnector < Base::Test::Unit
+  
   def setup
-    @pipeline = TestPipeline.new
-    @client = @pipeline.client
-    @vault = @pipeline.vault
-    @client.delete(client_path) if @client[client_path]
-    @vault.delete(vault_path) if @vault[vault_path]
-    @client.clean
-    @vault.clean
+    @c  = MyConnector.new
+    @c.clean
   end
   
-  def teardown
-    @vault.clean
-    @client.clean
+  def test_clean
+    
   end
-
-  def banner(label)
-    puts '*' * 10 + " #{label} " + '*' * 10
-  end
-  
   
 end
