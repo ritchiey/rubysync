@@ -16,7 +16,7 @@ require 'rubygems'
 
 SPEC = Gem::Specification.new do |s|
   s.name = "rubysync"
-  s.version = "0.0.2"
+  s.version = "0.0.3"
   s.rubyforge_project = 'rubysync'
   s.author = "Ritchie Young"
   s.email = "ritchiey@gmail.com"

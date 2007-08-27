@@ -1,5 +1,8 @@
-== 1.0.0 / 2007-08-27
 
-* 1 major enhancement
-  * Birthday!
+== 0.0.3 / 2007-08-27
+
+* Added XML Connector to enable demonstration with no dependencies on LDAP or DB servers
+* Added DBM based association tracking to enable any connector to be used as a vault
+* Added DBM based change tracking to make writing a simple (albeit inefficient) connector trivial
+
 
