@@ -39,7 +39,7 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   vault :test_b
 end
 
-class TestMemoryConnectors < Test::Unit::TestCase
+class TcXmlConnectors < Test::Unit::TestCase
   
   include RubySyncTest
   include HashlikeTests

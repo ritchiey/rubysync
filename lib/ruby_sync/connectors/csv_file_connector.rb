@@ -17,17 +17,25 @@ module RubySync
     class CsvFileConnector < RubySync::Connectors::FileConnector
       
       option  :field_names, # A list of names representing the namesspace for this connector
-              :path_field # The name of the field to use as the source_path
+              :path_field, # The name of the field to use as the source_path
+              :header_line # true if the first line is a header and should be ignored during imports
       
       in_glob       '*.csv'
       out_extension '.csv'
       field_names   []
-      path_field    (get_field_names.empty?)? 'field_0': @field_names[0]
+      path_field((get_field_names.empty?)? 'field_0': @field_names[0])
+      
       
       # Called for each filename matching in_glob in in_path
       # Yields a modify event for each row found in the file.
       def each_file_change(filename)
+        header = header_line
         CSV.open(filename, 'r') do |row|
+          if header # should we ignore the first line
+            header = false
+            next
+          end
+
           if defined? field_name &&row.length > field_names.length
             log.warn "#{name}: Row in file #{filename} exceeds defined field_names"
           end
@@ -35,7 +43,7 @@ module RubySync
           data = {}
           row.each_index do |i|
             field_name = (i < field_names.length)? field_names[i] : "field_#{i}"
-            data[field_name] = row[i].data
+            row[i] and data[field_name] = row[i].data
           end
           association_key = source_path = path_for(data)
           yield RubySync::Event.modify(self, source_path, association_key, create_operations_for(data))
@@ -44,7 +52,11 @@ module RubySync
 
       def self.sample_config
           return <<END
-          
+
+            # True if the first line of each file is a header
+            # and should be ignored
+            header_line   true
+
             field_names   ['names', 'of', 'the', 'columns']
             path_field    'name_of_field_to_use_as_the_id'
             in_path       '/directory/to/read/files/from'

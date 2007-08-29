@@ -40,6 +40,12 @@ module RubySync
       self.values = values
     end
   
+    def ==(o)
+      subject == o.subject &&
+      type == o.type &&
+      values == o.values
+    end
+    
     remove_method :type=
     def type=(type)
       unless [:add, :delete, :replace].include? type.to_sym

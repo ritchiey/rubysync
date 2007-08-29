@@ -112,6 +112,18 @@ class Controller < SimpleConsole::Controller
     end
   end
 
+  def start
+    pipeline_name = params[:id]
+    pipeline = pipeline_called pipeline_name
+    if pipeline
+      pipeline.start
+    else
+      log.error "Couldn't find a pipeline called '#{pipeline_name}'"
+    end
+  end
+
+
+
   # Create a Rubysync project directory
   def create
     config_path = params[:id]
@@ -207,6 +219,8 @@ Usage:
   * once {name}             
                           ; Execute the named pipeline within the current
                           ; configuration directory once and then exit
+                          
+  * start {name}          ; Execute the named pipeline
                         
   * example               ; Show an example of how this command might be used
 
@@ -236,9 +250,13 @@ puts <<"END"
   You would then edit the file pipelines/my_pipeline.rb to configure the
   policy for synchronizing between the two connectors.
                                         
-  You may then execute the pipeline in one-shot mode (daemon mode is coming):
+  You may then execute the pipeline in one-shot mode:
 
     $ rubysync once my
+    
+  or continually:
+  
+    $ rubysync start my
 END
 end
 
@@ -248,9 +266,6 @@ end
 
                                             
   
-  def start
-    puts "Not yet implemented"
-  end
 
 end
 
@@ -266,7 +281,6 @@ class #{name.to_s.camelize}Connector < #{type_class_name}
 end
     end;
   end
-  
 
   
   def pipeline_template name, vault_name, client_name
@@ -298,7 +312,7 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
   #    'first name' => 'givenName'
   # separate each mapping with a comma.
   # The following fields were detected on the client:
-  # #{(client_fields.map {|f| "'#{f}'"}).join(", ")}
+  # #{(client_fields.map {|f| "'#{f}'"}).join(",")}
   map_vault_to_client({
     #{(vault_fields.map {|f| "#'#{f}' => 'a_client_field'"}).join(",\n\t\t")}
   })

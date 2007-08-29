@@ -60,4 +60,31 @@ class TestUtilities < Test::Unit::TestCase
     assert_equal WRONG, c.just_one
   end
   
+  
+  def test_effective_operations
+    a = A.new
+    entry = {
+      "sn" => "Fox",
+      "givenName" => %w{Michael Andrew},
+      "shows" => "Family Ties"
+    }
+    
+    op = RubySync::Operation
+    ops = [
+      op.add("fans", ["Ritchie"]),
+      op.add("shows", ["Scrubs", "Boston Legal"]),
+      op.replace("givenName", %w{Michael J}),
+      op.delete("movies","Bright Lights, Big City")
+    ]
+    
+    e = a.effective_operations(ops, entry)
+    
+    assert_equal op.add("fans", ["Ritchie"]), e[0]
+    assert_equal op.replace("shows", ["Scrubs", "Boston Legal"]), e[1]
+    assert_equal op.replace("givenName", %w{Michael J}), e[2]
+    assert_equal 3, e.size
+  end
+  
+  
+  
 end

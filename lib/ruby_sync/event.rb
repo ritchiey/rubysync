@@ -93,9 +93,12 @@ module RubySync
       self.association && self.association.context && self.association.key
     end
     
+    # Reduces the operations in this event to those that will
+    # alter the 
     def merge other
-      # TODO implement merge
-      log.warn "Event.merge not yet implemented"
+      other.type == :add or raise "Can only merge with add events"
+      record = perform_operations(other.payload)
+      payload = effective_operations(payload, record)
     end
     
     # Retrieves all known values for the record affected by this event and

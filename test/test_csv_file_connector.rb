@@ -23,6 +23,7 @@ require 'csv'
 
 
 class TestCsvFileConnector < RubySync::Connectors::CsvFileConnector
+  dbm_path "/tmp/rubysync_csv"  
   field_names ['id', 'given name', 'last name', 'email']
   path_field  'id'
   in_path     File.expand_path("~/rubysync/csv_test/in")
@@ -30,6 +31,7 @@ class TestCsvFileConnector < RubySync::Connectors::CsvFileConnector
 end
 
 class TestMemoryConnector < RubySync::Connectors::MemoryConnector
+  dbm_path "/tmp/rubysync_memory"  
 end
 
 

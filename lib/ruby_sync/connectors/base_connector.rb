@@ -27,7 +27,11 @@ module RubySync::Connectors
       option  :dbm_path
       
       # set a default dbm path
-      def dbm_path() "#{base_path}/db/#{name}"; end
+      def dbm_path()
+        p = "#{base_path}/db"
+        ::FileUtils.mkdir_p p
+        ::File.join(p,name)
+      end
 
       # Stores association keys indexed by path:association_context
       def path_to_association_dbm_filename
@@ -125,13 +129,13 @@ module RubySync::Connectors
       # to generate events.
       # Should generally only be called by the pipeline to which it is attached.
       def start &blk
-        log.info "#{name}: Started"
+        log.debug "#{name}: Started"
         @running = true
         started()
         while @running
           each_change do |event|
             if event.type == :force_resync
-              each_entry &blk
+              each_entry(&blk)
               next
             end
             if is_delete_echo?(event) || is_echo?(event)
@@ -356,40 +360,6 @@ module RubySync::Connectors
       end
 
 
-      # Performs the given operations on the given record. The record is a
-      # Hash in which each key is a field name and each value is an array of
-      # values for that field.
-      # Operations is an Array of RubySync::Operation objects to be performed on the record.
-      def perform_operations operations, record={}
-        operations.each do |op|
-          unless op.instance_of? RubySync::Operation
-            log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
-            p op
-          end
-          case op.type
-          when :add
-            if record[op.subject]
-              existing = record[op.subject].as_array
-              (existing & op.values).empty? or
-                raise Exception.new("Attempt to add duplicate elements to #{name}")
-              record[op.subject] =  existing + op.values
-            else
-              record[op.subject] = op.values
-            end
-          when :replace
-            record[op.subject] = op.values
-          when :delete
-            if value == nil || value == "" || value == []
-              record.delete(op.subject)
-            else
-              record[op.subject] -= values
-            end
-          else
-            raise Exception.new("Unknown operation '#{op.type}'")
-          end
-        end
-        return record
-      end
 
 
       # Return an array of possible fields for this connector.
