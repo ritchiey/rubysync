@@ -36,10 +36,14 @@ module RubySyncTest
     @pipeline = TestPipeline.new
     @client = @pipeline.client
     @vault = @pipeline.vault
-    @client.delete(client_path) if @client[client_path]
-    @vault.delete(vault_path) if @vault[vault_path]
     @client.clean
     @vault.clean
+    secondary_setup
+    @client.delete(client_path) if @client[client_path]
+    @vault.delete(vault_path) if @vault[vault_path]
+  end
+
+  def secondary_setup
   end
   
   def teardown

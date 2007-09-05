@@ -21,78 +21,132 @@ require 'ruby_sync'
 $VERBOSE = false
 #require 'xmlsimple'
 #$VERBOSE = true
+require 'rexml/document'
 
-
+class REXML::Document
+  
+  def entry_element_for id
+    elements = root.each_element("entry[@id]='#{id}'")
+    (elements.empty?)? nil : elements[0]
+  end
+  
+end
 
 module RubySync::Connectors
   class XmlConnector < RubySync::Connectors::BaseConnector
+    
+    include REXML
 
     option :filename
 
     def each_entry
-      with_xml(:read_only=>true) do |content|
-        content.each do |entry|
-          yield entry[0], entry[1][0]
+      with_xml(:read_only=>true) do |xml|
+        xml.root.each_element("entry") do |element|
+          yield element.attribute('id').value, to_entry(element)
         end
       end
     end
     
     def add id, operations
-      with_xml do |content|
-        content[id] = perform_operations(operations)
+      entry = nil
+      with_xml do |xml|
+        xml.entry_element_for(id) and raise "Element '#{id}' already exists."
+        entry = perform_operations(operations)
       end
+      self[id] = entry
       id
     end
     
     def modify id, operations
+      entry = nil
       with_xml do |content|
-        existing = content[id] && content[id][0] || {}
-        content[id] = perform_operations(operations, existing)
+        existing = content[id] || {}
+        entry =  perform_operations(operations, existing)
       end
+      self[id] = entry
       id
     end
     
     def delete id
-      with_xml do |content|
-        content.delete(id)
+      with_xml do |xml|
+        xml.root.delete_element "entry[@id=#{id}]"
       end
-      id
     end
     
     def [](id)
-      value = nil
-      with_xml(:read_only=>true) do |content|
-        value = content[id] && content[id][0]
+      with_xml(:read_only=>true) do |xml|
+        return to_entry(xml.entry_element_for(id))
       end
-      value
     end
+    
+      
 
     def []=(id, value)
-      with_xml do |content|
-        content[id] = value 
+      with_xml do |xml|
+        new_child = to_xml(id, value)
+        if old_child = xml.entry_element_for(id)   
+          xml.root.replace_child(old_child, new_child)
+        else
+          xml.root << new_child
+        end
       end
     end
+
+
+    def to_xml key, entry
+      el = Element.new("entry")
+      el.add_attribute('id', key)
+      entry.each do |key, values|
+        el << attr = Element.new("attr")
+        attr.add_attribute 'name', key
+        values.as_array.each do |value|
+          value_el = Element.new('value')
+          attr << value_el.add_text(value)
+        end
+      end
+      el
+    end
+
+
+
     
+    def to_entry entry_element
+      entry_element or return nil
+      entry = {}
+      entry_element.each_element("attr") do |child|
+        entry[child.attribute('name').value] = values = []
+        child.each_element("value") do |value_element|
+          values << value_element.text
+        end
+      end
+      entry
+    end
+      
     
     def self.sample_config
-          return <<END
-          #
-          # "filename" should be the full name of the file containing
-          # the xml representation of the synchronized content.
-          # You probably want to change this:
-          #
-          filename "/tmp/rubysync.xml"
-END
+      return %q(
+#
+# "filename" should be the full name of the file containing
+# the xml representation of the synchronized content.
+# You probably want to change this:
+#
+filename "/tmp/rubysync.xml"
+)
     end    
 
-private
+
+
 
     
     def with_xml options={}
-      content = (File.exist?(filename))? content = XmlSimple.xml_in(filename) : {}
-      yield content
-      XmlSimple.xml_out(content, {'OutputFile'=>filename}) unless options[:read_only]
+      entries = {}
+      File.exist?(filename) or File.open(filename,"w") {|file| file.write "<entries/>"}
+      File.open(filename, "r+") do |file|
+        xml = Document.new(file)
+        yield xml
+        file.rewind
+        xml.write file
+      end
     end
-
   end
 end
