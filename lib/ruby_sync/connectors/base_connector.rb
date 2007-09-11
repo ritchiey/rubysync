@@ -23,7 +23,7 @@ module RubySync::Connectors
       include RubySync::Utilities
       include ConnectorEventProcessing
       
-      attr_accessor :once_only, :name, :is_vault
+      attr_accessor :once_only, :name, :is_vault, :pipeline
       option  :dbm_path
       
       # set a default dbm path
@@ -115,6 +115,10 @@ module RubySync::Connectors
             unless self[key]
               yield RubySync::Event.delete(self, key)
               dbm.delete key
+              if is_vault? and @pipeline
+                association = association_for @pipeline.association_context, key
+                remove_association association
+              end
             end
           end
         end        
@@ -255,7 +259,6 @@ module RubySync::Connectors
         end
       end
       
-      # Default implementation does nothing
       def associations_for path
         DBM.open(path_to_association_dbm_filename) do |dbm|
           assocs_string = dbm[path.to_s]
@@ -264,7 +267,7 @@ module RubySync::Connectors
         end
       end
 
-      # Default implementation does nothing
+
       def remove_association association
         path = nil
         DBM.open(association_to_path_dbm_filename) do |dbm|

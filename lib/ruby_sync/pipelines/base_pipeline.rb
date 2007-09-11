@@ -64,7 +64,11 @@ module RubySync
         options[:name] ||= "#{self.name}(vault)"
         options[:is_vault] = true
         class_def 'vault' do
-          @vault ||= eval("::" + class_name).new(options)
+          unless @vault
+            @vault = eval("::" + class_name).new(options)
+            @vault.pipeline = self
+          end
+          @vault
         end
       end
       

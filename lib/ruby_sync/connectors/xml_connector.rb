@@ -26,7 +26,7 @@ require 'rexml/document'
 class REXML::Document
   
   def entry_element_for id
-#    root.each_element_with_attribute('id', id) do |element|
+    #    root.each_element_with_attribute('id', id) do |element|
     root.each_element("entry[@id='#{id}']") do |element|
       return element
     end
@@ -80,7 +80,8 @@ module RubySync::Connectors
     
     def [](id)
       with_xml(:read_only=>true) do |xml|
-        return to_entry(xml.entry_element_for(id))
+        element = xml.entry_element_for(id)
+        return (element)? to_entry(element) : nil
       end
     end
     
@@ -137,30 +138,35 @@ module RubySync::Connectors
 # You probably want to change this:
 #
 filename "/tmp/rubysync.xml"
-)
+      )
     end    
 
 
-
-    def started
-      File.exist?(filename) or File.open(filename,"w") {|file| file.write "<entries/>"}
-      File.open(filename, "r") do |file|
-        @xml = Document.new(file)
-      end
-    end
-    
-    def stopped
-      File.open(filename, "w") do |file|
-        @xml.write file
-      end
-    end
-
-    # Should be re-entrant within a single thread but probably isn't
+    # Should be re-entrant within a single thread but isn't
     # thread-safe.
     def with_xml options={}
-      yield @xml
-      File.open(filename, 'w') do |file|
-        @xml.write file
+      unless @with_xml_invoked
+        begin
+          @with_xml_invoked = true
+          File.exist?(filename) or File.open(filename,'w') {|file| file.write('<entries/>')}
+          log.debug "with_xml about to open"
+          File.open(filename, "r") do |file|
+            file.flock(File::LOCK_EX)
+            @xml = Document.new(file)
+            begin
+              yield @xml
+            ensure
+              File.open(filename, "w") do |out|
+                @xml.write out
+              end
+            end
+          end
+          log.debug "with_xml closed"
+        ensure
+          @with_xml_invoked = false
+        end
+      else # this is a nested call so we don't need to read or write the file
+        yield @xml
       end
     end
   end
