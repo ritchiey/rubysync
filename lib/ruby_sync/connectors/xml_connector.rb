@@ -63,9 +63,9 @@ module RubySync::Connectors
     
     def modify id, operations
       entry = nil
-      with_xml do |content|
-        existing = content[id] || {}
-        entry =  perform_operations(operations, existing)
+      with_xml do |xml|
+        existing_entry = to_entry(xml.entry_element_for(id))
+        entry = perform_operations(operations, existing_entry)
       end
       self[id] = entry
       id
@@ -116,12 +116,13 @@ module RubySync::Connectors
 
     
     def to_entry entry_element
-      entry_element or return nil
       entry = {}
-      entry_element.each_element("attr") do |child|
-        entry[child.attribute('name').value] = values = []
-        child.each_element("value") do |value_element|
-          values << value_element.text
+      if entry_element
+        entry_element.each_element("attr") do |child|
+          entry[child.attribute('name').value] = values = []
+          child.each_element("value") do |value_element|
+            values << value_element.text
+          end
         end
       end
       entry
