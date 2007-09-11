@@ -26,8 +26,11 @@ require 'rexml/document'
 class REXML::Document
   
   def entry_element_for id
-    elements = root.each_element("entry[@id]='#{id}'")
-    (elements.empty?)? nil : elements[0]
+#    root.each_element_with_attribute('id', id) do |element|
+    root.each_element("entry[@id='#{id}']") do |element|
+      return element
+    end
+    nil
   end
   
 end
@@ -46,6 +49,7 @@ module RubySync::Connectors
         end
       end
     end
+    
     
     def add id, operations
       entry = nil
@@ -68,8 +72,9 @@ module RubySync::Connectors
     end
     
     def delete id
+      xpath = "//entry[@id='#{id}']"
       with_xml do |xml|
-        xml.root.delete_element "entry[@id=#{id}]"
+        xml.root.delete_element xpath
       end
     end
     
@@ -136,16 +141,25 @@ filename "/tmp/rubysync.xml"
 
 
 
-
-    
-    def with_xml options={}
-      entries = {}
+    def started
       File.exist?(filename) or File.open(filename,"w") {|file| file.write "<entries/>"}
-      File.open(filename, "r+") do |file|
-        xml = Document.new(file)
-        yield xml
-        file.rewind
-        xml.write file
+      File.open(filename, "r") do |file|
+        @xml = Document.new(file)
+      end
+    end
+    
+    def stopped
+      File.open(filename, "w") do |file|
+        @xml.write file
+      end
+    end
+
+    # Should be re-entrant within a single thread but probably isn't
+    # thread-safe.
+    def with_xml options={}
+      yield @xml
+      File.open(filename, 'w') do |file|
+        @xml.write file
       end
     end
   end

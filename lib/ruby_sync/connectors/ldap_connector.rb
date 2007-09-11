@@ -137,10 +137,6 @@ module RubySync::Connectors
       log.warn "Returning a likely sample set."
       %w{ cn givenName sn }
     end
-
-    
-    def stopped
-    end
     
 
 

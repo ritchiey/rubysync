@@ -48,7 +48,9 @@ class TcXmlConnectors < Test::Unit::TestCase
   include RubySyncTest
   include HashlikeTests
 
-  def secondary_setup
+  alias_method :old_setup, :setup
+  def setup
+    old_setup
     @tc = TestConnector.new
     File.delete_if_exists [@client.filename, @vault.filename, @tc.filename]
   end
@@ -73,10 +75,10 @@ class TcXmlConnectors < Test::Unit::TestCase
   
   def test_xml_delete
     xml_test_document
-    assert_not_nil @tc['tcd']
-    assert_equal 'Dummy',@tc["tcd"]['sn']
-    @tc.delete "tcd"
-    assert_nil @tc['tcd']
+    assert_not_nil @tc['ctd']
+    assert_equal ['Dummy'],@tc["ctd"]['sn']
+    @tc.delete "ctd"
+    assert_nil @tc['ctd']
   end
   
   def test_to_xml

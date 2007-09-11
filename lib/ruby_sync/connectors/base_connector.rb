@@ -57,7 +57,7 @@ module RubySync::Connectors
         self.name = options[:name]
         self.is_vault = options[:is_vault]
         if is_vault && !can_act_as_vault?
-          raise Exception.new("#{self.class.name} can't act as an identity vault.")
+          raise "#{self.class.name} can't act as an identity vault."
         end
         options.each do |key, value|
           if self.respond_to? "#{key}="
@@ -68,16 +68,20 @@ module RubySync::Connectors
         end
       end      
       
+
+      # Subclasses must override this. Called by perform_add to actually
+      # store the new record in the datastore. Returned value will be used
+      # as the association id if this connector is acting as the client.
+      def add id, operations
+        raise "add method not implemented"
+      end
+      
       
       # Override this to return a string that will be included within the class definition of
       # of configurations based on your connector.
       def self.sample_config
       end
       
-      # Override this to perform actions that must be performed the
-      # when the connector starts running. (Eg, opening network connections)
-      def started
-      end
       
       # Subclasses must override this to
       # interface with the external system and generate entries for every
@@ -120,9 +124,6 @@ module RubySync::Connectors
         Digest::MD5.hexdigest(Marshal.dump(o))
       end
       
-      # Override this to perform actions that must be performed when
-      # the connector exits (eg closing network conections).
-      def stopped; end
 
 
       # Call each_change repeatedly (or once if in once_only mode)
@@ -131,7 +132,7 @@ module RubySync::Connectors
       def start &blk
         log.debug "#{name}: Started"
         @running = true
-        started()
+        sync_started()
         while @running
           each_change do |event|
             if event.type == :force_resync
@@ -154,9 +155,26 @@ module RubySync::Connectors
             sleep 1
           end
         end
-        stopped
+        sync_stopped
       end
 
+      
+      # Called by start() after last call to each_change or each_entry
+      def sync_stopped; end
+      
+      # Called by start() before first call to each_change or each_entry
+      def sync_started; end
+
+      # Override this to perform actions that must be performed the
+      # when the connector starts running. (Eg, opening network connections)
+      def started
+      end
+      
+      # Override this to perform actions that must be performed when
+      # the connector exits (eg closing network conections).
+      def stopped; end
+
+      
       # Politely stop the connector.
       def stop
         log.info "#{name}: Attempting to stop"

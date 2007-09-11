@@ -43,6 +43,8 @@ module RubySync
   # array of RubySync::Operations describing changes to the attributes of the
   # record.
   class Event
+    
+    include RubySync::Utilities
 
     attr_accessor :type,        # delete, add, modify ...
                   :source,
@@ -94,11 +96,11 @@ module RubySync
     end
     
     # Reduces the operations in this event to those that will
-    # alter the 
+    # alter the target record
     def merge other
-      other.type == :add or raise "Can only merge with add events"
-      record = perform_operations(other.payload)
-      payload = effective_operations(payload, record)
+#      other.type == :add or raise "Can only merge with add events"
+#      record = perform_operations(other.payload)
+      payload = effective_operations(@payload, other)
     end
     
     # Retrieves all known values for the record affected by this event and
