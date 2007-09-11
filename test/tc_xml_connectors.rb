@@ -53,6 +53,13 @@ class TcXmlConnectors < Test::Unit::TestCase
     old_setup
     @tc = TestConnector.new
     File.delete_if_exists [@client.filename, @vault.filename, @tc.filename]
+    xml_test_document
+    @tc.started
+  end
+  
+  alias_method :old_teardown, :teardown
+  def teardown
+    @tc.stopped
   end
   
   
@@ -74,7 +81,6 @@ class TcXmlConnectors < Test::Unit::TestCase
 
   
   def test_xml_delete
-    xml_test_document
     assert_not_nil @tc['ctd']
     assert_equal ['Dummy'],@tc["ctd"]['sn']
     @tc.delete "ctd"
