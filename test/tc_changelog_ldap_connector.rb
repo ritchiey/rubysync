@@ -20,23 +20,25 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 require 'ruby_sync_test'
 require 'hashlike_tests'
 require 'ruby_sync/connectors/ldap_connector'
+require 'ruby_sync/connectors/ldap_changelog_connector'
 require 'ruby_sync/connectors/memory_connector'
 
 
-class MyLdapConnector < RubySync::Connectors::LdapConnector
-  host          'any_ldap'
-  port          389
-  username      'cn=Manager,dc=my-domain,dc=com'
-  password      'secret'
+class MyChangeLogConnector < RubySync::Connectors::LdapChangelogConnector
+  host        'changelog_ldap'
+  port        389
+  username    'cn=directory manager'
+  password    'password'
+  changelog_dn 'cn=changelog'
   search_filter "cn=*"
-  search_base   "ou=users,o=my-organization,dc=my-domain,dc=com"
+  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
 end
 
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
 
 class TestPipeline < RubySync::Pipelines::BasePipeline
   
-  client :my_ldap
+  client :my_changelog
 
   vault :my_memory
   
@@ -45,14 +47,15 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   out_transform do
     if type == :add or type == :modify
       each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
-      append RubySync::Operation.new(:add, "objectclass", ['person'])
+      append RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson'])
     end
   end
 
 end
 
 
-class TCLdapConnector < Test::Unit::TestCase
+
+class TestLdapChangelogConnector < Test::Unit::TestCase
     
   include RubySyncTest
   include HashlikeTests
@@ -63,13 +66,12 @@ class TCLdapConnector < Test::Unit::TestCase
 
 
   def vault_path
-    # TODO: Try using a different path for the vault that's derived from the client source path
-    'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'
+    'uid=bob,ou=People,dc=9to5magic,dc=com,dc=au'
   end
 
 
   def client_path
-    'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'
+    'uid=bob,ou=People,dc=9to5magic,dc=com,dc=au'
   end
 
 
@@ -82,14 +84,10 @@ class TCLdapConnector < Test::Unit::TestCase
   def test_client_to_vault
   end
 
+
+
 private
 
-  def ldap_attr
-    {
-      "objectclass"=>['person'],
-      "cn"=>'bob',
-      "sn"=>'roberts',
-      "mail"=>"bob@roberts.com"
-    }
-  end
+
+
 end

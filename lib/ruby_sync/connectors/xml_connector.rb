@@ -149,7 +149,6 @@ filename "/tmp/rubysync.xml"
         begin
           @with_xml_invoked = true
           File.exist?(filename) or File.open(filename,'w') {|file| file.write('<entries/>')}
-          log.debug "with_xml about to open"
           File.open(filename, "r") do |file|
             file.flock(File::LOCK_EX)
             @xml = Document.new(file)
@@ -161,7 +160,6 @@ filename "/tmp/rubysync.xml"
               end
             end
           end
-          log.debug "with_xml closed"
         ensure
           @with_xml_invoked = false
         end

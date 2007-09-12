@@ -224,12 +224,6 @@ module RubySync::Connectors
       # Whether this connector is capable of acting as a vault.
       # The vault is responsible for storing the association key of the client application
       # and must be able to retrieve records for that association key.
-      # Typically, databases and directories can act as vaults, text documents and HR or finance
-      # applications probably can't.
-      # To enable a connector to act as a vault, define the following methods:
-      # => path_for_foreign_key(pipeline_id, key)
-      # => foreign_key_for(path)
-      # and associate_with_foreign_key(key, path).
       def can_act_as_vault?
         defined? associate and
         defined? path_for_association and
@@ -279,19 +273,6 @@ module RubySync::Connectors
           assocs.delete(association.context) and dbm[path.to_s] = Marshal.dump(assocs)
         end
       end
-
-      # Could be more efficient for the default case where the
-      # associations are actually stored as a serialized hash but
-      # then it wouldn't be as generic and other implementations would
-      # have to reimplement it.
-      # def association_key_for context, path
-      #   raise "#{name} is not a vault." unless is_vault?
-      #   associations_for(path).each do |assoc|
-      #     (c, key) = assoc.split(RubySync::Association.delimiter, 2)
-      #     return key if c == context 
-      #   end
-      #   return nil
-      # end
 
       def association_key_for context, path
         DBM.open(path_to_association_dbm_filename) do |dbm|
