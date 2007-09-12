@@ -20,9 +20,9 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 require 'ruby_sync'
 require 'test/unit'
 
-require 'test_csv_file_connector'
-require 'test_memory_connectors'
-require 'test_ldif'
-require 'test_base_pipeline'
+require 'tc_csv_file_connector'
+require 'tc_memory_connectors'
+require 'tc_ldif'
+require 'tc_base_pipeline'
 #require 'test_ldap_connector'
 #require 'test_active_record_connector'
