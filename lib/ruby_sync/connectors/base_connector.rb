@@ -14,7 +14,8 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 require 'ruby_sync/connectors/connector_event_processing'
-require 'dbm'
+require 'yaml'
+require 'yaml/dbm'
 require 'digest/md5'
 
 module RubySync::Connectors
@@ -125,7 +126,7 @@ module RubySync::Connectors
       end
       
       def digest(o)
-        Digest::MD5.hexdigest(Marshal.dump(o))
+        Digest::MD5.hexdigest(o.to_yaml)
       end
       
 
@@ -235,11 +236,10 @@ module RubySync::Connectors
 
       # Store association for the given path
       def associate association, path
-        DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs_string = dbm[path.to_s]
-          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
-          assocs[association.context] = association.key
-          dbm[path.to_s] = Marshal.dump(assocs)
+        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs = dbm[path.to_s] || {}
+          assocs[association.context.to_s] = association.key.to_s
+          dbm[path.to_s] = assocs
         end
         DBM.open(association_to_path_dbm_filename) do |dbm|
           dbm[association.to_s] = path
@@ -254,9 +254,8 @@ module RubySync::Connectors
       end
       
       def associations_for path
-        DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs_string = dbm[path.to_s]
-          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
+        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs =  dbm[path.to_s]
           assocs.values
         end
       end
@@ -267,17 +266,15 @@ module RubySync::Connectors
         DBM.open(association_to_path_dbm_filename) do |dbm|
           return unless path =dbm.delete(association.to_s)
         end
-        DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs_string = dbm[path]
-          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
-          assocs.delete(association.context) and dbm[path.to_s] = Marshal.dump(assocs)
+        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs = dbm[path.to_s]
+          assocs.delete(association.context) and dbm[path.to_s] = assocs
         end
       end
 
       def association_key_for context, path
-        DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs_string = dbm[path.to_s]
-          assocs = (assocs_string)? Marshal.load(assocs_string) : {}
+        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
+          assocs = dbm[path.to_s] || {}
           assocs[context.to_s]
         end
       end

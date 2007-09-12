@@ -94,7 +94,8 @@ END
     def add(path, operations)
       result = nil
       with_ldap do |ldap|
-        result = ldap.add :dn=>path, :attributes=>perform_operations(operations)
+        attributes = perform_operations(operations)
+        result = ldap.add :dn=>path, :attributes=>attributes
       end
       log.debug("ldap.add returned '#{result}'")
       return true
@@ -127,7 +128,7 @@ END
     
     # Called by unit tests to inject data
     def test_add id, details
-      details << RubySync::Operation.new(:add, "objectclass", ['organizationalPerson'])
+      details << RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson'])
       add id, details
     end
     

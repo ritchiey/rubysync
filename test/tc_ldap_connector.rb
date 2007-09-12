@@ -45,7 +45,7 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   out_transform do
     if type == :add or type == :modify
       each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
-      append RubySync::Operation.new(:add, "objectclass", ['person'])
+      append RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson'])
     end
   end
 
@@ -86,7 +86,7 @@ private
 
   def ldap_attr
     {
-      "objectclass"=>['organizationalPerson'],
+      "objectclass"=>['inetOrgPerson'],
       "cn"=>'bob',
       "sn"=>'roberts'
       #"mail"=>"bob@roberts.com"
