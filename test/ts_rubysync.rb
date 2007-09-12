@@ -14,9 +14,10 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 require 'test/unit'
-#require 'test_csv_file_connector'
-require 'test_memory_connectors'
-require 'test_ldif'
-require 'test_base_pipeline'
-#require 'test_ldap_connector'
-#require 'test_active_record_connector'
+#require 'tc_csv_file_connector'
+require 'tc_memory_connectors'
+require 'tc_ldif'
+require 'tc_base_pipeline'
+require 'tc_ldap_connector'
+require 'tc_xml_connectors'
+#require 'tc_active_record_connector'

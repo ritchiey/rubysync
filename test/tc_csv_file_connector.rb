@@ -28,6 +28,7 @@ class TestCsvFileConnector < RubySync::Connectors::CsvFileConnector
   path_field  'id'
   in_path     File.expand_path("~/rubysync/csv_test/in")
   out_path    File.expand_path("~/rubysync/csv_test/out")
+  header_line false
 end
 
 class TestMemoryConnector < RubySync::Connectors::MemoryConnector
@@ -47,7 +48,7 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   
 end
 
-class TestCsvConnector < Test::Unit::TestCase
+class TcCsvConnector < Test::Unit::TestCase
   
   include RubySyncTest
     
@@ -56,8 +57,8 @@ class TestCsvConnector < Test::Unit::TestCase
     @client = @pipeline.client
     @vault = @pipeline.vault
     @filename = "#{@client.in_path}/client_to_vault.csv"
-    @pipeline.run_once # create the in and out directories if necessary
     File.delete @filename if File.exists? @filename
+    @pipeline.run_once # create the in and out directories if necessary
     @bob_details = {:cn=>'bob', :givenName=>"Robert", :sn=>"Smith", :mail=>'bob@thecure.com'}
   end
 
@@ -69,7 +70,7 @@ class TestCsvConnector < Test::Unit::TestCase
     assert_nil @vault["bob"], "Vault already contains bob"
     @pipeline.run_once
     assert_not_nil @vault["bob"], "Bob wasn't created in vault"
-    modded_bob={}; @bob_details.each_pair {|k,v| modded_bob[k.to_s]=v.as_array}
+    modded_bob={}; @bob_details.each_pair {|k,v| modded_bob[k.to_s]=as_array(v)}
     assert_equal modded_bob, @vault["bob"].reject {|k,v| ['modifier',:association].include? k}
     @pipeline.run_once
   end

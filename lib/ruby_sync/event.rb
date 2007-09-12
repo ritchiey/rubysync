@@ -138,7 +138,7 @@ module RubySync
     def sets_value? subject, value=nil
       return false if @payload == nil
       @payload.reverse_each do |op|
-        return true if op.subject == subject.to_s && (value == nil || op.values == value.as_array)
+        return true if op.subject == subject.to_s && (value == nil || op.values == as_array(value))
       end
       return false
     end
@@ -146,13 +146,13 @@ module RubySync
     # Remove any operations from the payload that affect fields with the given key or
     # keys (key can be a single field name or an array of field names).
     def drop_changes_to subject
-      subjects = subject.as_array
+      subjects = as_array(subject)
       uncommitted_operations
       @uncommitted_operations = @uncommitted_operations.delete_if {|op| subjects.include? op.subject }
     end
 
     def drop_all_but_changes_to subject
-      subjects = subject.as_array.map {|s| s.to_s}
+      subjects = as_array(subject).map {|s| s.to_s}
       @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject.to_s)}
     end
     
@@ -163,11 +163,11 @@ module RubySync
      
      
      def add_value field_name, value
-       uncommitted_operations << Operation.new(:add, field_name, value.as_array)
+       uncommitted_operations << Operation.new(:add, field_name, as_array(value))
      end
      
      def set_value field_name, value
-       uncommitted_operations << Operation.new(:replace, field_name, value.as_array)
+       uncommitted_operations << Operation.new(:replace, field_name, as_array(value))
      end
 
   
@@ -186,7 +186,7 @@ module RubySync
     # first.
     def append new_operations
       uncommitted_operations
-      @uncommitted_operations += new_operations.as_array
+      @uncommitted_operations += as_array(new_operations)
     end
 
     # Rollback any changes that 
@@ -222,7 +222,7 @@ module RubySync
     # the specified subject
     def each_operation_on subject
       return unless payload
-      subjects = subject.as_array.map {|s| s.to_s}
+      subjects = as_array(subject).map {|s| s.to_s}
       payload.each do |op|
         if subjects.include?(op.subject.to_s)
           yield(op)

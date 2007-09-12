@@ -21,7 +21,7 @@ require 'net/ldif'
 require 'test/unit'
 
 # TODO: Work out a cross platform method for testing file:// URL imports
-class TestLDIF < Test::Unit::TestCase
+class TcLDIF < Test::Unit::TestCase
   
   def setup
     @ldif = Net::LDIF    

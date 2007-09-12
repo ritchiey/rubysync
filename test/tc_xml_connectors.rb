@@ -99,7 +99,7 @@ class TcXmlConnectors < Test::Unit::TestCase
     assert_equal doc, xml.document
     values = []
     xml.each_element("attr[@name='sn']/value") {|e| values << e.text}
-    assert_equal entry['sn'].as_array, values
+    assert_equal as_array(entry['sn']), values
     values = []
     xml.each_element("attr[@name='givenName']/value") {|e| values << e.text}
     assert_equal entry['givenName'], values

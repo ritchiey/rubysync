@@ -33,7 +33,7 @@ class ChangeLogConnector < RubySync::Connectors::LdapConnector
   search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
 end
 
-class TestLdapChangelog <  Test::Unit::TestCase
+class TcLdapChangelog <  Test::Unit::TestCase
 
   include RubySyncTest
 

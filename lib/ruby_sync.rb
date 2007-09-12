@@ -26,23 +26,6 @@ require 'ruby_sync/util/metaid'
 require 'ruby_sync/operation'
 require 'ruby_sync/event'
 
-class Object
-
-  # If not already an array, slip into one
-  def as_array
-    (instance_of? Array)? self : [self]
-  end
-
-  # Make the log method globally available
-  def log
-    unless defined? @@log
-      @@log = Logger.new(STDOUT)
-      #@@log.level = Logger::DEBUG
-      @@log.datetime_format = "%H:%M:%S"
-    end
-    @@log
-  end
-end
 
 class Module
   # Add an option that will be defined by a class method, stored in a class variable

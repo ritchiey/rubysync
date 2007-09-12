@@ -42,7 +42,7 @@ end
 
 
 
-class TestActiveRecordVault < Test::Unit::TestCase
+class TcActiveRecordVault < Test::Unit::TestCase
 
   include RubySyncTest
 

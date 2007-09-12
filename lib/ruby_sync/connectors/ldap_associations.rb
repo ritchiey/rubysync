@@ -67,7 +67,7 @@ module LdapAssociations
           return []
         end
         associations = results[0][RUBYSYNC_ASSOCIATION_ATTRIBUTE]
-        return (associations)? associations.as_array : []
+        return (associations)? as_array(associations) : []
       end
     end
     

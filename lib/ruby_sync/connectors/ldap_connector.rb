@@ -61,7 +61,7 @@ module RubySync::Connectors
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
         ldap.search :base => search_base, :filter => search_filter do |ldap_entry|
-          yield to_entry(ldap_entry)
+          yield ldap_entry.dn, to_entry(ldap_entry)
         end
       end
     end
@@ -127,7 +127,7 @@ END
     
     # Called by unit tests to inject data
     def test_add id, details
-      details << RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson', 'organizationalPerson', 'person', 'top'])
+      details << RubySync::Operation.new(:add, "objectclass", ['organizationalPerson'])
       add id, details
     end
     
@@ -143,7 +143,7 @@ END
     def to_entry ldap_entry
       entry = {}
       ldap_entry.each do |name, values|
-        entry[name] = values
+        entry[name.to_s] = values.map {|v| String.new(v)}
       end
       entry
     end

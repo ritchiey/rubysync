@@ -45,7 +45,7 @@ class C < A
 end
 
 
-class TestUtilities < Test::Unit::TestCase
+class TcUtilities < Test::Unit::TestCase
 
   def test_class_option
     b = B.new

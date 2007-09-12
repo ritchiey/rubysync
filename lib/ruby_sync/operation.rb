@@ -18,6 +18,8 @@ module RubySync
   # Operations that may be performed on an attribute
   class Operation
   
+  include RubySync::Utilities
+  
   attr_accessor :type, :subject, :values
   
   
@@ -56,7 +58,7 @@ module RubySync
     
     remove_method :values=
     def values=(values)
-      @values = values.as_array
+      @values = as_array(values)
     end
     
     # Returns a duplicate of this operation but with the subject

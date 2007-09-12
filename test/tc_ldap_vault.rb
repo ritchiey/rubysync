@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -24,72 +24,68 @@ require 'ruby_sync/connectors/memory_connector'
 
 
 class MyLdapConnector < RubySync::Connectors::LdapConnector
-  host          'any_ldap'
-  port          389
-  username      'cn=Manager,dc=my-domain,dc=com'
-  password      'secret'
+  host        '10.1.1.4'
+  port        389
+  username    'cn=directory manager'
+  password    'password'
+  changelog_dn 'cn=changelog'
   search_filter "cn=*"
-  search_base   "ou=users,o=my-organization,dc=my-domain,dc=com"
+  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
+  
+  def initialize options={}
+    super(options)
+    skip_existing_changelog_entries
+  end
+
 end
 
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
 
 class TestPipeline < RubySync::Pipelines::BasePipeline
   
-  client :my_ldap
+  client :my_memory
 
-  vault :my_memory
+  vault :my_ldap
   
   allow_out :cn, :givenName, :sn
+  allow_in :cn, :givenName, :sn, :objectclass
   
-  out_transform do
+  def in_place(event)
+    event.target_path = "cn=#{event.source_path},ou=people,dc=9to5magic,dc=com,dc=au"
+  end
+  
+  def out_place(event)
+    event.target_path =~ /cn=(.+?),/oi
+    event.source_path = $1
+  end
+  
+  in_transform do
     if type == :add or type == :modify
       each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
-      append RubySync::Operation.new(:add, "objectclass", ['person'])
+      append RubySync::Operation.new(:add, "objectclass", ['organizationalPerson', 'RubySyncSynchable'])
     end
   end
 
 end
 
 
-class TCLdapConnector < Test::Unit::TestCase
-    
+class TcLdapVault < Test::Unit::TestCase
+
   include RubySyncTest
   include HashlikeTests
-
+ 
+  
   def unsynchable
-    [:objectclass, :interests, :cn, :dn]
-  end
-
-
-  def vault_path
-    # TODO: Try using a different path for the vault that's derived from the client source path
-    'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'
-  end
-
-
+    ["objectclass", "interests", "cn", "dn", "rubysyncassociation"]
+  end  
+  
   def client_path
-    'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'
+    'bob'
+  end
+  
+  def vault_path
+    'cn=bob,ou=people,dc=9to5magic,dc=com,dc=au'
   end
 
 
-  def test_ldap_add
-    assert_nil @client[client_path], "#{client_path} already exists on client"
-    @client.add client_path, @client.create_operations_for(ldap_attr)
-    assert_not_nil @client[client_path], "#{client_path} wasn't created"
-  end
-
-  def test_client_to_vault
-  end
-
-private
-
-  def ldap_attr
-    {
-      "objectclass"=>['person'],
-      "cn"=>'bob',
-      "sn"=>'roberts',
-      "mail"=>"bob@roberts.com"
-    }
-  end
 end

@@ -22,6 +22,8 @@ require 'test/unit'
 
 module RubySyncTest
 
+  
+  include RubySync::Utilities
 
   def initialize(test)
     super(test)

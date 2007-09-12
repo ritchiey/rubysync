@@ -36,7 +36,7 @@ end
 
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
 
-class TestPipeline < RubySync::Pipelines::BasePipeline
+class TcPipeline < RubySync::Pipelines::BasePipeline
   
   client :my_changelog
 

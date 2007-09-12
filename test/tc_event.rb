@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -13,33 +13,28 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-#
-# Performs end-to-end tests of the memory based testing connectors.
-#
-[File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)].each do |lib_path|
-  $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
-end
-require 'ruby_sync_test'
-require 'hashlike_tests'
-require 'ruby_sync/connectors/memory_connector'
 
+lib_path = File.dirname(__FILE__) + '/../lib'
+$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-class TestAConnector < RubySync::Connectors::MemoryConnector
-  dbm_path "/tmp/rubysync_a"
-end
+require 'ruby_sync'
+require 'test/unit'
 
-class TestBConnector < RubySync::Connectors::MemoryConnector
-  dbm_path "/tmp/rubysync_b"
-end
-
-class TestPipeline < RubySync::Pipelines::BasePipeline
-  client :test_a
-  vault :test_b
-end
-
-class TestMemoryConnectors < Test::Unit::TestCase
+class TcEvent < Test::Unit::TestCase
   
-  include RubySyncTest
-  include HashlikeTests
+  def setup
+    payload = [
+      RubySync::Operation.add("name", "Matthew"),
+      RubySync::Operation.add(:modifier, "rubysync")
+    ]
+    @connector = RubySync::Connectors::MemoryConnector.new :name=>"Test"
+    @event = RubySync::Event.modify @connector, 'source_path', nil, payload
+    puts @event.to_yaml
+  end
+
+  def test_sets_value?
+    assert @event.sets_value?(:modifier, "rubysync")
+    assert !@event.sets_value?(:modifier, "Matthew")
+  end
 
 end

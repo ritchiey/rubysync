@@ -33,6 +33,21 @@ module RubySync
     
     @@base_path=nil
 
+    # Make the log method globally available
+    def log
+      unless defined? @@log
+        @@log = Logger.new(STDOUT)
+        #@@log.level = Logger::DEBUG
+        @@log.datetime_format = "%H:%M:%S"
+      end
+      @@log
+    end    
+    
+    # If not already an array, slip into one
+    def as_array o
+      (o.instance_of? Array)? o : [o]
+    end
+    
     # Perform an action and rescue any exceptions thrown, display the exception with the specified text
     def with_rescue text
       begin
@@ -60,7 +75,7 @@ module RubySync
     
     # Ensure that a given path exists as a directory
     def ensure_dir_exists paths
-      paths.as_array.each do |path|
+      as_array(paths).each do |path|
         raise Exception.new("Can't create nil directory") unless path
         if File.exist? path
           unless File.directory? path
@@ -113,7 +128,7 @@ module RubySync
       # Keep going up until we start repeating ourselves
       while File.directory?(bp) && bp != last && bp != "/"
         return bp if File.directory?("#{bp}/pipelines") &&
-                            File.directory?("#{bp}/connectors")
+        File.directory?("#{bp}/connectors")
         last = bp
         bp = File.expand_path("#{bp}/..")
       end
@@ -141,78 +156,78 @@ module RubySync
       "#{dir}#{file}"
     end
     
-      # Performs the given operations on the given record. The record is a
-      # Hash in which each key is a field name and each value is an array of
-      # values for that field.
-      # Operations is an Array of RubySync::Operation objects to be performed on the record.
-      def perform_operations operations, record={}
-        operations.each do |op|
-          unless op.instance_of? RubySync::Operation
-            log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
-            p op
-          end
-          case op.type
-          when :add
-            if record[op.subject]
-              existing = record[op.subject].as_array
-              next if existing == op.values # already same so ignore
-              (existing & op.values).empty? or
-                raise "Attempt to add duplicate elements to #{name}"
-              record[op.subject] =  existing + op.values
-            else
-              record[op.subject] = op.values
-            end
-          when :replace
-            record[op.subject] = op.values
-          when :delete
-            if value == nil || value == "" || value == []
-              record.delete(op.subject)
-            else
-              record[op.subject] -= values
-            end
-          else
-            raise Exception.new("Unknown operation '#{op.type}'")
-          end
+    # Performs the given operations on the given record. The record is a
+    # Hash in which each key is a field name and each value is an array of
+    # values for that field.
+    # Operations is an Array of RubySync::Operation objects to be performed on the record.
+    def perform_operations operations, record={}
+      operations.each do |op|
+        unless op.instance_of? RubySync::Operation
+          log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
+          p op
         end
-        return record
+        case op.type
+        when :add
+          if record[op.subject]
+            existing = as_array(record[op.subject])
+            next if existing == op.values # already same so ignore
+            (existing & op.values).empty? or
+            raise "Attempt to add duplicate elements to #{name}"
+            record[op.subject] =  existing + op.values
+          else
+            record[op.subject] = op.values
+          end
+        when :replace
+          record[op.subject] = op.values
+        when :delete
+          if value == nil || value == "" || value == []
+            record.delete(op.subject)
+          else
+            record[op.subject] -= values
+          end
+        else
+          raise Exception.new("Unknown operation '#{op.type}'")
+        end
       end
+      return record
+    end
 
       
-      # Filter operations to eliminate those that would have
-      # no effect on the record. Returns the resulting array
-      # of operations.
-      def effective_operations operations, record={}
-        effective = []
-        operations.each do |op|
-          existing = (record[op.subject] || []).as_array
-          case op.type
-          when :add
-            if existing.empty?
-              effective << op
-            else
-              next if existing == op.values # already same so ignore
-              effective << Operation.replace(op.subject, op.values)
-            end
-          when :replace
-            if existing.empty?
-              effective << Operation.add(op.subject, op.values)
-            else
-              next if existing == op.values
-              effective << op
-            end
-          when :delete
-            if [nil, "", []].include?(op.values)
-              effective << op if record[op.subject]
-            else
-              targets = op.values & existing
-              targets.empty? or effective << Operation.delete(op.subject, targets)
-            end
+    # Filter operations to eliminate those that would have
+    # no effect on the record. Returns the resulting array
+    # of operations.
+    def effective_operations operations, record={}
+      effective = []
+      operations.each do |op|
+        existing = as_array(record[op.subject] || [])
+        case op.type
+        when :add
+          if existing.empty?
+            effective << op
           else
-            raise Exception.new("Unknown operation '#{op.type}'")
+            next if existing == op.values # already same so ignore
+            effective << Operation.replace(op.subject, op.values)
           end
+        when :replace
+          if existing.empty?
+            effective << Operation.add(op.subject, op.values)
+          else
+            next if existing == op.values
+            effective << op
+          end
+        when :delete
+          if [nil, "", []].include?(op.values)
+            effective << op if record[op.subject]
+          else
+            targets = op.values & existing
+            targets.empty? or effective << Operation.delete(op.subject, targets)
+          end
+        else
+          raise Exception.new("Unknown operation '#{op.type}'")
         end
-        effective
       end
+      effective
+    end
  
   end
 end

@@ -105,7 +105,7 @@ module RubySync::Connectors
       entry.each do |key, values|
         el << attr = Element.new("attr")
         attr.add_attribute 'name', key
-        values.as_array.each do |value|
+        as_array(values).each do |value|
           value_el = Element.new('value')
           attr << value_el.add_text(value)
         end

@@ -20,39 +20,19 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 require 'ruby_sync'
 require 'test/unit'
 
-class ClientConnector < RubySync::Connectors::MemoryConnector
+class MyConnector < RubySync::Connectors::BaseConnector
+  
 end
 
-class VaultConnector < RubySync::Connectors::MemoryConnector
-end
-
-class TestPipeline < RubySync::Pipelines::BasePipeline
-
-  client :client
-  vault :vault
-  
-  allow_in :cn, :givenName, :sn
-  allow_out :id, :name
-  
-  # This is experimental at this stage
-  # map_vault_to_client :cn => :id,
-  #                     :givenName => calc { :name.split(/\w+/)[0] },
-  #                     :sn => calc { :name.split(/\w+/)[1] }
-                      
-end
-
-class TestBasePipeline < Test::Unit::TestCase
-  
+class TcBaseConnector < Base::Test::Unit
   
   def setup
-    @pipeline = TestPipeline.new
-    @client = @pipeline.client
-    @vault = @pipeline.vault
+    @c  = MyConnector.new
+    @c.clean
   end
   
-  def test_mappings
+  def test_clean
     
   end
-  
   
 end
