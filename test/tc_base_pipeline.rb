@@ -26,7 +26,7 @@ end
 class VaultConnector < RubySync::Connectors::MemoryConnector
 end
 
-class TcPipeline < RubySync::Pipelines::BasePipeline
+class TestPipeline < RubySync::Pipelines::BasePipeline
 
   client :client
   vault :vault
@@ -41,7 +41,7 @@ class TcPipeline < RubySync::Pipelines::BasePipeline
                       
 end
 
-class TestBasePipeline < Test::Unit::TestCase
+class TcBasePipeline < Test::Unit::TestCase
   
   
   def setup

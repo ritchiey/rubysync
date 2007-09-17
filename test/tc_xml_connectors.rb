@@ -24,23 +24,23 @@ require 'hashlike_tests'
 require 'ruby_sync/connectors/xml_connector'
 
 
-class TestAConnector < RubySync::Connectors::XmlConnector
+class XmlTestAConnector < RubySync::Connectors::XmlConnector
   dbm_path "/tmp/rubysync_a"
   filename "/tmp/rubysync_a.xml"
 end
 
-class TestBConnector < RubySync::Connectors::XmlConnector
+class XmlTestBConnector < RubySync::Connectors::XmlConnector
   dbm_path "/tmp/rubysync_b"
   filename "/tmp/rubysync_b.xml"
 end
 
-class TestConnector <  RubySync::Connectors::XmlConnector
+class XmlTestConnector <  RubySync::Connectors::XmlConnector
   filename "/tmp/rubysync_test.xml"
 end
 
-class TestPipeline < RubySync::Pipelines::BasePipeline
-  client :test_a
-  vault :test_b
+class XmlTestPipeline < RubySync::Pipelines::BasePipeline
+  client :xml_test_a
+  vault :xml_test_b
 end
 
 class TcXmlConnectors < Test::Unit::TestCase
@@ -51,7 +51,7 @@ class TcXmlConnectors < Test::Unit::TestCase
   alias_method :old_setup, :setup
   def setup
     old_setup
-    @tc = TestConnector.new
+    @tc = XmlTestConnector.new
     File.delete_if_exists [@client.filename, @vault.filename, @tc.filename]
     xml_test_document
     @tc.started
@@ -62,6 +62,9 @@ class TcXmlConnectors < Test::Unit::TestCase
     @tc.stopped
   end
   
+  def testPipeline
+    XmlTestPipeline
+  end
   
   
   #  def test_with_xml()

@@ -61,6 +61,14 @@ module RubySync
       @values = as_array(values)
     end
     
+    def value
+      @values[0]
+    end
+    
+    def value= new_value
+      @values = new_value.as_array
+    end
+
     # Returns a duplicate of this operation but with the subject
     # changed to the specified subject 
     def same_but_on subject

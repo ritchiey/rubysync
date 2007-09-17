@@ -27,11 +27,7 @@ class ::File
   end
 end
 
-# Generally useful methods
-module RubySync
-  module Utilities
-    
-    @@base_path=nil
+class Object    
 
     # Make the log method globally available
     def log
@@ -42,7 +38,14 @@ module RubySync
       end
       @@log
     end    
+end
     
+
+# Generally useful methods
+module RubySync
+  module Utilities
+    @@base_path=nil
+
     # If not already an array, slip into one
     def as_array o
       (o.instance_of? Array)? o : [o]
@@ -160,12 +163,14 @@ module RubySync
     # Hash in which each key is a field name and each value is an array of
     # values for that field.
     # Operations is an Array of RubySync::Operation objects to be performed on the record.
-    def perform_operations operations, record={}
+    def perform_operations operations, record={}, options={}
+      subjects = options[:subjects]
       operations.each do |op|
         unless op.instance_of? RubySync::Operation
           log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
           p op
         end
+        next if subjects and !subjects.include?(op.subject)
         case op.type
         when :add
           if record[op.subject]

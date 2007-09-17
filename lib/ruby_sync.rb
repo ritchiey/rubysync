@@ -21,8 +21,6 @@ require 'rubygems'
 require 'active_support'
 require 'ruby_sync/util/utilities'
 require 'ruby_sync/util/metaid'
-#require 'ruby_sync/connectors/base_connector'
-#require 'ruby_sync/pipelines/base_pipeline'
 require 'ruby_sync/operation'
 require 'ruby_sync/event'
 
@@ -49,17 +47,17 @@ class Configuration
   include RubySync::Utilities
 
   def initialize
-    include_in_search_path "#{base_path}/pipelines"
-    include_in_search_path "#{base_path}/connectors"
-    include_in_search_path "#{base_path}/shared/connectors"
-    include_in_search_path "#{base_path}/shared/pipelines"    
-    include_in_search_path "#{base_path}/shared/lib"
+    base_path and include_in_search_path "#{base_path}/pipelines"
+    base_path and include_in_search_path "#{base_path}/connectors"
+    base_path and include_in_search_path "#{base_path}/shared/connectors"
+    base_path and include_in_search_path "#{base_path}/shared/pipelines"    
+    base_path and include_in_search_path "#{base_path}/shared/lib"
 
     lib_path = File.dirname(__FILE__)
     require_all_in_dir "#{lib_path}/ruby_sync/connectors", "*_connector.rb"
-    require_all_in_dir "#{base_path}/shared/connectors", "*_connector.rb"
+    base_path and require_all_in_dir "#{base_path}/shared/connectors", "*_connector.rb"
     require_all_in_dir "#{lib_path}/ruby_sync/pipelines", "*_pipeline.rb"
-    require_all_in_dir "#{base_path}/shared/pipelines", "*_pipeline.rb"
+    base_path and require_all_in_dir "#{base_path}/shared/pipelines", "*_pipeline.rb"
   end
 
   # We find the first directory in the search path that is a parent of the specified
@@ -91,6 +89,3 @@ class Configuration
 end
 
 Configuration.new
-
-
-  

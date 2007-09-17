@@ -170,7 +170,11 @@ module RubySync
        uncommitted_operations << Operation.new(:replace, field_name, as_array(value))
      end
 
-  
+    def values_for field_name
+      values = perform_operations @payload, [], :subjects=>[field_name]
+      values[field_name]
+    end
+           
     def uncommitted_operations
       @uncommitted_operations ||= @payload || []
       return @uncommitted_operations

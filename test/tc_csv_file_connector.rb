@@ -17,6 +17,7 @@ lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
 require 'ruby_sync_test'
+require 'ruby_sync/connectors/file_connector'
 require 'ruby_sync/connectors/csv_file_connector'
 require 'ruby_sync/connectors/memory_connector'
 require 'csv'

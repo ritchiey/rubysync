@@ -19,19 +19,19 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'ruby_sync_test'
 
-class MyActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
+class ArActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
     model :person
     application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
     dbm_path "/tmp/rubysync_ar_test"
 end
 
-class MyMemoryConnector < RubySync::Connectors::MemoryConnector
+class ArMemoryConnector < RubySync::Connectors::MemoryConnector
   dbm_path "/tmp/rubysync_memory_test"
 end
 
-class TestPipeline < RubySync::Pipelines::BasePipeline
-  client :my_memory
-  vault :my_active_record
+class ArTestPipeline < RubySync::Pipelines::BasePipeline
+  client :ar_memory
+  vault :ar_active_record
   
   allow_in :first_name, :last_name
   allow_out :first_name, :last_name
@@ -42,10 +42,14 @@ end
 
 
 
-class TcActiveRecordVault < Test::Unit::TestCase
+class TcActiveRecordConnector < Test::Unit::TestCase
 
   include RubySyncTest
 
+  def testPipeline
+    ArTestPipeline
+  end  
+  
   def client_path
     'bob'
   end
@@ -109,7 +113,7 @@ class TcActiveRecordVault < Test::Unit::TestCase
   end
   
   def test_fields
-    assert_equal(%w{first_name last_name}.sort, ::MyActiveRecordConnector.fields.sort)
+    assert_equal(%w{first_name last_name}.sort, ::ArActiveRecordConnector.fields.sort)
   end
   
 end

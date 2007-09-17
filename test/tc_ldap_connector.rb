@@ -34,7 +34,7 @@ end
 
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
 
-class TestPipeline < RubySync::Pipelines::BasePipeline
+class LdapTestPipeline < RubySync::Pipelines::BasePipeline
   
   client :my_ldap
 
@@ -56,6 +56,10 @@ class TCLdapConnector < Test::Unit::TestCase
     
   include RubySyncTest
   include HashlikeTests
+  
+  def testPipeline
+    LdapTestPipeline
+  end
 
   def unsynchable
     [:objectclass, :interests, :cn, :dn]
@@ -82,7 +86,7 @@ class TCLdapConnector < Test::Unit::TestCase
   def test_client_to_vault
   end
 
-private
+  private
 
   def ldap_attr
     {

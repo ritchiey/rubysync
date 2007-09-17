@@ -15,7 +15,7 @@
 
 
 require "yaml"
-
+defined?(RubySync::Connectors::BaseConnector) or require 'ruby_sync/connectors/base_connector'
 
 module RubySync::Connectors
   class MemoryConnector < RubySync::Connectors::BaseConnector

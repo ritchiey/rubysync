@@ -35,7 +35,7 @@ module RubySyncTest
   
 
   def setup
-    @pipeline = TestPipeline.new
+    @pipeline = testPipeline.new
     @client = @pipeline.client
     @vault = @pipeline.vault
     @client.clean
