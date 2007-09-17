@@ -1,0 +1,186 @@
+$ mkdir x
+$ cd x
+$ rubysync create kaos
+$ ls -l
+total 0
+drwxr-xr-x   7 ritchiey  ritchiey  238 Aug 21 16:47 kaos
+$ cd kaos
+$ ls -l
+total 0
+drwxr-xr-x   2 ritchiey  ritchiey   68 Aug 21 16:47 connectors
+drwxr-xr-x   2 ritchiey  ritchiey   68 Aug 21 16:47 db
+drwxr-xr-x   2 ritchiey  ritchiey   68 Aug 21 16:47 log
+drwxr-xr-x   2 ritchiey  ritchiey   68 Aug 21 16:47 pipelines
+drwxr-xr-x   5 ritchiey  ritchiey  170 Aug 21 16:47 shared
+$ rubysync connector hr -t csv_file
+$ rubysync connector kaos_vault -t xml$ mate .. 
+$ cat connectors/hr_connector.rb 
+class HrConnector < RubySync::Connectors::CsvFileConnector
+            
+            field_names   ['id', 'first_name', 'last_name', 'skills']
+            path_field    'id'
+            in_path       '/Users/ritchiey/x/in'
+            out_path      '/Users/ritchiey/x/out'
+            in_glob       '*.csv'
+            out_extension '.csv'
+
+end
+$ cat connectors/kaos_vault_connector.rb 
+class KaosVaultConnector < RubySync::Connectors::XmlConnector
+            #
+          # "filename" should be the full name of the file containing
+          # the xml representation of the synchronized content.
+          # You probably want to change this:
+          #
+          filename "/Users/ritchiey/x/kaos.xml"
+
+end
+$ rubysync fields hr
+id
+first_name
+last_name
+skills
+$ rubysync fields kaos_vault
+
+$ rubysync pipeline hr_import -C hr -V kaos_vault
+$ # Now edit the pipeline config
+$ # Actually, here's the pipeline before editing
+$ cat pipelines/hr_import_pipeline.rb 
+class HrImportPipeline < RubySync::Pipelines::BasePipeline
+
+  client :hr
+
+  vault :kaos_vault
+
+  # Remove any fields that you don't want to set in the client from the vault
+  allow_out :allow, :these, :fields, :through
+
+  # Remove any fields that you don't want to set in the vault from the client
+  allow_in :allow, :these, :fields, :through
+
+  # If the client and vault have different names for the same field, define the
+  # the mapping here. For example, if the vault has a field called "first name" and
+  # the client has a field called givenName you may put:
+  #    'first name' => 'givenName'
+  # separate each mapping with a comma.
+  # The following fields were detected on the client:
+  # 'id', 'first_name', 'last_name', 'skills'
+  map_vault_to_client({
+    #'allow' => 'a_client_field',
+                #'these' => 'a_client_field',
+                #'fields' => 'a_client_field',
+                #'through' => 'a_client_field'
+  })
+
+  # "in" means going from client to vault
+  #in_transform do
+  #end
+
+  # "out" means going from vault to client
+  #out_transform do
+  #end
+
+end
+$ # now edit the pipeline
+$ cat pipelines/hr_import_pipeline.rb 
+class HrImportPipeline < RubySync::Pipelines::BasePipeline
+
+  client :hr
+
+  vault :kaos_vault
+
+  # Remove any fields that you don't want to set in the client from the vault
+  allow_out :id, :first_name, :last_name
+
+  # Remove any fields that you don't want to set in the vault from the client
+  allow_in :id, :first_name, :last_name
+
+  # If the client and vault have different names for the same field, define the
+  # the mapping here. For example, if the vault has a field called "first name" and
+  # the client has a field called givenName you may put:
+  #    'first name' => 'givenName'
+  # separate each mapping with a comma.
+  # The following fields were detected on the client:
+  # 'id', 'first_name', 'last_name', 'skills'
+  map_vault_to_client({
+    #'allow' => 'a_client_field',
+                #'these' => 'a_client_field',
+                #'fields' => 'a_client_field',
+                #'through' => 'a_client_field'
+  })
+
+  # "in" means going from client to vault
+  #in_transform do
+  #end
+
+  # "out" means going from vault to client
+  #out_transform do
+  #end
+
+end
+$ # so all we've done specified which fields to allow in an out. Notice that we left "skills" out.
+$ # also note that we're exporting as well as importing for now
+$ # so now we can run our sync      
+$ rubysync once hr_import
+$ # oops. Forgot to give it any data
+$ # notice, though how it created the import and export directories for us.
+$ cd ../in
+$ # lets make some henchmen
+$ cat > henchmen.csv
+bobby,BareKnuckle,Bobby,pugilism:yoga
+tt,Testy,Terry,kidnapping:interrogation:juggling
+$ ls -l
+total 8
+-rw-r--r--   1 ritchiey  ritchiey  87 Aug 21 17:11 henchmen.csv
+$ # we need to run rubysync from within the configuration directory
+$ cd ../kaos/
+$ rubysync once hr_import
+$ ls -l ../in
+total 8
+-rw-r--r--   1 ritchiey  ritchiey  87 Aug 21 17:11 henchmen.csv.bak
+$ # note that the csv has been renamed
+$ # lets have a look at the xml file thats been created
+$ cat ../kaos.xml
+<opt>
+  <tt>
+    <id>tt</id>
+    <first_name>Testy</first_name>
+    <last_name>Terry</last_name>
+  </tt>
+  <bobby>
+    <id>bobby</id>
+    <first_name>BareKnuckle</first_name>
+    <last_name>Bobby</last_name>
+  </bobby>
+</opt>
+$ # ok, great. We've got a couple of records in there. 
+$ # remember that we also configured an output directory
+$ ls -l ../out
+$ # no output. ok what if we modify the vault itself
+$ cat ../kaos.xml 
+<opt>
+  <tt>
+    <id>tt</id>
+    <first_name>Testy</first_name>
+    <last_name>Terry</last_name>
+  </tt>
+  <bobby>
+    <id>bobby</id>
+    <first_name>BareKnuckle</first_name>
+    <last_name>Bobby</last_name>
+  </bobby>
+  <desd>
+    <id>desd</id>
+    <first_name>Dangerous</first_name>
+    <last_name>Des</last_name>
+  </desd>
+</opt>
+$ # and run it again
+$ rubysync once hr_import
+$ ls -l ../out
+total 8
+-rw-r--r--   1 ritchiey  ritchiey  20 Aug 21 17:25 20070821172521.csv
+$ cat ../out/20070821172521.csv 
+desd,Dangerous,Des,
+$ # So it just sends through the changes to the file 
+$ # How's it doingr
