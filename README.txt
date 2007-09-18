@@ -17,12 +17,10 @@ for your organisation.
 
 == FEATURES/PROBLEMS:
   
-* Add support for running continually
-* Test suites. Individual tests work but test suites have trouble ???
 
 == SYNOPSIS:
 
-  This sets up the skeleton of a configuration for importing comma delimeted
+  This sets up the skeleton of a configuration for importing comma delimited
   text files into a database. Note, if the application happens to be a Rails
   app then it can also export changes.
 

@@ -18,7 +18,10 @@ require 'tc_csv_file_connector'
 require 'tc_memory_connectors'
 require 'tc_ldif'
 require 'tc_base_pipeline'
-require 'tc_ldap_connector'
 require 'tc_xml_connectors'
 require 'tc_transformation'
 #require 'tc_active_record_connector'
+
+# The following require some setup on your computer before they'll work
+
+#require 'tc_ldap_connector'

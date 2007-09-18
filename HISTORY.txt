@@ -1,3 +1,7 @@
+== 0.0.4 / 2007-09-18
+
+* XML Connector now works correctly even if id used isn't a valid XML tag
+* Improved transformations
 
 == 0.0.3 / 2007-08-27
 

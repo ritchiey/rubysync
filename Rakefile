@@ -26,6 +26,12 @@ Hoe.new('rubysync', Rubysync::VERSION) do |p|
   p.url = p.paragraphs_of('README.txt', 0).first.split(/\n/)[1..-1]
   p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
   p.remote_rdoc_dir = ""
+  p.extra_deps = [
+    ["ruby-net-ldap", ">=0.0.4"],
+    ["activesupport", ">=1.4.0"],
+    ["activerecord", ">=1.15.3"],
+    ["simpleconsole", ">=0.1.1"]
+    ]
 end
 
 # vim: syntax=Ruby
