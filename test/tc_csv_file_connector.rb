@@ -37,7 +37,7 @@ class TestMemoryConnector < RubySync::Connectors::MemoryConnector
 end
 
 
-class TestPipeline < RubySync::Pipelines::BasePipeline
+class CsvTestPipeline < RubySync::Pipelines::BasePipeline
   client :test_csv_file
          
   vault :test_memory
@@ -54,7 +54,7 @@ class TcCsvConnector < Test::Unit::TestCase
   include RubySyncTest
     
   def setup
-    @pipeline = TestPipeline.new
+    @pipeline = CsvTestPipeline.new
     @client = @pipeline.client
     @vault = @pipeline.vault
     @filename = "#{@client.in_path}/client_to_vault.csv"
@@ -63,6 +63,11 @@ class TcCsvConnector < Test::Unit::TestCase
     @bob_details = {:cn=>'bob', :givenName=>"Robert", :sn=>"Smith", :mail=>'bob@thecure.com'}
   end
 
+  
+#  def testPipeline
+#    CsvTestPipeline
+#  end
+  
   def test_client_to_vault
     banner :test_client_to_vault
     CSV.open(@filename, 'w') do |csv|

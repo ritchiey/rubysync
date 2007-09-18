@@ -146,7 +146,7 @@ module RubySync
     # Remove any operations from the payload that affect fields with the given key or
     # keys (key can be a single field name or an array of field names).
     def drop_changes_to subject
-      subjects = as_array(subject)
+      subjects = as_array(subject).map {|s| s.to_s}
       uncommitted_operations
       @uncommitted_operations = @uncommitted_operations.delete_if {|op| subjects.include? op.subject }
     end
@@ -158,21 +158,26 @@ module RubySync
     
      # Add a value to a given subject unless it already sets a value
      def add_default field_name, value
-       add_value field_name, value unless sets_value? field_name
+       add_value(field_name.to_s, value) unless sets_value? field_name.to_s
      end
      
      
      def add_value field_name, value
-       uncommitted_operations << Operation.new(:add, field_name, as_array(value))
+       uncommitted_operations << Operation.new(:add, field_name.to_s, as_array(value))
      end
      
      def set_value field_name, value
-       uncommitted_operations << Operation.new(:replace, field_name, as_array(value))
+       uncommitted_operations << Operation.new(:replace, field_name.to_s, as_array(value))
      end
 
     def values_for field_name
-      values = perform_operations @payload, [], :subjects=>[field_name]
-      values[field_name]
+      values = perform_operations @payload, {}, :subjects=>[field_name.to_s]
+      values[field_name.to_s]
+    end
+    
+    def value_for field_name
+      values = values_for field_name
+      (values)? values[0] : nil
     end
            
     def uncommitted_operations
@@ -202,6 +207,20 @@ module RubySync
       if uncommitted_operations 
         @payload = uncommitted_operations
         @uncommitted_operations = nil
+      end
+    end
+    
+    # Typically this will be called in the 'transform_in' and 'transform_out'
+    # blocks in a pipeline configuration.
+    def map(left, right=nil, &blk)
+      if right
+        drop_changes_to left
+        @uncommitted_operations = uncommitted_operations.map do |op|
+          (op.subject.to_s == right.to_s)? op.same_but_on(left.to_s) : op
+        end
+      elsif blk and [:add, :modify].include? @type
+        drop_changes_to left.to_s
+        uncommitted_operations << RubySync::Operation.replace(left.to_s, blk.call) 
       end
     end
   
