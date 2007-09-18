@@ -1,5 +1,7 @@
-== 0.0.4 / 2007-09-18
+== 0.0.5 / 2007-09-18
 
+* Fixed gem dependency issues
+* Fixed shebang portability issues
 * XML Connector now works correctly even if id used isn't a valid XML tag
 * Improved transformations
 
