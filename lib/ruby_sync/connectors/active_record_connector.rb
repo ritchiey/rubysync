@@ -51,7 +51,6 @@ module RubySync::Connectors
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
         db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]
         # Require the models
-        log.debug "Loading the models for #{self.class.name}:"
         Dir.chdir(File.join(rails_app_path,'app','models')) do
           Dir.glob('*.rb') do |filename|
             log.debug("\t#{filename}")

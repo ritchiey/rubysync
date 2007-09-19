@@ -17,12 +17,26 @@
 lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-require 'ruby_sync'
+
+require 'ruby_sync/util/utilities'
 require 'test/unit'
 
-require 'tc_csv_file_connector'
-require 'tc_memory_connectors'
-require 'tc_ldif'
-require 'tc_base_pipeline'
-#require 'test_ldap_connector'
-#require 'test_active_record_connector'
+
+module RubySync
+  module Connectors
+    autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/connectors'
+  end
+end
+
+class TcLoader < Test::Unit::TestCase
+
+  def test_autoload_dir
+    lib_path = File.dirname(__FILE__) + '/../lib'
+    base_path = "#{lib_path}/ruby_sync/connectors"
+    base_module = RubySync::Connectors
+    assert_equal "#{base_path}/base_connector.rb", base_module.send(:autoload?,:BaseConnector)
+    assert_equal "#{base_path}/xml_connector.rb", base_module.send(:autoload?, :XmlConnector)
+    assert_equal "#{base_path}/csv_file_connector.rb", base_module.send(:autoload?,:CsvFileConnector)
+  end
+  
+end

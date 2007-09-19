@@ -17,7 +17,7 @@
 lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-require 'ruby_sync'
+require 'rubysync'
 require 'test/unit'
 
 RIGHT = "this is right"
@@ -84,7 +84,7 @@ class TcUtilities < Test::Unit::TestCase
     assert_equal op.replace("givenName", %w{Michael J}), e[2]
     assert_equal 3, e.size
   end
-  
+
   
   
 end

@@ -15,20 +15,13 @@
 
 
 require 'fileutils'
+require 'rubygems'
+require 'active_support'
 require 'irb'
 
 
-class ::File
-  def self.delete_if_exists(files)
-    files.kind_of?(Array) or files = [files]
-    files.each do |file|
-      File.delete(file) if File.exist?(file)
-    end
-  end
-end
 
-class Object    
-
+module Kernel    
     # Make the log method globally available
     def log
       unless defined? @@log
@@ -38,6 +31,17 @@ class Object
       end
       @@log
     end    
+  
+  # Calculate the constants
+  def autoload_dir base_dir, path
+    dir_name = File.join(base_dir, path)
+    Dir.foreach(dir_name) do |filename|
+      next unless filename =~ /\.rb$/o
+      module_name = path.camelize
+      class_name = filename[0..-4].camelize
+      eval(module_name).send(:autoload,class_name.to_sym, File.join(dir_name, filename))
+    end
+  end
 end
     
 
@@ -115,8 +119,8 @@ module RubySync
       $:.unshift path unless $:.include?(path)
     end
     
-    # Return the base_path 
-    def base_path
+    # Return the base_path
+    ::Kernel.send :define_method, :base_path do
       @@base_path = find_base_path unless @@base_path
       @@base_path
     end
@@ -125,7 +129,7 @@ module RubySync
     # all of it's ancestors until it finds one that looks like a rubysync configuration
     # directory.
     # Returns false if no suitable directory was found
-    def find_base_path
+    ::Kernel.send :define_method, :find_base_path do
       bp = File.expand_path(".")
       last = nil
       # Keep going up until we start repeating ourselves
@@ -138,12 +142,6 @@ module RubySync
       return false
     end
        
-    # Make and instance method _name_ that returns the value set by the
-    # class method _name_.
-    # def self.class_option name
-    #   self.class_eval "def #{name}() self.class.instance_variable_get :#{name}; end"
-    #   self.instance_eval "def #{name}(value) @#{name}=value; end"
-    # end
     
     def get_preference(name, file_name=nil)
       class_name ||= get_preference_file

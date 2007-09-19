@@ -17,7 +17,7 @@
 lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-require 'ruby_sync'
+require 'rubysync'
 require 'test/unit'
 
 class TcEvent < Test::Unit::TestCase

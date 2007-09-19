@@ -17,7 +17,7 @@
 lib_path = File.dirname(__FILE__) + '/..'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-require 'ruby_sync'
+require 'rubysync'
 require 'net/ldif'
 $VERBOSE = false
 require 'net/ldap'

@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w
+#!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
@@ -14,6 +14,57 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 
-class Rubysync
-  VERSION = '0.0.5'
+lib_path = File.dirname(__FILE__)
+$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
+
+require 'rubygems'
+require 'active_support'
+require 'ruby_sync/util/utilities'
+require 'ruby_sync/util/metaid'
+require 'ruby_sync/operation'
+require 'ruby_sync/event'
+
+
+module RubySync
+  VERSION = '0.0.6'
 end
+
+
+class Module
+  # Add an option that will be defined by a class method, stored in a class variable
+  # and accessible as an instance method
+  def option *names
+    names.each do |name|
+      meta_def name do |value|
+        class_def name do
+          value
+        end
+        meta_def "get_#{name}" do
+          value
+        end
+      end
+    end
+  end
+end
+
+class File
+  def self.delete_if_exists(files)
+    files.kind_of?(Array) or files = [files]
+    files.each do |file|
+      File.delete(file) if File.exist?(file)
+    end
+  end
+end
+
+
+module RubySync
+  module Connectors
+    autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/connectors'
+    base_path and autoload_dir base_path, 'connectors'
+  end
+  module Pipelines
+    autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/pipelines'
+    base_path and autoload_dir base_path, 'pipelines'
+  end
+end
+

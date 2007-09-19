@@ -17,7 +17,7 @@ require 'rubygems'
 require 'hoe'
 require './lib/rubysync.rb'
 
-Hoe.new('rubysync', Rubysync::VERSION) do |p|
+Hoe.new('rubysync', RubySync::VERSION) do |p|
   p.rubyforge_name = 'rubysync'
   p.author = 'Ritchie Young'
   p.email = 'ritchiey@gmail.com'

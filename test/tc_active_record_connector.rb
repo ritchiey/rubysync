@@ -62,7 +62,8 @@ class TcActiveRecordConnector < Test::Unit::TestCase
     super(test)
   end
     
-    def start
+    def setup
+      super
       # Wipe existing database content
       # TODO: Find out how rails does this.
       ::RubySyncAssociation.delete_all
@@ -109,7 +110,7 @@ class TcActiveRecordConnector < Test::Unit::TestCase
   end
   
   def find_bob
-    Person.find_by_first_name "Robert"
+    Person.find_by_first_name "bob"
   end
   
   def test_fields

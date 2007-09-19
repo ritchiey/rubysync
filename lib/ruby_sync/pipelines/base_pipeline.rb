@@ -18,6 +18,7 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'active_support'
 require 'ruby_sync/util/metaid'
+require 'ruby_sync/util/utilities'
 require 'yaml'
 
 
