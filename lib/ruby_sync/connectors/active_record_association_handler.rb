@@ -17,7 +17,7 @@
 lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-require 'rubysync'
+require 'ruby_sync'
 
 module RubySync::Connectors::ActiveRecordAssociationHandler
   

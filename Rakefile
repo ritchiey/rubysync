@@ -15,7 +15,7 @@
 
 require 'rubygems'
 require 'hoe'
-require './lib/rubysync.rb'
+require './lib/ruby_sync.rb'
 
 Hoe.new('rubysync', RubySync::VERSION) do |p|
   p.rubyforge_name = 'rubysync'

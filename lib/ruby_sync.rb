@@ -60,11 +60,11 @@ end
 module RubySync
   module Connectors
     autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/connectors'
-    base_path and autoload_dir base_path, 'connectors'
   end
   module Pipelines
     autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/pipelines'
-    base_path and autoload_dir base_path, 'pipelines'
   end
 end
+base_path and autoload_dir File.join(base_path, 'connectors')
+base_path and autoload_dir File.join(base_path, 'pipelines')
 

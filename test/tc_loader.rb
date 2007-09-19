@@ -25,6 +25,8 @@ require 'test/unit'
 module RubySync
   module Connectors
     autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/connectors'
+    debugger
+    autoload_dir "#{File.dirname(__FILE__)}/connectors"
   end
 end
 
@@ -37,6 +39,7 @@ class TcLoader < Test::Unit::TestCase
     assert_equal "#{base_path}/base_connector.rb", base_module.send(:autoload?,:BaseConnector)
     assert_equal "#{base_path}/xml_connector.rb", base_module.send(:autoload?, :XmlConnector)
     assert_equal "#{base_path}/csv_file_connector.rb", base_module.send(:autoload?,:CsvFileConnector)
+    assert_equal "#{File.dirname(__FILE__)}/connectors/hr_connector.rb", autoload?(:HrConnector)
   end
   
 end

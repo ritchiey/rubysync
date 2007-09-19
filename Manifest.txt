@@ -120,7 +120,7 @@ lib/ruby_sync/operation.rb
 lib/ruby_sync/pipelines/base_pipeline.rb
 lib/ruby_sync/util/metaid.rb
 lib/ruby_sync/util/utilities.rb
-lib/rubysync.rb
+lib/ruby_sync.rb
 test/data/example1.ldif
 test/data/example2.ldif
 test/data/example3.ldif

@@ -371,18 +371,12 @@ module RubySync::Connectors
       # Ensures that the named connector is loaded and returns its class object
       def self.class_for connector_name
         name = class_name_for connector_name
-        (name)? eval("::"+name) : nil
+        (name)? eval(name) : nil
       end
 
-      # Ensures that the named connector is loaded and returns its class name.
+      # Return the class name for a path style connector name
       def self.class_name_for connector_name
-        filename = "#{connector_name}_connector"
-        class_name = filename.camelize
-        eval "defined? #{class_name}" or
-        $".include?(filename) or
-        require filename or
-        raise Exception.new("Can't find connector '#{filename}'")
-        class_name
+        '::' + "#{connector_name}_connector".camelize
       end
 
 private

@@ -76,7 +76,7 @@
 
 lib_path = File.dirname(__FILE__) + '/../lib'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
-require 'rubysync'
+require 'ruby_sync'
 require "simpleconsole"
 require 'rdoc/usage'
 
@@ -187,7 +187,7 @@ class Controller < SimpleConsole::Controller
   private
   
   def configure_logging
-    log_levels = [::Logger::WARN, ::Logger::INFO, ::Logger::DEBUG]
+    log_levels = [Logger::WARN, Logger::INFO, Logger::DEBUG]
     verbosity = [(params[:verbose]||0), log_levels.size-1].min
     log.level = log_levels[verbosity]
   end

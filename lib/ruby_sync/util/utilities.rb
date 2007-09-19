@@ -33,12 +33,15 @@ module Kernel
     end    
   
   # Calculate the constants
-  def autoload_dir base_dir, path
+  def autoload_dir base_dir, path=''
     dir_name = File.join(base_dir, path)
     Dir.foreach(dir_name) do |filename|
       next unless filename =~ /\.rb$/o
       module_name = path.camelize
       class_name = filename[0..-4].camelize
+      if (path == '')
+        load_path = filename 
+      
       eval(module_name).send(:autoload,class_name.to_sym, File.join(dir_name, filename))
     end
   end
@@ -108,7 +111,6 @@ module RubySync
     # the given name.
     def something_called name, extension
       filename = "#{name.to_s}_#{extension}"
-      $".include?(filename) or require filename or return nil
       eval(filename.camelize).new
     end
     
