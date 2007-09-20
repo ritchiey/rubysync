@@ -187,7 +187,7 @@ class Controller < SimpleConsole::Controller
   private
   
   def configure_logging
-    log_levels = [Logger::WARN, Logger::INFO, Logger::DEBUG]
+    log_levels = [::Logger::WARN, ::Logger::INFO, ::Logger::DEBUG]
     verbosity = [(params[:verbose]||0), log_levels.size-1].min
     log.level = log_levels[verbosity]
   end
@@ -264,9 +264,6 @@ def fields
   puts @field_names.join("\n")
 end
 
-                                            
-  
-
 end
 
 
@@ -285,8 +282,7 @@ end
   
   def pipeline_template name, vault_name, client_name
     vault = (vault_name)? ::RubySync::Connectors::BaseConnector.class_for(vault_name) : nil
-    vault_fields = vault && vault.fields || %w{allow these fields through}
-    possible_fields = (vault_fields.map {|n| ":#{n}"}).join(", ")
+    vault_fields = vault && vault.fields || []
 
     client = (client_name)? ::RubySync::Connectors::BaseConnector.class_for(client_name) : nil
     client_fields = client && client.fields || []
@@ -301,33 +297,39 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
   #{vault_specifier}
 
   # Remove any fields that you don't want to set in the client from the vault
-  allow_out #{possible_fields}
+  allow_out #{allow_through(vault_fields)}
 
   # Remove any fields that you don't want to set in the vault from the client
-  allow_in #{possible_fields}
+  allow_in #{allow_through(client_fields)}
 
   # If the client and vault have different names for the same field, define the
   # the mapping here. For example, if the vault has a field called "first name" and
   # the client has a field called givenName you may put:
-  #    'first name' => 'givenName'
-  # separate each mapping with a comma.
-  # The following fields were detected on the client:
-  # #{(client_fields.map {|f| "'#{f}'"}).join(",")}
-  map_vault_to_client({
-    #{(vault_fields.map {|f| "#'#{f}' => 'a_client_field'"}).join(",\n\t\t")}
-  })
-
+  #    map 'first name', 'givenName'
+  #
+  # You can also calculate the values for fields. For more info, see
+  # http://rubysync.org/docs/rubysync-transformations/
+  
   # "in" means going from client to vault
-  #in_transform do
-  #end
+  in_transform do
+    #{transform_fields(vault_fields, 'vault', 'client')}
+  end
 
   # "out" means going from vault to client
-  #out_transform do
-  #end
+  out_transform do
+    #{transform_fields(client_fields, 'client', 'vault')}
+  end
 
 end
     end;
   end
 
+def allow_through fields
+  (fields.empty? ? %w{allow these fields through} : fields).to_ruby
+end
+
+def transform_fields fields, mine, other
+  (fields.empty? ? ['sample',mine,'fields'] : fields).map {|f| "#map '#{f}', '#{other}_field'"}.join(",\n    ")
+end
 
 SimpleConsole::Application.run(ARGV, Controller, View)

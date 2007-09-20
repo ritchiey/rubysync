@@ -34,7 +34,12 @@ module Kernel
       @@log
     end    
 end
-    
+
+class Array
+  def to_ruby
+    map {|f| "'#{f}'"}.join(', ')    
+  end
+end
 
 # Generally useful methods
 module RubySync
