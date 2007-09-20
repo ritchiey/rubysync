@@ -27,6 +27,10 @@ require 'ruby_sync/event'
 
 module RubySync
   VERSION = '0.0.6'
+  module Connectors
+  end
+  module Pipelines
+  end
 end
 
 
@@ -57,14 +61,12 @@ class File
 end
 
 
-module RubySync
-  module Connectors
-    autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/connectors'
-  end
-  module Pipelines
-    autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/pipelines'
-  end
+load_paths = [lib_path]
+if (base_path)
+  load_paths << File.join(base_path, 'connectors')
+  load_paths << File.join(base_path, 'pipelines')
+  load_paths << File.join(base_path, 'shared', 'pipelines')
+  load_paths << File.join(base_path, 'shared', 'connectors')
+  load_paths << File.join(base_path, 'shared', 'lib')
 end
-base_path and autoload_dir File.join(base_path, 'connectors')
-base_path and autoload_dir File.join(base_path, 'pipelines')
-
+Dependencies.load_paths = load_paths

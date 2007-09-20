@@ -16,9 +16,9 @@
 #
 # Performs end-to-end tests of the memory based testing connectors.
 #
-[File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)].each do |lib_path|
-  $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
-end
+lib_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+$:.unshift lib_path unless $:.include?(lib_path)
+
 require 'ruby_sync_test'
 require 'hashlike_tests'
 require 'ruby_sync/connectors/memory_connector'

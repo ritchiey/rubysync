@@ -25,10 +25,9 @@ require 'test/unit'
 module RubySync
   module Connectors
     autoload_dir "#{File.dirname(__FILE__)}/../lib", 'ruby_sync/connectors'
-    debugger
-    autoload_dir "#{File.dirname(__FILE__)}/connectors"
   end
 end
+autoload_dir "#{File.dirname(__FILE__)}/connectors"
 
 class TcLoader < Test::Unit::TestCase
 

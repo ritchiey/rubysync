@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
+lib_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+$:.unshift lib_path unless $:.include?(lib_path)
 
 require 'fileutils'
 require 'rubygems'
@@ -31,20 +33,6 @@ module Kernel
       end
       @@log
     end    
-  
-  # Calculate the constants
-  def autoload_dir base_dir, path=''
-    dir_name = File.join(base_dir, path)
-    Dir.foreach(dir_name) do |filename|
-      next unless filename =~ /\.rb$/o
-      module_name = path.camelize
-      class_name = filename[0..-4].camelize
-      if (path == '')
-        load_path = filename 
-      
-      eval(module_name).send(:autoload,class_name.to_sym, File.join(dir_name, filename))
-    end
-  end
 end
     
 

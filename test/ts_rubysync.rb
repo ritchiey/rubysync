@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
+$:.unshift File.dirname(__FILE__)
+
 require 'test/unit'
-#require 'tc_loader' # Doesn't work in this context. Haven't worked out why
 require 'tc_csv_file_connector'
 require 'tc_memory_connectors'
 require 'tc_ldif'
