@@ -39,6 +39,10 @@ class XmlTestConnector <  RubySync::Connectors::XmlConnector
 end
 
 class XmlTestPipeline < RubySync::Pipelines::BasePipeline
+  
+  allow_in
+  allow_out
+  
   client :xml_test_a
   vault :xml_test_b
 end

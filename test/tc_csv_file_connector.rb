@@ -41,11 +41,15 @@ class CsvTestPipeline < RubySync::Pipelines::BasePipeline
   client :test_csv_file
          
   vault :test_memory
+  allow_in
+  allow_out
   
-  map_client_to_vault 'id'=>:cn,
-                      'given name'=>:givenName,
-                      'last name'=>:sn,
-                      "email"=>:mail
+  in_transform do
+    map :cn, :id
+    map :givenName, 'given name'
+    map :sn, 'last name'
+    map :mail, :email
+  end
   
 end
 

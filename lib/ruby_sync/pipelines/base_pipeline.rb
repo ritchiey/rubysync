@@ -127,24 +127,28 @@ module RubySync
         event.retrieve_association(association_context)
         event.convert_to_modify if event.associated? and event.type == :add
         
-        hint = " (#{vault.name} => #{client.name})"
+        hint = "(path=#{event.source_path} #{vault.name} => #{client.name})"
         log.info "Processing out-going #{event.type} event #{hint}"
-        log.info YAML.dump(event)
-        return unless out_event_filter event
+        #log.info YAML.dump(event)
+        unless out_event_filter event
+	  log.info "Disallowed by out_event_filter"
+          log.info "---\n"; return
+	end
         
         # Remove unwanted attributes
         perform_transform :out_filter, event
 
         unless event.associated?
+	  log.info "no association"
           if [:delete, :remove_association].include? event.type
             log.info "#{name}: No action for #{event.type} of unassociated entry"
-            log.info YAML.dump(event)
-            return
+            log.info "---\n"; return
           end
         end
 
         if event.type == :modify
           unless event.associated? and client.has_entry_for_key?(event.association.key)
+	  log.info "Can't find associated client record so converting modify to add"
             event.convert_to_add
           end
         end
@@ -155,16 +159,19 @@ module RubySync
           if match # exactly one event record on the client matched
             log.info "Match found, merging"
             event.merge(match)
-            association = Association.new(self.association_context, match.src_path)
+            association = Association.new(self.association_context, match.source_path)
             vault.associate asssociation, event.source_path
-            return
+            log.info "---\n"; return
           end
           log.info "No match found, creating"
-          return unless out_create(event)
+          unless out_create(event)
+	    log.info "Creation denied by create rule"
+            log.info "---\n"; return
+	  end
           perform_transform :out_place, event
+	  log.info "Placing new entry at #{event.target_path}"
         end
         
-        perform_transform :out_map_schema, event
         perform_transform :out_transform, event
         association_key = nil
         with_rescue("#{client.name}: Processing command") do
@@ -175,6 +182,8 @@ module RubySync
           with_rescue("#{client.name}: Storing association #{association} in vault") do
             vault.associate(association, event.source_path)
           end
+	else
+	  log.info "Client didn't return an association key"
         end
       end
       
@@ -209,14 +218,15 @@ module RubySync
       
       # Override to modify the target path for creation in the vault
       def in_place(event)
-        log.debug "Default placement rule target_path = source_path"
+        log.debug "Setting target_path to source_path"
         event.target_path = event.source_path
       end
       
       def perform_transform name, event, hint=""
+	log.info "Performing #{name}"
         call_if_exists name, event, hint
         event.commit_changes
-        log_progress name, event, hint
+        #log_progress name, event, hint
       end
       
       # Transform the out-going event before the client receives it
@@ -244,6 +254,7 @@ module RubySync
       
       # Execute the in pipe once and then return
       def run_in_once
+        return unless allowed_in
         log.debug "Running #{name} 'in' pipeline once"
         client.once_only = true
         client.start {|event| in_handler(event)}
@@ -251,6 +262,7 @@ module RubySync
       
       # Execute the out pipe once and then return
       def run_out_once
+        return unless allowed_out
         log.debug "Running #{name} 'out' pipeline once"
         vault.once_only = true
         vault.start {|event| out_handler(event)}
@@ -285,36 +297,43 @@ module RubySync
       def in_handler(event)
         event.retrieve_association(association_context)        
 
-        hint = " (#{client.name} => #{vault.name})"
-        log.info "Processing incoming #{event.type} event"+hint
-        log.info YAML.dump(event)
-        perform_transform :in_map_schema, event, hint
-        perform_transform :in_transform, event, hint
+        hint = "(#{client.name} => #{vault.name}) #{event.source_path}"
+        log.info "Processing incoming #{event.type} event "+hint
         perform_transform :in_filter, event, hint
+        perform_transform :in_transform, event, hint
         
         # The client can't really know whether its an add or a modify because it doesn't store
         # the association.
         if event.type == :modify
-          event.convert_to_add unless event.associated? and vault.find_associated(event.association)
+          unless event.associated? and vault.find_associated(event.association)
+	    log.info "No associated entry in vault for modify event. Converting to add"
+	    event.convert_to_add
+	  end
         elsif event.type == :add and event.associated? and vault.find_associated(event.association)
+	  log.info "Associated entry in vault for add event. Converting to modify"
           event.convert_to_modify
         end
         
+	# todo: Maybe we should merge any add or modify that is associated or matched
         if event.type == :add
-          match = in_match(event) # exactly one event record in the vault matched
+          match = in_match(event)
           if match
+	    log.info "Matching record found in vault. Merging."
             event.merge(match)
-            return
+            log.info "---\n"; return
           end
           
           if in_create(event)
             perform_transform :in_place, event, hint
+	    log.info "Create on vault allowed. Placing at #{event.target_path}"
           else
-            return
+	    log.info "Create rule disallowed creation"
+            log.info "---\n"; return
           end
         end
-        
+
         with_rescue("#{vault.name}: Processing command") {vault.process(event)}
+        log.info "---\n"
         
       end
       
@@ -367,14 +386,9 @@ module RubySync
       # default allowed_in in case allow_in doesn't get called
       def allowed_in; nil; end
       
-      # Default method for allowed_in. Override by calling allow_in
-      #def allowed_in; false; end
+      
       def in_filter(event)
-        if allowed_in
-          event.drop_all_but_changes_to allowed_in
-        else
-          event
-        end
+          allowed_in == [] or event.drop_all_but_changes_to(allowed_in || [])
       end
 
 
@@ -389,15 +403,10 @@ module RubySync
       # default allowed_out in case allow_out doesn't get called
       def allowed_out; nil; end
       
-      # Default method for allowed_out. Override by calling allow_in
-      #def allowed_out; false; end
       def out_filter(event)
-        if allowed_out
-          event.drop_all_but_changes_to allowed_out
-        else
-          event
-        end
+          allowed_out == [] or event.drop_all_but_changes_to(allowed_out || [])
       end
+
 
 
     end

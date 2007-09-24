@@ -35,6 +35,8 @@ end
 class MemoryTestPipeline < RubySync::Pipelines::BasePipeline
   client :memory_test_a
   vault :memory_test_b
+  allow_in
+  allow_out
 end
 
 class TcMemoryConnectors < Test::Unit::TestCase

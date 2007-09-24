@@ -52,7 +52,7 @@ class LdapTestPipeline < RubySync::Pipelines::BasePipeline
 end
 
 
-class TCLdapConnector < Test::Unit::TestCase
+class TcLdapConnector < Test::Unit::TestCase
     
   include RubySyncTest
   include HashlikeTests

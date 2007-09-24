@@ -36,6 +36,9 @@ class TransformationTestPipeline < RubySync::Pipelines::BasePipeline
   client :transformation_vault
   vault :transformation_client
   
+  allow_in :givenName, :sn, :interests
+  allow_out :first_name, :last_name
+  
   in_transform do
    map :first_name, :givenName
    map :last_name, :sn
@@ -51,6 +54,7 @@ class TcTransformation < Test::Unit::TestCase
   
   include RubySyncTest
 
+
   def client_path() 'bob'; end
   def vault_path() 'bob'; end
   
@@ -61,6 +65,7 @@ class TcTransformation < Test::Unit::TestCase
   def test_transform
     @client['bob'] = @bob_details
     @pipeline.run_once
+    assert_not_nil @vault['bob'],"Bob wasn't created on the vault"
     assert_equal @bob_details['givenName'], @vault['bob']['first_name']
     assert_equal @bob_details['sn'], @vault['bob']['last_name']
     assert_equal "Created by RubySync", @vault['bob']['note'][0]

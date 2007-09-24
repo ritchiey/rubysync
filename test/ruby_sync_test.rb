@@ -27,6 +27,7 @@ module RubySyncTest
 
   def initialize(test)
     super(test)
+    log.level = ::Logger::DEBUG
     @bob_details = {'givenName'=>['bob'],
                     'sn'=>['Smith'],
                     'interests'=>['music', 'makeup']

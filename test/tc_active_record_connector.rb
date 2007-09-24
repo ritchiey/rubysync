@@ -33,11 +33,19 @@ class ArTestPipeline < RubySync::Pipelines::BasePipeline
   client :ar_memory
   vault :ar_active_record
   
-  allow_in :first_name, :last_name
+  allow_in :givenName, :sn
   allow_out :first_name, :last_name
-  
-  map_client_to_vault :givenName  => :first_name,
-                      :sn         => :last_name
+ 
+  in_transform do
+    map :first_name, :givenName
+    map :last_name, :sn 
+  end
+
+  out_transform do
+    map :givenName, :first_name
+    map :sn, :last_name 
+  end
+
 end
 
 
