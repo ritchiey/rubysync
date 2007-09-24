@@ -12,7 +12,6 @@ docs/to_sync.txt
 docs/walkthru.txt
 examples/ar_webapp/README
 examples/ar_webapp/Rakefile
-examples/ar_webapp/app/.DS_Store
 examples/ar_webapp/app/controllers/application.rb
 examples/ar_webapp/app/controllers/hobbies_controller.rb
 examples/ar_webapp/app/controllers/interests_controller.rb
@@ -28,9 +27,7 @@ examples/ar_webapp/app/models/ruby_sync_observer.rb
 examples/ar_webapp/app/models/ruby_sync_operation.rb
 examples/ar_webapp/app/models/ruby_sync_state.rb
 examples/ar_webapp/app/models/ruby_sync_value.rb
-examples/ar_webapp/app/views/.DS_Store
 examples/ar_webapp/app/views/layouts/application.rhtml
-examples/ar_webapp/app/views/people/.DS_Store
 examples/ar_webapp/app/views/people/show.rhtml
 examples/ar_webapp/config/boot.rb
 examples/ar_webapp/config/database.yml
@@ -103,6 +100,7 @@ examples/my_ims/connectors/my_csv_connector.rb
 examples/my_ims/connectors/my_db_connector.rb
 examples/my_ims/pipelines/my_pipeline.rb
 lib/net/ldif.rb
+lib/ruby_sync.rb
 lib/ruby_sync/connectors/active_record_association_handler.rb
 lib/ruby_sync/connectors/active_record_connector.rb
 lib/ruby_sync/connectors/active_record_event_handler.rb
@@ -120,7 +118,6 @@ lib/ruby_sync/operation.rb
 lib/ruby_sync/pipelines/base_pipeline.rb
 lib/ruby_sync/util/metaid.rb
 lib/ruby_sync/util/utilities.rb
-lib/ruby_sync.rb
 test/data/example1.ldif
 test/data/example2.ldif
 test/data/example3.ldif
@@ -140,7 +137,6 @@ test/tc_ldap_changelog.rb
 test/tc_ldap_connector.rb
 test/tc_ldap_vault.rb
 test/tc_ldif.rb
-test/tc_loader.rb
 test/tc_memory_connectors.rb
 test/tc_transformation.rb
 test/tc_utilities.rb
