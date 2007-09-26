@@ -22,8 +22,8 @@ module RubySync
       out_extension     ".out"
       
       def started
-        ensure_dir_exists in_path
-        ensure_dir_exists out_path
+        defined? in_path and ensure_dir_exists in_path
+        defined? out_path and ensure_dir_exists out_path
       end
       
       def each_change(&blk)

@@ -75,9 +75,25 @@ module RubySync::Connectors
       def self.sample_config
           return <<END
 
-    application '/path/to/a/rails/application'
-    model 'name_of_model_to_sync'
+    # Uncomment and adjust the following if your app is a Ruby on Rails
+    # application. It will grab the config from the RoR database.yml.
+    # application '/path/to/a/rails/application'
+    # model 'name_of_model_to_sync'
+    # rails_env 'development'   # typically development or production 
 
+    # OR
+
+    # Uncomment and adjust the following if your app is not
+    # a Ruby on Rails application (EXPERIMENTAL)
+    #
+    # db_type 'mysql'  # eg 'db2', 'mysql', 'oci', 'postgresql', 'sqlite', 'sqlserver'
+    # db_host 'localhost' # network name of db server
+    # db_name 'database_name' # Name of the database (not the table)
+    # model 'my_model'
+    # class MyModel < ActiveRecord::Base
+    #     set_table_name "users"
+    # end
+    
 END
       end
       

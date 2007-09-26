@@ -46,8 +46,9 @@ module RubySync
     
     include RubySync::Utilities
 
-    attr_accessor :type,        # delete, add, modify ...
+    attr_accessor :type,        # :delete, :add, :modify ...
                   :source,
+                  :target,
                   :payload,
                   :source_path,
                   :target_path,
@@ -145,14 +146,14 @@ module RubySync
     
     # Remove any operations from the payload that affect fields with the given key or
     # keys (key can be a single field name or an array of field names).
-    def drop_changes_to subject
-      subjects = as_array(subject).map {|s| s.to_s}
+    def drop_changes_to *subjects
+      subjects = subjects.flatten.collect {|s| s.to_s}
       uncommitted_operations
       @uncommitted_operations = @uncommitted_operations.delete_if {|op| subjects.include? op.subject }
     end
 
-    def drop_all_but_changes_to subject
-      subjects = as_array(subject).map {|s| s.to_s}
+    def drop_all_but_changes_to *subjects
+      subjects = subjects.flatten.collect {|s| s.to_s}
       @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject.to_s)}
     end
     
@@ -170,15 +171,17 @@ module RubySync
        uncommitted_operations << Operation.new(:replace, field_name.to_s, as_array(value))
      end
 
-    def values_for field_name
+    def values_for field_name, default=[]
       values = perform_operations @payload, {}, :subjects=>[field_name.to_s]
-      values[field_name.to_s]
+      values[field_name.to_s] || default
     end
+    alias_method :values_of, :values_for 
     
-    def value_for field_name
+    def value_for field_name, default=''
       values = values_for field_name
-      (values)? values[0] : nil
+      values[0] || default
     end
+    alias_method :value_of, :value_for 
            
     def uncommitted_operations
       @uncommitted_operations ||= @payload || []
@@ -222,6 +225,10 @@ module RubySync
         drop_changes_to left.to_s
         uncommitted_operations << RubySync::Operation.replace(left.to_s, blk.call) 
       end
+    end
+    
+    def place(&blk)
+      self.target_path = blk.call
     end
   
   protected

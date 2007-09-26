@@ -51,6 +51,23 @@ class Module
   end
 end
 
+
+# Add an option that will be defined by a class method, stored in a class variable
+# and accessible as an instance method
+def array_option *names
+  names.each do |name|
+    meta_def name do |*values|
+      class_def name do
+        values
+      end
+      meta_def "get_#{name}" do
+        values
+      end
+    end
+  end
+end
+
+
 class File
   def self.delete_if_exists(files)
     files.kind_of?(Array) or files = [files]

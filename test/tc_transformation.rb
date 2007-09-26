@@ -48,6 +48,9 @@ class TransformationTestPipeline < RubySync::Pipelines::BasePipeline
    map(:note) {"Created by RubySync"}
    map(:shopping) {%w/fish milk bread/}
   end
+  
+  in_place { "#{self.source_path}/path/in/vault"}
+  out_place { "#{self.source_path}".split('/')[0] }
 end
 
 class TcTransformation < Test::Unit::TestCase
@@ -56,21 +59,21 @@ class TcTransformation < Test::Unit::TestCase
 
 
   def client_path() 'bob'; end
-  def vault_path() 'bob'; end
+  def vault_path() 'bob/path/in/vault'; end
   
   def testPipeline
     TransformationTestPipeline
   end
   
   def test_transform
-    @client['bob'] = @bob_details
+    @client[client_path] = @bob_details
     @pipeline.run_once
-    assert_not_nil @vault['bob'],"Bob wasn't created on the vault"
-    assert_equal @bob_details['givenName'], @vault['bob']['first_name']
-    assert_equal @bob_details['sn'], @vault['bob']['last_name']
-    assert_equal "Created by RubySync", @vault['bob']['note'][0]
-    assert_equal "music:makeup", @vault['bob']['hobbies'][0]
-    assert_equal %w/fish milk bread/, @vault['bob']['shopping']
+    assert_not_nil @vault[vault_path],"Bob wasn't created on the vault"
+    assert_equal @bob_details['givenName'], @vault[vault_path]['first_name']
+    assert_equal @bob_details['sn'], @vault[vault_path]['last_name']
+    assert_equal "Created by RubySync", @vault[vault_path]['note'][0]
+    assert_equal "music:makeup", @vault[vault_path]['hobbies'][0]
+    assert_equal %w/fish milk bread/, @vault[vault_path]['shopping']
   end
   
 end

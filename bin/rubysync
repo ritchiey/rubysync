@@ -320,6 +320,36 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
     #{transform_fields(client_fields, 'client', 'vault')}
   end
 
+  # if the vault doesn't already hold an association for this record
+  # from the client, perform a search here to see if a match can be found
+  # in_match do
+  # end
+
+  # if the vault doesn't have an association linking this record to one on
+  # the client, perform a search here to see if an existing client record
+  # matches this record
+  # out_match do
+  # end
+
+  # If this evaluates to false, it will veto the creation of a record on
+  # the vault. Good for checking you've got the required fields etc
+  # in_create_if do
+  # end
+
+  # if this evaluates to false for an outgoing event then it will
+  # veto the creation of a new record on the client
+  # out_create_if do
+  # end
+
+  # Should evaluate to the path for placing a new record on the vault
+  # in_place do
+  # end
+
+  # Should evaluate to the path for placing a new record on the client
+  # out_place do
+  # end
+
+
 end
     end;
   end
@@ -329,7 +359,7 @@ def allow_through fields
 end
 
 def transform_fields fields, mine, other
-  (fields.empty? ? ['sample',mine,'fields'] : fields).map {|f| "#map '#{f}', '#{other}_field'"}.join(",\n    ")
+  (fields.empty? ? ['sample',mine,'fields'] : fields).map {|f| "#map '#{f}', '#{other}_field'"}.join("\n    ")
 end
 
 SimpleConsole::Application.run(ARGV, Controller, View)

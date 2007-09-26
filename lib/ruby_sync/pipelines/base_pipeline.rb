@@ -43,6 +43,10 @@ module RubySync
       
       attr_accessor :delay    # delay in seconds between checking connectors
       
+      array_option :dump_before, :dump_after
+      dump_before []
+      dump_after []
+      
       def initialize
         @delay = 5
       end
@@ -73,166 +77,65 @@ module RubySync
         end
       end
       
-      def self.map_client_to_vault mappings
-        remove_method :client_to_vault_map if method_defined? :client_to_vault_map
-        class_def 'client_to_vault_map' do
-          unless @client_to_vault_map
-            @client_to_vault_map = {}
-            mappings.each {|k,v| @client_to_vault_map[k.to_s] = v.to_s}
-          end
-          @client_to_vault_map
-        end
-        unless method_defined? :vault_to_client_map
-          class_def 'vault_to_client_map' do
-            @vault_to_client_map ||= client_to_vault_map.invert
-          end
-        end
-      end
-      
-      def self.map_vault_to_client mappings
-        remove_method :vault_to_client_map if method_defined? :vault_to_client_map
-        class_def 'vault_to_client_map' do
-          unless @vault_to_client_map
-            @vault_to_client_map = {}
-            mappings.each {|k,v| @vault_to_client_map[k.to_s] = v.to_s}
-          end
-          @vault_to_client_map
-        end
-        unless method_defined? :client_to_vault_map
-          class_def 'client_to_vault_map' do
-            @client_to_vault_map ||= vault_to_client_map.invert
-          end
-        end
-      end
-      
-      def self.out_transform &blk
-        define_method :out_transform do |event|
-          event.meta_def :transform, &blk
-          event.transform
-        end
-      end
-      
-      def self.in_transform &blk
-        define_method :in_transform do |event|
-          event.meta_def :transform, &blk
-          event.transform
-        end
-      end
-      
-      
-      # Called by the identity-vault connector in the 'out' thread to process events generated
-      # by the identity vault.
-      def out_handler(event)
 
-        event.retrieve_association(association_context)
-        event.convert_to_modify if event.associated? and event.type == :add
-        
-        hint = "(path=#{event.source_path} #{vault.name} => #{client.name})"
-        log.info "Processing out-going #{event.type} event #{hint}"
-        #log.info YAML.dump(event)
-        unless out_event_filter event
-	  log.info "Disallowed by out_event_filter"
-          log.info "---\n"; return
-	end
-        
-        # Remove unwanted attributes
-        perform_transform :out_filter, event
+      def self.in_transform(&blk) event_method :in_transform,&blk; end
+      def self.out_transform(&blk) event_method :out_transform,&blk; end
+      def self.in_match(&blk) event_method :in_match_if,&blk; end
+      def self.out_match(&blk) event_method :out_match_if,&blk; end
+      def self.in_create_if(&blk) event_method :in_create_if,&blk; end
+      def self.out_create_if(&blk) event_method :out_create_if,&blk; end
 
-        unless event.associated?
-	  log.info "no association"
-          if [:delete, :remove_association].include? event.type
-            log.info "#{name}: No action for #{event.type} of unassociated entry"
-            log.info "---\n"; return
-          end
+      def self.event_method name,&blk
+        define_method name do |event|
+          event.instance_eval &blk
         end
+      end
 
-        if event.type == :modify
-          unless event.associated? and client.has_entry_for_key?(event.association.key)
-	  log.info "Can't find associated client record so converting modify to add"
-            event.convert_to_add
-          end
-        end
+      def self.in_place(&blk) place :in, &blk; end
+      def self.out_place(&blk) place :out, &blk; end
 
-        if event.type == :add
-          match = out_match(event) 
-          log.info "Attempting to match"
-          if match # exactly one event record on the client matched
-            log.info "Match found, merging"
-            event.merge(match)
-            association = Association.new(self.association_context, match.source_path)
-            vault.associate asssociation, event.source_path
-            log.info "---\n"; return
-          end
-          log.info "No match found, creating"
-          unless out_create(event)
-	    log.info "Creation denied by create rule"
-            log.info "---\n"; return
-	  end
-          perform_transform :out_place, event
-	  log.info "Placing new entry at #{event.target_path}"
-        end
-        
-        perform_transform :out_transform, event
-        association_key = nil
-        with_rescue("#{client.name}: Processing command") do
-          association_key = client.process(event)
-        end
-        if association_key
-          association = Association.new(association_context, association_key)
-          with_rescue("#{client.name}: Storing association #{association} in vault") do
-            vault.associate(association, event.source_path)
-          end
-	else
-	  log.info "Client didn't return an association key"
+      def self.place direction, &blk
+        define_method "#{direction}_place" do |event|
+          event.target_path = event.instance_eval &blk
         end
       end
       
-      # Override to map schema from vault namespace to client namespace
-      # def out_map_schema event
-      # end
       
       # Override to implement some kind of matching
-      def out_match event
+      def default_match event
         log.debug "Default matching rule - source path exists on client?"
-        client.respond_to?('[]') and client[event.source_path]
-        false
+        event.target.respond_to?('[]') and event.target[event.source_path]
       end
+      alias_method :in_match, :default_match
+      alias_method :out_match, :default_match
       
       # Override to restrict creation on the client
-      def out_create event
+      def default_create event
         log.debug "Create allowed through default rule"
         true
       end
+      alias_method :in_create, :default_create
+      alias_method :out_create, :default_create
       
-      # Override to restrict creation on the vault
-      def in_create event
-        log.debug "Create allowed through default rule"
-        true
-      end
       
       # Override to modify the target path for creation on the client
-      def out_place(event)
+      def default_place(event)
         log.debug "Default placement rule target_path = source_path"
         event.target_path = event.source_path
       end
+      alias_method :in_place, :default_place
+      alias_method :out_place, :default_place
       
-      # Override to modify the target path for creation in the vault
-      def in_place(event)
-        log.debug "Setting target_path to source_path"
-        event.target_path = event.source_path
-      end
       
       def perform_transform name, event, hint=""
-	log.info "Performing #{name}"
+	      log.info "Performing #{name}"
+	      log.info event.to_yaml if dump_before.include?(name.to_sym)
         call_if_exists name, event, hint
         event.commit_changes
+	      log.info event.to_yaml if dump_after.include?(name.to_sym)
         #log_progress name, event, hint
       end
-      
-      # Transform the out-going event before the client receives it
-      # def out_transform(event)
-      # end
-      
+            
       # Execute the pipeline once then return.
       def run_once
         log.info "Running #{name} pipeline once"
@@ -295,7 +198,8 @@ module RubySync
       
       # Called by the 'in' connector in the 'in' thread to process events generated by the client.
       def in_handler(event)
-        event.retrieve_association(association_context)        
+        event.target = @vault
+        event.retrieve_association(association_context)
 
         hint = "(#{client.name} => #{vault.name}) #{event.source_path}"
         log.info "Processing incoming #{event.type} event "+hint
@@ -314,7 +218,7 @@ module RubySync
           event.convert_to_modify
         end
         
-	# todo: Maybe we should merge any add or modify that is associated or matched
+	      # todo: Maybe we should merge any add or modify that is associated or matched
         if event.type == :add
           match = in_match(event)
           if match
@@ -337,16 +241,82 @@ module RubySync
         
       end
       
+      
+          # Called by the identity-vault connector in the 'out' thread to process events generated
+          # by the identity vault.
+          def out_handler(event)
+            event.target = @client
+            event.retrieve_association(association_context)
+            event.convert_to_modify if event.associated? and event.type == :add
+
+            hint = "(path=#{event.source_path} #{vault.name} => #{client.name})"
+            log.info "Processing out-going #{event.type} event #{hint}"
+            #log.info YAML.dump(event)
+            unless out_event_filter event
+    	  log.info "Disallowed by out_event_filter"
+              log.info "---\n"; return
+    	end
+
+            # Remove unwanted attributes
+            perform_transform :out_filter, event
+
+            unless event.associated?
+    	  log.info "no association"
+              if [:delete, :remove_association].include? event.type
+                log.info "#{name}: No action for #{event.type} of unassociated entry"
+                log.info "---\n"; return
+              end
+            end
+
+            if event.type == :modify
+              unless event.associated? and client.has_entry_for_key?(event.association.key)
+    	  log.info "Can't find associated client record so converting modify to add"
+                event.convert_to_add
+              end
+            end
+
+            if event.type == :add
+              match = out_match(event) 
+              log.info "Attempting to match"
+              if match # exactly one event record on the client matched
+                log.info "Match found, merging"
+                event.merge(match)
+                association = Association.new(self.association_context, match.source_path)
+                vault.associate asssociation, event.source_path
+                log.info "---\n"; return
+              end
+              log.info "No match found, creating"
+              unless out_create(event)
+    	    log.info "Creation denied by create rule"
+                log.info "---\n"; return
+    	  end
+              perform_transform :out_place, event
+    	  log.info "Placing new entry at #{event.target_path}"
+            end
+
+            perform_transform :out_transform, event
+            association_key = nil
+            with_rescue("#{client.name}: Processing command") do
+              association_key = client.process(event)
+            end
+            if association_key
+              association = Association.new(association_context, association_key)
+              with_rescue("#{client.name}: Storing association #{association} in vault") do
+                vault.associate(association, event.source_path)
+              end
+    	else
+    	  log.info "Client didn't return an association key"
+            end
+          end
+      
+      
+      
       # The context for all association keys used by this pipeline.
       # By default, defer to the client
       def association_context
         @client.association_context
       end
-      
-      def in_match event
-        log.debug "Default match rule - source path exists in vault"
-        vault.respond_to?('[]') and vault[event.source_path]
-      end
+
       
       # If client_to_vault_map is defined (usually by map_client_to_vault)
       # then fix up the contents of the payload to refer to the fields by

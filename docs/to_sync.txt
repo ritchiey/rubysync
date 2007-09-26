@@ -1,6 +1,8 @@
 Things to Sync
 
 gmail address book
+google calendar
+google provisioning api
 yahoo address book
 msn address book
 delicious links
@@ -11,5 +13,5 @@ windows mobile address book
 rss feeds
 any HTML page using scRubyt
 imdb.com
-
-
+mac address book
+mac calendar
