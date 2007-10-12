@@ -47,6 +47,8 @@ class TransformationTestPipeline < RubySync::Pipelines::BasePipeline
    # Constant string
    map(:note) {"Created by RubySync"}
    map(:shopping) {%w/fish milk bread/}
+   # Conditional mapping
+   map(:password) {value_for(:givenName)} if type == :add
   end
   
   in_place { "#{self.source_path}/path/in/vault"}
@@ -74,6 +76,13 @@ class TcTransformation < Test::Unit::TestCase
     assert_equal "Created by RubySync", @vault[vault_path]['note'][0]
     assert_equal "music:makeup", @vault[vault_path]['hobbies'][0]
     assert_equal %w/fish milk bread/, @vault[vault_path]['shopping']
+    assert_equal @bob_details['givenName'], @vault[vault_path]['password']
+    @vault[vault_path]['password'] = new_password = 'myNewPassword'
+    assert_equal new_password, @vault[vault_path]['password']
+    @client[client_path]['givenName'] = new_given_name = 'Mary'
+    @pipeline.run_once
+    assert_equal [new_given_name], @vault[vault_path]['first_name']
+    assert_equal new_password, @vault[vault_path]['password']
   end
   
 end
