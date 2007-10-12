@@ -348,6 +348,13 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
   # Should evaluate to the path for placing a new record on the client
   # out_place do
   # end
+  
+  
+  # These statements control logging. In log level 2 or higher (specify -v 2),
+  # the event will be dumped to the log at any of the places specified below.
+  # Uncomment and edit to taste. 
+  # dump_before :in_filter, :in_transform, :in_place, :out_filter, :out_place, :out_transform
+  # dump_after :in_filter, :in_transform, :in_place, :out_filter, :out_place, :out_transform
 
 
 end

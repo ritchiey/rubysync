@@ -1,3 +1,10 @@
+== 0.1.0 / 2007-09-26
+
+* Dropped the map_client_to_vault and map_vault_to_client methods. in_transform and out_transform now handle that
+  this enables calculated and literal values as well as simple mappings
+* Now uses the class loader from activesupport - much more stable
+* Refreshed the examples
+
 == 0.0.5 / 2007-09-18
 
 * Fixed gem dependency issues

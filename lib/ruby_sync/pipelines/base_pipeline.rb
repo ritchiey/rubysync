@@ -204,7 +204,6 @@ module RubySync
         hint = "(#{client.name} => #{vault.name}) #{event.source_path}"
         log.info "Processing incoming #{event.type} event "+hint
         perform_transform :in_filter, event, hint
-        perform_transform :in_transform, event, hint
         
         # The client can't really know whether its an add or a modify because it doesn't store
         # the association.
@@ -217,6 +216,9 @@ module RubySync
 	  log.info "Associated entry in vault for add event. Converting to modify"
           event.convert_to_modify
         end
+
+        perform_transform :in_transform, event, hint
+
         
 	      # todo: Maybe we should merge any add or modify that is associated or matched
         if event.type == :add
@@ -335,15 +337,6 @@ module RubySync
           op.subject = map[op.subject] || op.subject if op.subject
         end
       end
-        
-      
-      
-      
-      # Override to perform whatever transformation on the event is required
-      #def in_transform(event); event; end
-      
-      # Convert fields in the incoming event to those used by the identity vault
-      #def in_map_schema(event); end
       
       # Specify which fields will be allowed through the incoming filter
       # If nil (the default), all fields are allowed. 
