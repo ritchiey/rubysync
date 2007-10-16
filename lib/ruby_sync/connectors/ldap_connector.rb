@@ -60,7 +60,7 @@ module RubySync::Connectors
 
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
-        ldap.search :base => search_base, :filter => search_filter do |ldap_entry|
+        ldap.search :base => search_base, :filter => search_filter, :return_result => false do |ldap_entry|
           yield ldap_entry.dn, to_entry(ldap_entry)
         end
       end

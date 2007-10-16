@@ -379,6 +379,17 @@ module RubySync::Connectors
         '::' + "#{connector_name}_connector".camelize
       end
 
+      def self.sample_config
+          return <<END
+          # Call the option class method to declare the options used to configure
+          # your connector.
+          #option :option1, :option2 # ...
+          
+          
+          
+END
+      end
+
 private
 
       def self.options options

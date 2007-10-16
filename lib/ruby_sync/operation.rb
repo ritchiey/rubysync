@@ -82,6 +82,7 @@ module RubySync
     def same_but_as type
       op = self.dup
       op.type = type
+      op.values = nil if type == :delete
       op
     end
     
@@ -93,6 +94,10 @@ module RubySync
       op
     end
     
+    def sets_blank?
+      [:add, :replace].include? @type and
+      (!@values || as_array(@values).select {|v| v && v != ''}.empty?)
+    end
     
   end
 end

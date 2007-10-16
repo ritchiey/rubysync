@@ -80,10 +80,10 @@ module RubySync
 
       def self.in_transform(&blk) event_method :in_transform,&blk; end
       def self.out_transform(&blk) event_method :out_transform,&blk; end
-      def self.in_match(&blk) event_method :in_match_if,&blk; end
-      def self.out_match(&blk) event_method :out_match_if,&blk; end
-      def self.in_create_if(&blk) event_method :in_create_if,&blk; end
-      def self.out_create_if(&blk) event_method :out_create_if,&blk; end
+      def self.in_match(&blk) event_method :in_match,&blk; end
+      def self.out_match(&blk) event_method :out_match,&blk; end
+      def self.in_create(&blk) event_method :in_create,&blk; end
+      def self.out_create(&blk) event_method :out_create,&blk; end
 
       def self.event_method name,&blk
         define_method name do |event|
@@ -216,19 +216,19 @@ module RubySync
 	  log.info "Associated entry in vault for add event. Converting to modify"
           event.convert_to_modify
         end
-
-        perform_transform :in_transform, event, hint
-
         
 	      # todo: Maybe we should merge any add or modify that is associated or matched
         if event.type == :add
           match = in_match(event)
           if match
 	    log.info "Matching record found in vault. Merging."
+            perform_transform :in_transform, event, hint
             event.merge(match)
             log.info "---\n"; return
           end
           
+          perform_transform :in_transform, event, hint
+	
           if in_create(event)
             perform_transform :in_place, event, hint
 	    log.info "Create on vault allowed. Placing at #{event.target_path}"
@@ -282,6 +282,7 @@ module RubySync
               log.info "Attempting to match"
               if match # exactly one event record on the client matched
                 log.info "Match found, merging"
+                perform_transform :out_place, event
                 event.merge(match)
                 association = Association.new(self.association_context, match.source_path)
                 vault.associate asssociation, event.source_path
@@ -293,7 +294,7 @@ module RubySync
                 log.info "---\n"; return
     	  end
               perform_transform :out_place, event
-    	  log.info "Placing new entry at #{event.target_path}"
+    	      log.info "Placing new entry at #{event.target_path}"
             end
 
             perform_transform :out_transform, event
@@ -337,6 +338,15 @@ module RubySync
           op.subject = map[op.subject] || op.subject if op.subject
         end
       end
+        
+      
+      
+      
+      # Override to perform whatever transformation on the event is required
+      #def in_transform(event); event; end
+      
+      # Convert fields in the incoming event to those used by the identity vault
+      #def in_map_schema(event); end
       
       # Specify which fields will be allowed through the incoming filter
       # If nil (the default), all fields are allowed. 

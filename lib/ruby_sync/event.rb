@@ -156,7 +156,18 @@ module RubySync
       subjects = subjects.flatten.collect {|s| s.to_s}
       @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject.to_s)}
     end
-    
+   
+   def delete_when_blank
+       @uncommitted_operations = uncommitted_operations.map do |op| 
+         if op.sets_blank?
+	   @type == :modify ? op.same_but_as(:delete) : nil
+	 else
+	   op
+	 end
+       end.compact
+   end    
+       
+     
      # Add a value to a given subject unless it already sets a value
      def add_default field_name, value
        add_value(field_name.to_s, value) unless sets_value? field_name.to_s
