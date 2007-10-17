@@ -38,7 +38,7 @@ module RubySync
         log.info "Adding '#{event.target_path}' to '#{name}'"
         raise Exception.new("#{name}: Entry with path '#{event.target_path}' already exists, add failing.") if self[event.target_path]
         if is_vault? && event.association && path_for_association(event.association)
-          raise Exception.new("#{name}: Association already in use. Add failing.") 
+          raise Exception.new("#{name}: Association (#{event.association.to_s}) already in use. Add failing.") 
         end
         call_if_exists(:target_transform, event)
         if add(event.target_path, event.payload)

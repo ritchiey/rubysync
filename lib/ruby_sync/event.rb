@@ -46,7 +46,7 @@ module RubySync
     
     include RubySync::Utilities
 
-    attr_accessor :type,        # :delete, :add, :modify ...
+    attr_accessor :type,        # :delete, :add, :modify, :disassociate
                   :source,
                   :target,
                   :payload,
@@ -68,6 +68,12 @@ module RubySync
     
     def self.modify source, source_path, association=nil, payload=nil
       self.new(:modify, source, source_path, association, payload)
+    end
+
+    # Remove the association between the entry on the source and
+    # the associated entry (if any) on the target.
+    def self.disassociate source, source_path, association=nil, payload=nil
+      self.new(:disassociate, source, source_path, association, payload)
     end
 
     def initialize type, source, source_path=nil, association=nil, payload=nil

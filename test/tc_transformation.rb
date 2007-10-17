@@ -53,6 +53,8 @@ class TransformationTestPipeline < RubySync::Pipelines::BasePipeline
   
   in_place { "#{self.source_path}/path/in/vault"}
   out_place { "#{self.source_path}".split('/')[0] }
+  
+  dump_after :in_transform
 end
 
 class TcTransformation < Test::Unit::TestCase
@@ -69,7 +71,9 @@ class TcTransformation < Test::Unit::TestCase
   
   def test_transform
     @client[client_path] = @bob_details
+    assert_nil @vault.path_for_association(RubySync::Association.new(@pipeline.association_context, client_path)), "Association appears on vault before sync. Strange."
     @pipeline.run_once
+    assert_not_nil @vault.path_for_association(RubySync::Association.new(@pipeline.association_context, client_path)), "Association doesn't appear to have been created on vault"
     assert_not_nil @vault[vault_path],"Bob wasn't created on the vault"
     assert_equal @bob_details['givenName'], @vault[vault_path]['first_name']
     assert_equal @bob_details['sn'], @vault[vault_path]['last_name']

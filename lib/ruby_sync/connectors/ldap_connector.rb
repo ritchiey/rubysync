@@ -118,6 +118,7 @@ END
       with_ldap do |ldap|
         result = ldap.search :base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*'
         return nil if !result or result.size == 0
+        # todo: See if this can be shortened
         answer = {}
         result[0].attribute_names.each do |name|
           answer[name.to_s] = result[0][name]
