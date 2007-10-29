@@ -1,3 +1,9 @@
+== 0.1.1 / 2007-10-29
+
+* Some streamlining of the base_pipeline in_handler and out_handler methods
+* Added documentation to the base_connector class so you get a template for building your
+own connector if you run "rubysync connector my_connector -t base"
+
 == 0.1.0 / 2007-09-26
 
 * Dropped the map_client_to_vault and map_vault_to_client methods. in_transform and out_transform now handle that

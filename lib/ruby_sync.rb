@@ -26,7 +26,7 @@ require 'ruby_sync/event'
 
 
 module RubySync
-  VERSION = '0.0.6'
+  VERSION = '0.1.1'
   module Connectors
   end
   module Pipelines

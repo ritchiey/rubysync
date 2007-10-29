@@ -12,10 +12,12 @@ Alternatively, you can run it in one-shot mode and simply sync A with B.
 You can configure RubySync to perform transformations on the data as it
 syncs. RubySync is designed both as a handy utility to pack into your
 directory management toolkit or as a fully-fledged provisioning system
-for your organisation.
+for your organization.
 
 
 == FEATURES/PROBLEMS:
+
+* Connectors available for CSV files, XML, LDAP and RDBMS (via ActiveRecord)
   
 
 == SYNOPSIS:
@@ -40,7 +42,7 @@ for your organisation.
   You would then edit the file pipelines/my_pipeline.rb to configure the
   policy for synchronizing between the two connectors.
                                         
-  You may then execute the pipeline in one-shot mode (daemon mode is coming):
+  You may then execute the pipeline in one-shot mode:
 
     $ rubysync once my
 

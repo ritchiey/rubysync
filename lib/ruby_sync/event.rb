@@ -131,6 +131,11 @@ module RubySync
       end
     end
           
+
+    def hint
+    "(#{source.name} => #{target.name}) #{source_path}"
+    end
+          
     
     def to_yaml_properties
       %w{ @type @source_path @target_path @association @payload}
