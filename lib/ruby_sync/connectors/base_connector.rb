@@ -93,12 +93,18 @@ module RubySync::Connectors
         raise "Not implemented"
       end
 
-      # Subclasses must override this to interface with the external system
+      # Subclasses MAY override this to interface with the external system
       # and generate an event for every change that affects items within
       # the scope of this connector.
-      # todo: Make the default behaviour to build a database of the key of
-      # each entry with a hash of the contents of the entry. Then to compare
-      # that against each entry to see if it has changed.
+      #
+      # The default behaviour is to compare a hash of each entry in the
+      # database with a stored hash of its previous value and generate
+      # add, modify and delete events appropriately. This is normally a very
+      # inefficient way to operate so overriding this method is highly
+      # recommended if you can detect changes in a more efficient manner.
+      #
+      # This method will be called repeatedly until the connector is
+      # stopped.
       def each_change
         DBM.open(self.mirror_dbm_filename) do |dbm|
           # scan existing entries to see if any new or modified
@@ -359,8 +365,6 @@ module RubySync::Connectors
       end
 
 
-
-
       # Return an array of possible fields for this connector.
       # Implementations should override this to query the datasource
       # for possible fields.
@@ -381,12 +385,98 @@ module RubySync::Connectors
 
       def self.sample_config
           return <<END
+          # The comments in this file should help you to create a custom connector.
+          # We're going to assume that you know how to program in Ruby. If you don't then
+          # quickly pop-off and learn it: http://ruby-lang.org.
+          #
+          # Edit the comments as you go to describe the specifics of your connector.
+          # If you need more information, consult http://rubysync.org/docs/developer/connectors
+          
+          
           # Call the option class method to declare the options used to configure
           # your connector.
-          #option :option1, :option2 # ...
+          # eg.
+          #
+          #option :filename, :frequency
+          #
+          # Would define an option called filename and one called frequency. You could then follow up with:
+          #
+          # filename 'default.csv'
+          # frequency 10
+          #
+          # And, of course, the same could be done in child classes (aka configuration files)
+          # The value set becomes available as a readable method of the same name in instances
+          # of the class.                   
           
           
+          ####### Configuration methods
           
+          # Return the list of the fields available for this connector. Feel free to print an
+          # informative message if you can't determine the available fields for the datastore.
+          def self.fields
+            puts "The author of #{__FILE__} hasn't got around to implementing the working out the default fields yet :>"
+          end
+          
+          # Return the string that will be inserted as the contents of the subclass created
+          # when "rubysync connnector blah -t your_connector" is run.
+          def self.sample_config
+            return <<-END
+              # This is the default configuration provided by #{__FILE__}
+              #
+              # Kind of sparse. Isn't it?
+              #
+              #
+            END
+          end
+
+          ####### Reading methods
+          
+          # If your datasource supports random access (as would, for example, a database) then
+          # implement the following:
+          #
+          #def [](path)
+          #  #return the entry at location indicated by 'path'
+          #  #An 'entry' is a hash where the key is the attribute name and the value is an
+          #  #array containing the value or values for the the attribute
+          #end               
+          
+          # Subclasses must override this to
+          # interface with the external system and generate entries for every
+          # entry in the scope passing the entry path (id) and its data (as a hash of arrays).
+          def each_entry
+            raise "Not implemented"
+          end
+
+          # Subclasses MAY override this to interface with the external system
+          # and generate an event for every change that affects items within
+          # the scope of this connector.
+          #
+          # The default behaviour is to compare a hash of each entry in the
+          # database with a stored hash of its previous value and generate
+          # add, modify and delete events appropriately. This is normally a very
+          # inefficient way to operate so overriding this method is highly
+          # recommended if you can detect changes in a more efficient manner.
+          #
+          # This method will be called repeatedly until the connector is
+          # stopped.
+          #def each_change
+          #end
+          
+          ######## Writing methods
+
+          
+          # Apply operations to create database a entry at path
+          def add(path, operations)
+          end
+          
+          # Apply operations to alter database entry at path
+          def modify(path, operations)
+          end
+
+
+          # Remove database entry at path
+          def delete(path)
+          end
 END
       end
 

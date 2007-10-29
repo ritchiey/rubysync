@@ -87,7 +87,7 @@ module RubySync
         if entry = self[path]
           DBM.open(self.mirror_dbm_filename) do |dbm|
             dbm[path.to_s] = digest(entry)
-          end
+           end
         end
       end
       

@@ -113,8 +113,6 @@ module RubySync::Connectors
       el
     end
 
-
-
     
     def to_entry entry_element
       entry = {}
