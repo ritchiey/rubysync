@@ -17,8 +17,12 @@ for your organization.
 
 == FEATURES/PROBLEMS:
 
+* Event-driven synchronization (if connector supports it) with fall-back to polling
+* Ruby DSL for "configuration" style event processing
+* Clean separation of connector details from data transformation
 * Connectors available for CSV files, XML, LDAP and RDBMS (via ActiveRecord)
-  
+* Easy API for writing your own connectors
+
 
 == SYNOPSIS:
 

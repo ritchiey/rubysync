@@ -233,21 +233,20 @@ end
 def example
 puts <<"END"
   This sets up the skeleton of a configuration for importing comma delimeted
-  text files into a database. Note, if the application happens to be a Rails
-  app then it can also export changes.
+  text files into an XML file.
 
-    $ rubysync create db_demo
+    $ rubysync create xml_demo
     $ cd db_demo
     $ rubysync connector my_csv -t csv_file
-    $ rubysync connector my_db -t active_record
+    $ rubysync connector my_xml -t xml
   
   You would then edit the files:
 
     connectors/my_csv_connector.rb   ;where to get CSV files, field names, etc
-    connectors/my_db_connector.rb    ;how to connect to your DB or Rails app.
+    connectors/my_xml_connector.rb   ;Set the path to your XML file
 
   And enter:
-    $ rubysync pipeline my -C my_csv -V my_db
+    $ rubysync pipeline my -C my_csv -V my_xml
 
   You would then edit the file pipelines/my_pipeline.rb to configure the
   policy for synchronizing between the two connectors.
