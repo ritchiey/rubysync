@@ -22,7 +22,7 @@ Hoe.new('rubysync', RubySync::VERSION) do |p|
   p.author = 'Ritchie Young'
   p.email = 'ritchiey@gmail.com'
   p.summary = "Event driven identity synchronization engine"
-  p.description = p.paragraphs_of('README.txt', 2..5).join("\n\n")
+  p.description = p.paragraphs_of('README.txt', 1..5).join("\n\n")
   p.url = p.paragraphs_of('README.txt', 0).first.split(/\n/)[1..-1]
   p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
   p.remote_rdoc_dir = ""
