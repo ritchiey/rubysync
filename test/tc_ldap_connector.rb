@@ -26,10 +26,10 @@ require 'ruby_sync/connectors/memory_connector'
 class MyLdapConnector < RubySync::Connectors::LdapConnector
   host          'any_ldap'
   port          389
-  username      'cn=Manager,dc=my-domain,dc=com'
+  username      'cn=admin,dc=9to5magic,dc=com,dc=au'
   password      'secret'
   search_filter "cn=*"
-  search_base   "ou=users,o=my-organization,dc=my-domain,dc=com"
+  search_base   "dc=9to5magic,dc=com,dc=au"
 end
 
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end

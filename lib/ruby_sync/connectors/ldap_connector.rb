@@ -5,19 +5,19 @@
 # This file is part of RubySync.
 #
 # RubySync is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License
+# under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2 of
-the License, or (at your option) any later version.
+# the License, or (at your option) any later version.
 #
 # RubySync is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied
+# WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-the GNU General Public License for more details.
+# the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-along with RubySync; if not, write to the
+# along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-Boston, MA 02110-1301, USA
+# Boston, MA 02110-1301, USA
 
 
 lib_path = File.dirname(__FILE__) + '/..'
@@ -47,8 +47,7 @@ module RubySync::Connectors
    :password,
    :search_filter,
    :search_base,
-   :association_attribute # name of the attribute in which to store
-the association key(s)
+   :association_attribute # name of the attribute in which to store the association key(s)
 
    association_attribute 'RubySyncAssociation'
    bind_method           :simple
@@ -62,8 +61,7 @@ the association key(s)
 
 
    def started
-     #TODO: If vault, check the schema to make sure that the
-association_attribute is there
+     #TODO: If vault, check the schema to make sure that the association_attribute is there
      @connections = []
      @connection_index = 0
    end
@@ -73,8 +71,7 @@ association_attribute is there
 
    def each_entry
      Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
-       ldap.search :base => search_base, :filter => search_filter,
-:return_result => false do |ldap_entry|
+       ldap.search :base => search_base, :filter => search_filter, :return_result => false do |ldap_entry|
          yield ldap_entry.dn, to_entry(ldap_entry)
        end
      end
@@ -120,10 +117,8 @@ END
    end
 
    def modify(path, operations)
-     log.debug "Modifying #{path} with the following
-operations:\n#{operations.inspect}"
-     with_ldap {|ldap| ldap.modify :dn=>path,
-:operations=>to_ldap_operations(operations) }
+     log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
+     with_ldap {|ldap| ldap.modify :dn=>path, :operations=>to_ldap_operations(operations) }
    end
 
    def delete(path)
@@ -132,8 +127,7 @@ operations:\n#{operations.inspect}"
 
    def [](path)
      with_ldap do |ldap|
-       result = ldap.search :base=>path,
-:scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*'
+       result = ldap.search :base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*'
        return nil if !result or result.size == 0
        answer = {}
        result[0].attribute_names.each do |name|
@@ -177,8 +171,7 @@ operations:\n#{operations.inspect}"
 
   def with_ldap
      result = nil
-     @connections[@connection_index] = Net::LDAP.new(:host=>host,
-:port=>port, :auth=>auth) unless @connections[@connection_index]
+     @connections[@connection_index] = Net::LDAP.new(:host=>host, :port=>port, :auth=>auth) unless @connections[@connection_index]
      if @connections[@connection_index]
        ldap = @connections[@connection_index]
        @connection_index += 1
