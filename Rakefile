@@ -30,7 +30,8 @@ Hoe.new('rubysync', RubySync::VERSION) do |p|
     ["ruby-net-ldap", ">=0.0.4"],
     ["activesupport", ">=1.4.0"],
     ["activerecord", ">=1.15.3"],
-    ["simpleconsole", ">=0.1.1"]
+    ["simpleconsole", ">=0.1.1"],
+    ["contacts", ">=1.0.7"]
     ]
 end
 

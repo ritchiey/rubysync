@@ -1,0 +1,216 @@
+In this article, we'll start slowly by importing a directory of CSV files into an XML file. That's probably not what you're trying to achieve but its a great way of getting the idea without LDAP and database complications getting in the way. Then we'll adapt the example to import into an LDAP server.
+
+h3. Concepts
+
+To synchronize data using RubySync, you must define a _connector_ for each of the end-points (in our case, a CSV file and an XML file) and then
+a _pipeline_ to define the rules for synchronizing and modifying the records. That's it for now, let start.
+
+h3. The Process
+
+# "Install RubySync":/installing<pre>
+</pre>	
+# We're going to be creating a few files and directories so create an empty folder to work in. I'm going refer to this as _folder_ so where ever you see that, substitute your own folder path. Create a folder called _folder_/in. This is where we'll drop CSV files that we want RubySync to import.<pre>
+</pre>
+#  Create a plain text file containing the following text:
+	<pre><code>
+id,first_name,last_name,skills
+bobby,BareKnuckle,Bobby,pugilism:yoga
+tt,Testy,Terry,kidnapping:interrogation:juggling
+	</code></pre>and save it to _folder_/in/users.csv.<pre>
+</pre>
+# At the command line, change to _folder_ and type
+	<pre><code>
+		rubysync create example1
+		cd example1
+	</code></pre>
+  This creates a subdirectory within _folder_ containing the basic structure for a RubySync project.<pre>
+	</pre>
+#  Now create the RubySync connector to process csv files found in _folder_/in by typing:
+			<pre><code>rubysync connector hr -t csv_file</code></pre>
+			Edit the newly created file called _folder_/example1/connectors/my_csv_connector.rb and adjust it to look like this:
+ <pre><code>
+	class HrConnector < RubySync::Connectors::CsvFileConnector
+		header_line   true
+		field_names   ['id','first_name','last_name','skills']
+		path_field    'id'
+		in_path       '_folder_/in'
+		in_glob       '*.csv'
+		out_extension '.csv'
+	end
+ </code></pre>
+Remembering to substitute your own absolute directory path for _folder_. Notice that the field names are the same as the ones on the top line of
+			the users.csv file. Also notice that we've removed the out_path line because we're only going to be reading from this connector.<pre>
+</pre>
+# Create the connector for the XML file with the following command:
+			<pre><code>rubysync connector my_vault -t xml</code></pre>
+		Edit the newly created _folder_/example1/connectors/my_vault_connector.rb and adjust it to look like this:
+	<pre><code>
+		class MyVaultConnector < RubySync::Connectors::XmlConnector#
+		# "filename" should be the full name of the file containing
+		# the xml representation of the synchronized content.
+		# You probably want to change this:
+		#
+		filename "folder/my_vault.xml"
+		end
+	</code></pre>
+	Again remember to replace _folder_ with the absolute path for your directory.<pre>
+	</pre>
+# Create the pipeline that joins the two connectors with the following command:
+		<pre><code>rubysync pipeline hr_import -C hr -V my_vault</code></pre>
+			The -C stands for "client" and the -V stands for "vault". The vault is the center of your system. It very often ends up with several pipelines attached to it. Because the vault sits at the center, we talk about events going "out" to clients or coming "in" from clients.<pre>
+	</pre>
+# Edit the newly created file called _folder_/example1/pipelines/hr_import_pipeline.rb. Notice that the allow_in option has picked up the fields that we specified in the hr_connector.rb file. Adjust the file to look like this (copy and paste is good here :)<pre><code>
+	class HrImportPipeline < RubySync::Pipelines::BasePipeline
+
+	  client :hr
+
+	  vault :my_vault
+
+	  allow_in 'id', 'first_name', 'last_name', 'skills'
+
+	  in_transform do
+	    map 'cn', 'id'
+	    map 'givenName', 'first_name'
+	    map 'sn', 'last_name'
+	    map('objectclass') { %w/inetOrgPerson organizationalPerson person top/ }
+	    map('employeeType') { value_of('skills').split(':') }
+	    drop_changes_to 'skills'
+	  end
+  
+	  in_place do
+	    "cn=#{source_path},ou=users,dc=9to5magic,dc=com,dc=au"
+	  end
+
+	end
+	</code></pre>
+# Run your pipeline with the following command:
+			<pre><code>
+				rubysync once hr_import
+			</code></pre>
+		This executes the pipeline once (as opposed to repeatedly). No news is good news.  You should just get the next command prompt.<pre>
+	</pre>
+# Open the _folder_/my_vault.xml file in your favourite XML viewing utility. Most web browsers are good for this. If the demo gods are smiling upon us, it will look something like this:
+	<pre><code>
+	<?xml version="1.0"?>
+	<entries>
+		<entry id="cn=bobby,ou=users,dc=9to5magic,dc=com,dc=au">
+			<attr name="cn">
+				<value>bobby</value>
+			</attr>
+			<attr name="givenName">
+				<value>BareKnuckle</value>
+			</attr>
+			<attr name="objectclass">
+				<value>inetOrgPerson</value>
+				<value>organizationalPerson</value>
+				<value>person</value>
+				<value>top</value>
+			</attr>
+			<attr name="sn">
+				<value>Bobby</value>
+			</attr>
+			<attr name="employeeType">
+				<value>pugilism</value>
+				<value>yoga</value>
+			</attr>
+		</entry>
+		<entry id="cn=tt,ou=users,dc=9to5magic,dc=com,dc=au">
+			<attr name="cn">
+				<value>tt</value>
+			</attr>
+			<attr name="givenName">
+				<value>Testy</value>
+			</attr>
+			<attr name="objectclass">
+				<value>inetOrgPerson</value>
+				<value>organizationalPerson</value>
+				<value>person</value>
+				<value>top</value>
+			</attr>
+			<attr name="sn">
+				<value>Terry</value>
+			</attr>
+			<attr name="employeeType">
+				<value>kidnapping</value>
+				<value>interrogation</value>
+				<value>juggling</value>
+			</attr>
+		</entry>
+	</entries>
+	</code></pre>
+	Note: If you just open it in a text editor it will all appear on one line.
+	Also, be aware that RubySync tracks changes and only updates records as necessary. So, if your XML file didn't look like this and you want to import it again from scratch, delete both _folder_/my_vault.xml and all files in the _folder_/example1/db directory and rename the _folder_/in/users.csv.bak file to _folder_/in/users.csv.<pre>
+	</pre>
+# Through an amazing coincidence, we've managed to create a set of attributes in our XML file which should import straight into an LDAP server if it has the inetOrgPerson schema loaded. Lets create a connector to our LDAP server.<pre><code>
+	rubysync connector my_ldap -t ldap
+	</code></pre>
+	Edit your newly created _folder_/example1/connectors/my_ldap_connector.rb and adjust it to suit your LDAP server. You will need to provide the credentials for a user that can create objects at some point in the tree.<pre>
+</pre>
+# Now edit your _folder_/example1/pipelines/hr_import_pipeline.rb and change the line that currently says <pre><code>vault my_vault</code></pre> to read <pre><code>vault my_ldap</code></pre> Also, near the bottom of the file, change the<pre><code>
+	"cn=#{source_path},ou=users,dc=9to5magic,dc=com,dc=au"
+	</code></pre> line to specify a valid path within your LDAP server. Then save the file.<pre>
+</pre>
+# We'll now try to import into the LDAP server. Before we do it, we'll have to delete the existing tracking files and rename our import file again. With _folder_/example1 as your current working directory<pre><code>
+	rm db/*
+	mv ../in/users.csv.bak ../in/users.csv
+	rubysync once hr_import
+	</code></pre>
+	If all has gone well your users will appear in your LDAP directory. If you weren't so fortunate, here are some tips for working out what went wrong:<pre>
+</pre>	* Did RubySync throw an error? If it worked, there'll be no output. Have a look at the error for clues.
+		* Did RubySync simply fail to connect? Check your network settings and try connecting from the computer you're running rubysync on using ldapsearch or ldapadd.
+		* Does the container that you tried to import the users into exist in the tree?
+		* Are the credentials you specified correct?
+		* Is the inetOrgPerson schema loaded? Try using "LDAP Studio":http://directory.apache.org/studio/ or some other tool to browse the schema and see if that's the problem.
+		* If none of the above, post the problem to the "mailing list":http://groups.google.com/group/rubysync and we'll try to help.<pre>
+</pre>
+# Finally, set RubySync running with<pre><code>
+	rubysync start hr_import
+</code></pre> and play around with dropping more CSV files into the _folder_/in directory. You should find you can easily add new records as well as modify the existing ones.
+
+h3. Analysis
+
+We've (hopefully) just created a pipeline that imports users from a CSV text file to an LDAP server and we've done it with just about no programming. The bit that I really glossed over though was the contents of the pipeline file. Lets look at it again:<pre><code>
+	     1  class HrImportPipeline < RubySync::Pipelines::BasePipeline
+	     2  
+	     3    client :hr
+	     4  
+	     5    vault :my_ldap
+	     6  
+	     7    allow_in 'id', 'first_name', 'last_name', 'skills'
+	     8  
+	     9    in_transform do
+	    10      map 'cn', 'id'
+	    11      map 'givenName', 'first_name'
+	    12      map 'sn', 'last_name'
+	    13      map('objectclass') { %w/inetOrgPerson organizationalPerson person top/ }
+	    14      map('employeeType') { value_of('skills').split(':') }
+	    15      drop_changes_to 'skills'
+	    16    end
+	    17    
+	    18    in_place do
+	    19      "cn=#{source_path},ou=users,dc=9to5magic,dc=com,dc=au"
+	    20    end
+	    21  
+	    22  end
+	</code></pre>
+
+Lines 3 and 5 specify our client and vault connectors respectively.
+
+Line 7 (allow_in) is a filter. Only those fields specified are allowed to come from the client to the vault.
+
+The _in_transform_ block (lines 7-16) is executed for each event coming from the client to the vault.
+
+Lines 10-12 demonstrate simple field renames.
+
+Line 13 shows how we can assign literal values to a target field. "objectclass" is a multi-valued field so we assign it an array.
+The <code>%w/inetOrgPerson organizationalPerson person top/</code> statement returns a list containing the words specified delimited by whitespace. It means exactly the same thing as <code>['inetOrgPerson', 'organizationalPerson', 'person', 'top']</code>
+
+Line 14 splits the single-valued, colon delimited string supplied in the _skills_ field into an array to be assigned to the multi-valued field _employeeType_ and line 15 drops the _skills_ field so that it doesn't end up in our target record.
+
+The _in_place_ rule (lines 18-20) tells RubySync where to create any new entries in the vault.
+
+h3. Conclusion
+
+We've seen how to use RubySync as a simple pipeline to import CSV files from a directory into an LDAP server and performed some transformations on the records as they've been imported. We've also seen how RubySync separates the connection code from the rule code in the pipeline. This was demonstrated by how few changes were required to import to the LDAP server once we were importing successfully into the XML file.
+
+If you followed the example, zip up a copy of your _folder_ directory for future because I'll probably expand on this example in a future article when we expand from a simple import into a simple meta-directory configuration.

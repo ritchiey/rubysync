@@ -80,6 +80,7 @@ module RubySync
       self.type = type.to_sym
       self.source = source
       self.source_path = source_path
+      puts "EVENT ASSOCIATION: #{association.inspect}"
       self.association = make_association(association)
       self.payload = payload
       @target_path = nil
@@ -257,7 +258,7 @@ module RubySync
 
   # Try to make a sensible association from the passed in object
   def make_association o  
-    if o.kind_of? Array
+    if o.kind_of?(Array) and o.size == 2
       return Association.new(o[0],o[1])
     elsif o.kind_of? RubySync::Association
       return o
