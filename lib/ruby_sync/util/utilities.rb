@@ -178,10 +178,12 @@ module RubySync
         when :replace
           record[op.subject] = op.values
         when :delete
-          if value == nil || value == "" || value == []
-            record.delete(op.subject)
-          else
-            record[op.subject] -= values
+          if record[op.subject]
+            if op.values.empty?
+              record.delete(op.subject)
+            else
+              record[op.subject] -= op.values
+            end
           end
         else
           raise Exception.new("Unknown operation '#{op.type}'")
