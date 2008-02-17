@@ -27,7 +27,7 @@ module RubySync
       self.new(:add, subject, values)
     end
     
-    def self.delete subject, values
+    def self.delete subject, values=nil
       self.new(:delete, subject, values)
     end
     

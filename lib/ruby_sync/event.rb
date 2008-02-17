@@ -106,9 +106,7 @@ module RubySync
     # Reduces the operations in this event to those that will
     # alter the target record
     def merge other
-#      other.type == :add or raise "Can only merge with add events"
-#      record = perform_operations(other.payload)
-      payload = effective_operations(@payload, other)
+      @payload = effective_operations(@payload, other)
     end
     
     # Retrieves all known values for the record affected by this event and
@@ -124,17 +122,30 @@ module RubySync
       @type = :add
     end
 
-    def convert_to_modify
+    
+    def convert_to_modify(other)
       log.info "Converting '#{type}' event to modify"
+      # The add event contained an operation for each attribute of the source record.
+      # Therefore, we should delete any attributes in the target record that don't appear
+      # in the event.
+      affected = affected_subjects
+      other.each do |key, value|
+        unless affected.include? key
+          @payload << Operation.delete(key)
+        end
+      end 
+
+      @payload = effective_operations(@payload, other)
       @type = :modify
-      @payload.each do |op|
-        op.type = :replace
-      end
     end
           
+    # Return a list of subjects that this event affects
+    def affected_subjects
+      @payload.map {|op| op.subject}.uniq
+    end
 
     def hint
-    "(#{source.name} => #{target.name}) #{source_path}"
+      "(#{source.name} => #{target.name}) #{source_path}"
     end
           
     
