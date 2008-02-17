@@ -80,7 +80,6 @@ module RubySync
       self.type = type.to_sym
       self.source = source
       self.source_path = source_path
-      puts "EVENT ASSOCIATION: #{association.inspect}"
       self.association = make_association(association)
       self.payload = payload
       @target_path = nil
@@ -125,17 +124,18 @@ module RubySync
     
     def convert_to_modify(other)
       log.info "Converting '#{type}' event to modify"
+
       # The add event contained an operation for each attribute of the source record.
       # Therefore, we should delete any attributes in the target record that don't appear
       # in the event.
       affected = affected_subjects
       other.each do |key, value|
         unless affected.include? key
+          log.info "Adding delete operation for #{key}"
           @payload << Operation.delete(key)
         end
       end 
 
-      @payload = effective_operations(@payload, other)
       @type = :modify
     end
           

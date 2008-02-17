@@ -27,7 +27,7 @@ module RubySync
       
       
       # Called for each filename matching in_glob in in_path
-      # Yields a modify event for each row found in the file.
+      # Yields an add event for each row found in the file.
       def each_file_change(filename)
         header = header_line
         CSV.open(filename, 'r') do |row|
@@ -46,7 +46,7 @@ module RubySync
             row[i] and data[field_name] = row[i].data
           end
           association_key = source_path = path_for(data)
-          yield RubySync::Event.modify(self, source_path, association_key, create_operations_for(data))
+          yield RubySync::Event.add(self, source_path, association_key, create_operations_for(data))
         end
       end
 

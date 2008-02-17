@@ -218,21 +218,23 @@ module RubySync
               event.association = Association.new(association_context, event.source_path)
               vault.associate event.association, match
               associated_entry = vault[match]
+            else
+              log.info "No match found for unassociated entry."
             end
           end          
         end
+
+        perform_transform :in_transform, event, event.hint
             
         if associated_entry
           if event.type == :add
-        	  log.info "Associated entry in vault for add event. Converting to modify"
-            event.convert_to_modify
+        	log.info "Associated entry in vault for add event. Converting to modify"
+            event.convert_to_modify associated_entry
           end
         elsif event.type == :modify
       	    log.info "No associated entry in vault for modify event. Converting to add"
       	    event.convert_to_add 
         end
-
-        perform_transform :in_transform, event, event.hint
 
         case event.type
         when :add

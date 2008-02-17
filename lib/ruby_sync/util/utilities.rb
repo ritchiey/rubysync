@@ -179,7 +179,7 @@ module RubySync
           record[op.subject] = op.values
         when :delete
           if record[op.subject]
-            if op.values.empty?
+            unless op.value
               record.delete(op.subject)
             else
               record[op.subject] -= op.values
@@ -216,7 +216,7 @@ module RubySync
             effective << op
           end
         when :delete
-          if [nil, "", []].include?(op.values)
+          unless op.value
             effective << op if record[op.subject]
           else
             targets = op.values & existing
