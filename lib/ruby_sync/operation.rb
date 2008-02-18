@@ -58,11 +58,11 @@ module RubySync
     
     remove_method :values=
     def values=(values)
-      @values = as_array(values)
+      @values = (values == nil)? nil : as_array(values)
     end
     
     def value
-      @values[0]
+      @values and @values[0]
     end
     
     def value= new_value

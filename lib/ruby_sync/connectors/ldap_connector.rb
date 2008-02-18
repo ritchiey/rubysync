@@ -131,7 +131,7 @@ END
        return nil if !result or result.size == 0
        answer = {}
        result[0].attribute_names.each do |name|
-         answer[name.to_s] = result[0][name]
+         answer[name.to_s] = result[0][name] unless name.to_s.downcase == 'dn'
        end
        answer
      end

@@ -95,8 +95,16 @@ module RubySync
 
       def in_match(event)
         log.debug "Default matching rule - vault[in_place] exists?"
-        path = in_place(event)
-        vault.respond_to?('[]') and vault[path] and path
+	if vault.respond_to?('[]')
+          path = in_place(event) 
+	  if path
+	    log.debug "Checking for object at '#{path}' on vault."
+	    vault[path] and path
+	  end
+	else
+	  log.debug "Vault doesn't support random access - no match"
+	  nil
+	end
       end
       
       def out_match(event)
@@ -130,12 +138,11 @@ module RubySync
       end
       
       def perform_transform name, event, hint=""
-	      log.info "Performing #{name}"
-	      log.info event.to_yaml if dump_before.include?(name.to_sym)
+	log.info event.to_yaml if dump_before.include?(name.to_sym)
+	log.info "Performing #{name}"
         call_if_exists name, event, hint
         event.commit_changes
-	      log.info event.to_yaml if dump_after.include?(name.to_sym)
-        #log_progress name, event, hint
+	log.info event.to_yaml if dump_after.include?(name.to_sym)
       end
             
       # Execute the pipeline once then return.
@@ -208,6 +215,8 @@ module RubySync
         log.info "Processing incoming #{event.type} event "+event.hint
         perform_transform :in_filter, event, event.hint
 
+        perform_transform :in_transform, event, event.hint
+            
         associated_entry = nil
         unless event.type == :disassociate
           associated_entry = vault.find_associated(event.association) if event.associated?
@@ -224,8 +233,6 @@ module RubySync
           end          
         end
 
-        perform_transform :in_transform, event, event.hint
-            
         if associated_entry
           if event.type == :add
         	log.info "Associated entry in vault for add event. Converting to modify"

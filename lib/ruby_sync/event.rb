@@ -175,6 +175,10 @@ module RubySync
       @uncommitted_operations = @uncommitted_operations.delete_if {|op| subjects.include? op.subject }
     end
 
+    def downcase_subjects
+      @uncommitted_operations = uncommitted_operations.map {|op| Operation.new(op.type, op.subject.downcase, op.values)}
+    end
+
     def drop_all_but_changes_to *subjects
       subjects = subjects.flatten.collect {|s| s.to_s}
       @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject.to_s)}
