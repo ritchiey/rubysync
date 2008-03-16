@@ -24,11 +24,9 @@ require 'ruby_sync/connectors/xml_connector'
 
 
 class TransformationVaultConnector < RubySync::Connectors::MemoryConnector
-  dbm_path "/tmp/rubysync_xml"
 end
 
 class TransformationClientConnector < RubySync::Connectors::MemoryConnector
-  dbm_path "/tmp/rubysync_memory"
 end
 
 
@@ -39,22 +37,25 @@ class TransformationTestPipeline < RubySync::Pipelines::BasePipeline
   allow_in :givenName, :sn, :interests
   allow_out :first_name, :last_name
   
-  in_transform do
-   map :first_name, :givenName
-   map :last_name, :sn
-   # Calculated value
-   map(:hobbies) {values_for(:interests).join ':'}
-   # Constant string
-   map(:note) {"Created by RubySync"}
-   map(:shopping) {%w/fish milk bread/}
-   # Conditional mapping
-   map(:password) {value_for(:givenName)} if type == :add
+  in_event_transform do
+    map :first_name, :givenName
+    map :last_name, :sn
+    # Calculated value
+    map(:hobbies) {values_for(:interests).join ':'}
+    # Constant string
+    map(:note) {"Created by RubySync"}
+    map(:shopping) {%w/fish milk bread/}
   end
   
+  in_command_transform do
+    # Conditional mapping
+    map(:password) {value_for(:first_name)} if type == :add
+  end
+
   in_place { "#{self.source_path}/path/in/vault"}
   out_place { "#{self.source_path}".split('/')[0] }
   
-  dump_after :in_transform
+  dump_after :in_command_transform
 end
 
 class TcTransformation < Test::Unit::TestCase

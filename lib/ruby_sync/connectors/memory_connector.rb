@@ -20,6 +20,9 @@ defined?(RubySync::Connectors::BaseConnector) or require 'ruby_sync/connectors/b
 module RubySync::Connectors
   class MemoryConnector < RubySync::Connectors::BaseConnector
 
+    include MemoryAssociationTracking
+    include MemoryChangeTracking
+
 
     def each_entry
       @data.each do |key, entry|

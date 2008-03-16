@@ -68,12 +68,6 @@ module RubySync
         return nil # don't want to create any new associations
       end
       
-      def delete_from_mirror path
-        DBM.open(self.mirror_dbm_filename) do |dbm|
-          dbm.delete(path)
-        end
-      end
-
       def perform_modify event
         path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
         raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
@@ -84,12 +78,17 @@ module RubySync
       end
       
       def update_mirror path
-        if entry = self[path]
-          DBM.open(self.mirror_dbm_filename) do |dbm|
-            dbm[path.to_s] = digest(entry)
-           end
-        end
       end
+      
+      def delete_from_mirror path
+      end
+      
+      def clean
+        remove_associations if respond_to? :remove_associations
+        remove_mirror if respond_to? :remove_mirror
+      end
+      
+      
       
     end
   end

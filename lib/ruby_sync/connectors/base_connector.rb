@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-require 'ruby_sync/connectors/connector_event_processing'
-require 'yaml'
-require 'yaml/dbm'
-require 'digest/md5'
+
 
 module RubySync::Connectors
     class BaseConnector
@@ -25,32 +22,8 @@ module RubySync::Connectors
       include ConnectorEventProcessing
       
       attr_accessor :once_only, :name, :is_vault, :pipeline
-      option  :dbm_path
       
-      # set a default dbm path
-      def dbm_path()
-        p = "#{base_path}/db"
-        ::FileUtils.mkdir_p p
-        ::File.join(p,name)
-      end
-
-      # Stores association keys indexed by path:association_context
-      def path_to_association_dbm_filename
-        dbm_path + "_path_to_assoc"
-      end
-      
-      # Stores paths indexed by association_context:association_key
-      def association_to_path_dbm_filename
-        dbm_path + "_assoc_to_path"
-      end
-      
-      # Stores a hash for each entry so we can tell when
-      # entries are added, deleted or modified
-      def mirror_dbm_filename
-        dbm_path + "_mirror"
-      end
-      
-      def initialize options={}
+     def initialize options={}
         base_path # call this once to get the working directory before anything else
                   # in the connector changes the cwd
         options = self.class.default_options.merge(options)
@@ -92,49 +65,6 @@ module RubySync::Connectors
       def each_entry
         raise "Not implemented"
       end
-
-      # Subclasses MAY override this to interface with the external system
-      # and generate an event for every change that affects items within
-      # the scope of this connector.
-      #
-      # The default behaviour is to compare a hash of each entry in the
-      # database with a stored hash of its previous value and generate
-      # add, modify and delete events appropriately. This is normally a very
-      # inefficient way to operate so overriding this method is highly
-      # recommended if you can detect changes in a more efficient manner.
-      #
-      # This method will be called repeatedly until the connector is
-      # stopped.
-      def each_change
-        DBM.open(self.mirror_dbm_filename) do |dbm|
-          # scan existing entries to see if any new or modified
-          each_entry do |path, entry|
-            digest = digest(entry)
-            unless stored_digest = dbm[path.to_s] and digest == stored_digest
-              operations = create_operations_for(entry)
-              yield RubySync::Event.add(self, path, nil, operations) 
-              dbm[path.to_s] = digest
-            end
-          end
-          
-          # scan dbm to find deleted
-          dbm.each do |key, stored_hash|
-            unless self[key]
-              yield RubySync::Event.delete(self, key)
-              dbm.delete key
-              if is_vault? and @pipeline
-                association = association_for @pipeline.association_context, key
-                remove_association association
-              end
-            end
-          end
-        end        
-      end
-      
-      def digest(o)
-        Digest::MD5.hexdigest(o.to_yaml)
-      end
-      
 
 
       # Call each_change repeatedly (or once if in once_only mode)
@@ -240,52 +170,7 @@ module RubySync::Connectors
       end
 
 
-      # Store association for the given path
-      def associate association, path
-        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs = dbm[path.to_s] || {}
-          assocs[association.context.to_s] = association.key.to_s
-          dbm[path.to_s] = assocs
-        end
-        DBM.open(association_to_path_dbm_filename) do |dbm|
-          dbm[association.to_s] = path
-        end
-      end
-      
-      def path_for_association association
-        is_vault? or return path_for_own_association_key(association.key)
-        DBM.open(association_to_path_dbm_filename) do |dbm|
-          dbm[association.to_s]
-        end
-      end
-      
-      def associations_for path
-        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs =  dbm[path.to_s]
-          assocs.values
-        end
-      end
-
-
-      def remove_association association
-        path = nil
-        DBM.open(association_to_path_dbm_filename) do |dbm|
-          return unless path =dbm.delete(association.to_s)
-        end
-        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs = dbm[path.to_s]
-          assocs.delete(association.context) and dbm[path.to_s] = assocs
-        end
-      end
-
-      def association_key_for context, path
-        YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
-          assocs = dbm[path.to_s] || {}
-          assocs[context.to_s]
-        end
-      end
-
-      
+     
       # Return the association object given the association context and path.
       # This should only be called on the vault.
       def association_for(context, path)
@@ -309,17 +194,7 @@ module RubySync::Connectors
         self.name
       end
       
-      def remove_mirror
-        File.delete_if_exists(["#{mirror_dbm_filename}.db"])
-      end
-      
-      def remove_associations
-        File.delete_if_exists(["#{association_to_path_dbm_filename}.db","#{path_to_association_dbm_filename}.db"])
-      end
-
-      def clean
-        remove_associations
-        remove_mirror
+     def clean
       end
       
       # Attempts to delete non-existent items may occur due to echoing. Many systems won't be able to record

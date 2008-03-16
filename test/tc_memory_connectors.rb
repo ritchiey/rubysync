@@ -25,11 +25,9 @@ require 'ruby_sync/connectors/memory_connector'
 
 
 class MemoryTestAConnector < RubySync::Connectors::MemoryConnector
-  dbm_path "/tmp/rubysync_a"
 end
 
 class MemoryTestBConnector < RubySync::Connectors::MemoryConnector
-  dbm_path "/tmp/rubysync_b"
 end
 
 class MemoryTestPipeline < RubySync::Pipelines::BasePipeline

@@ -122,7 +122,7 @@ module RubySync
     end
 
     
-    def convert_to_modify(other)
+    def convert_to_modify(other, filter)
       log.info "Converting '#{type}' event to modify"
 
       # The add event contained an operation for each attribute of the source record.
@@ -130,7 +130,7 @@ module RubySync
       # in the event.
       affected = affected_subjects
       other.each do |key, value|
-        unless affected.include? key
+        if filter.include?(key) and !affected.include?(key)
           log.info "Adding delete operation for #{key}"
           @payload << Operation.delete(key)
         end

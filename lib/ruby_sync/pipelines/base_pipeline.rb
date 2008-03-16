@@ -78,8 +78,12 @@ module RubySync
       end
       
 
-      def self.in_transform(&blk) event_method :in_transform,&blk; end
-      def self.out_transform(&blk) event_method :out_transform,&blk; end
+      def self.in_transform(&blk) deprecated_event_method :in_transform, :in_event_transform, &blk; end
+      def self.in_event_transform(&blk) event_method :in_event_transform,&blk; end
+      def self.in_command_transform(&blk) event_method :in_command_transform,&blk; end
+      def self.out_transform(&blk) deprecated_event_method :out_transform, :out_event_transform, &blk; end
+      def self.out_event_transform(&blk) event_method :out_event_transform,&blk; end
+      def self.out_command_transform(&blk) event_method :out_command_transform,&blk; end
       def self.in_match(&blk) event_method :in_match,&blk; end
       def self.out_match(&blk) event_method :out_match,&blk; end
       def self.in_create(&blk) event_method :in_create,&blk; end
@@ -89,9 +93,15 @@ module RubySync
 
       def self.event_method name,&blk
         define_method name do |event|
-          event.instance_eval &blk
+          event.instance_eval(&blk)
         end
       end
+
+      def self.deprecated_event_method name, replacement, &blk
+	log.warn "'#{name}' has been deprecated. Use '#{replacement}' instead."
+	event_method(replacement, &blk)
+      end
+
 
       def in_match(event)
         log.debug "Default matching rule - vault[in_place] exists?"
@@ -215,7 +225,7 @@ module RubySync
         log.info "Processing incoming #{event.type} event "+event.hint
         perform_transform :in_filter, event, event.hint
 
-        perform_transform :in_transform, event, event.hint
+        perform_transform :in_event_transform, event, event.hint
             
         associated_entry = nil
         unless event.type == :disassociate
@@ -236,12 +246,14 @@ module RubySync
         if associated_entry
           if event.type == :add
         	log.info "Associated entry in vault for add event. Converting to modify"
-            event.convert_to_modify associated_entry
+            event.convert_to_modify associated_entry, allowed_in
           end
         elsif event.type == :modify
       	    log.info "No associated entry in vault for modify event. Converting to add"
       	    event.convert_to_add 
         end
+
+	perform_transform :in_command_transform, event, event.hint
 
         case event.type
         when :add
@@ -275,6 +287,7 @@ module RubySync
 
         log.info "Processing outgoing #{event.type} event "+ event.hint
         perform_transform :out_filter, event, event.hint
+        perform_transform :out_command_transform, event, event.hint
 
         associated_entry = nil
         unless event.type == :disassociate
@@ -293,14 +306,14 @@ module RubySync
         if associated_entry
           if event.type == :add
         	  log.info "Associated entry in client for add event. Converting to modify"
-            event.convert_to_modify
+            event.convert_to_modify(associated_entry)
           end
         elsif event.type == :modify
       	    log.info "No associated entry in client for modify event. Converting to add"
       	    event.convert_to_add 
         end
 
-        perform_transform :out_transform, event, event.hint
+        perform_transform :out_command_transform, event, event.hint
 
         case event.type
         when :add

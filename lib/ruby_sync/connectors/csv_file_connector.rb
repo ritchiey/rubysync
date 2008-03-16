@@ -6,9 +6,8 @@
 require "csv"
 require "ruby_sync/connectors/file_connector"
 
-module RubySync
+module RubySync::Connectors
   
-  module Connectors
     
     # Reads files containing Comma Separated Values from the in_path directory and
     # treats each line as an incoming event.
@@ -102,4 +101,3 @@ END
       
     end
   end
-end
