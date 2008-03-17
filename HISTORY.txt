@@ -1,3 +1,10 @@
+== 0.2.0 / 2008-03-17
+* Added show command to do simple record lookups from a connector
+* Extracted out the dbm functionality from base_connector into dbm_change_tracking and dbm_association_tracking
+* Added memory_association and memory_change_tracking modules for testing purposes
+* More pipeline streamlining
+* Tests now pass under jruby 1.1R2 as well as ruby 1.8.6
+
 == 0.1.1 / 2007-10-29
 
 * Some streamlining of the base_pipeline in_handler and out_handler methods

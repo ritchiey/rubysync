@@ -1,77 +1,77 @@
 #!/usr/bin/env ruby
 
 
-  # == Synopsis
-  # 
-  #   Command line tool for running *rubysync* <em>A Free MetaDirectory.</em>
-  # 
-  # == Usage
-  #   
-  #     rubysync command name [options]
-  #   
-  #  Valid commands are::
-  #   * create {name}::            Create a rubysync configuration directory
-  # 
-  #   * connector {name} -t {type} [--vault {name}] [--client {name}]
-  #                           ; Create a connector of the given name in
-  #                           ; the current rubysync configuration directory
-  #                         
-  #   * fields {name}           ; list the fields detected by the named connector
-  # 
-  #   * pipeline {name}         ; Create a rubysync pipeline of the given name
-  #                           ; in the current rubysync configuration directory
-  #                         
-  #   * once {name}::             
-  #       Execute the named pipeline within the current configuration directory once and then exit
-  #                         
-  #   * example::          Show an example of how this command might be used
-  # 
-  # == Example
-  # 
-  #   This sets up the skeleton of a configuration for importing comma delimeted
-  #   text files into an xml file.
-  #     <tt>
-  #     $ rubysync create xml_demo
-  #     $ cd xml_demo
-  #     $ rubysync connector my_csv -t csv_file
-  #     $ rubysync connector my_xml -t xml
-  #     </tt>
-  #   
-  #   You would then edit the files::
-  # 
-  #     * +connectors/my_csv_connector.rb+:: where to get the CSV files, field names, etc
-  #     * +connectors/my_xml_connector.rb+::  how to connect to your XML file.
-  # 
-  #   And enter::
-  #     <tt>
-  #     $ rubysync pipeline my_pipeline -C my_csv -V my_xml
-  #     </tt>
-  # 
-  #   You would then edit the file +pipelines/my_pipeline.rb+ to configure the
-  #   policy for synchronizing between the two connectors.
-  #                                         
-  #   You may then execute the pipeline in one-shot mode (daemon mode is coming)::
-  # 
-  #     <tt>
-  #     $ rubysync once my_pipeline
-  #     </tt>
-  # 
-  # == Author
-  #   Ritchie Young, 9 to 5 Magic (http://9to5magic.com.au)
-  #  
-  # == Copyright
-  #   Copyright (c) 2007 Ritchie Young. All rights reserved.
-  # 
-  # This file is part of RubySync.
-  # 
-  # RubySync is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
-  # as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
-  # 
-  # RubySync is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-  # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-  # 
-  # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
-  # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+# == Synopsis
+# 
+#   Command line tool for running *rubysync* <em>A Free MetaDirectory.</em>
+# 
+# == Usage
+#   
+#     rubysync command name [options]
+#   
+#  Valid commands are::
+#   * create {name}::            Create a rubysync configuration directory
+# 
+#   * connector {name} -t {type} [--vault {name}] [--client {name}]
+#                           ; Create a connector of the given name in
+#                           ; the current rubysync configuration directory
+#                         
+#   * fields {name}           ; list the fields detected by the named connector
+# 
+#   * pipeline {name}         ; Create a rubysync pipeline of the given name
+#                           ; in the current rubysync configuration directory
+#                         
+#   * once {name}::             
+#       Execute the named pipeline within the current configuration directory once and then exit
+#                         
+#   * example::          Show an example of how this command might be used
+# 
+# == Example
+# 
+#   This sets up the skeleton of a configuration for importing comma delimeted
+#   text files into an xml file.
+#     <tt>
+#     $ rubysync create xml_demo
+#     $ cd xml_demo
+#     $ rubysync connector my_csv -t csv_file
+#     $ rubysync connector my_xml -t xml
+#     </tt>
+#   
+#   You would then edit the files::
+# 
+#     * +connectors/my_csv_connector.rb+:: where to get the CSV files, field names, etc
+#     * +connectors/my_xml_connector.rb+::  how to connect to your XML file.
+# 
+#   And enter::
+#     <tt>
+#     $ rubysync pipeline my_pipeline -C my_csv -V my_xml
+#     </tt>
+# 
+#   You would then edit the file +pipelines/my_pipeline.rb+ to configure the
+#   policy for synchronizing between the two connectors.
+#                                         
+#   You may then execute the pipeline in one-shot mode (daemon mode is coming)::
+# 
+#     <tt>
+#     $ rubysync once my_pipeline
+#     </tt>
+# 
+# == Author
+#   Ritchie Young, 9 to 5 Magic (http://9to5magic.com.au)
+#  
+# == Copyright
+#   Copyright (c) 2007 Ritchie Young. All rights reserved.
+# 
+# This file is part of RubySync.
+# 
+# RubySync is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+# 
+# RubySync is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 
 lib_path = File.dirname(__FILE__) + '/../lib'
@@ -88,11 +88,11 @@ class Controller < SimpleConsole::Controller
   before_filter :configure_logging
   
   params :string => {:p => :pipe,
-                     :t => :type,
-                     :V => :vault,
-                     :C => :client},
-         :int =>{:v => :verbose,
-	 	:d => :delay}
+    :t => :type,
+    :V => :vault,
+    :C => :client},
+    :int =>{:v => :verbose,
+    :d => :delay}
 
   def default
     #RDoc::usage 'Usage'
@@ -130,16 +130,16 @@ class Controller < SimpleConsole::Controller
   def create
     config_path = params[:id]
     ensure_dir_exists([
-      config_path,
-      "#{config_path}/pipelines",
-      "#{config_path}/connectors",
-      "#{config_path}/shared",
-      "#{config_path}/shared/pipelines",
-      "#{config_path}/shared/connectors",
-      "#{config_path}/shared/lib",
-      "#{config_path}/log",
-      "#{config_path}/db"
-    ])
+	config_path,
+	"#{config_path}/pipelines",
+	"#{config_path}/connectors",
+	"#{config_path}/shared",
+	"#{config_path}/shared/pipelines",
+	"#{config_path}/shared/connectors",
+	"#{config_path}/shared/lib",
+	"#{config_path}/log",
+	"#{config_path}/db"
+      ])
   end
   
   # Create a connector configuration file
@@ -167,6 +167,29 @@ class Controller < SimpleConsole::Controller
     @field_names = connector && connector.fields || []
   end
   
+  def show
+    params[:id] =~ /(.+?)\[(.+?)\]/o
+    connector_name = $1
+    path = $2
+    unless connector_name and path
+      puts "Usage: rubysync show connector[path]"
+    else
+      connector = connector_called(connector_name)
+      if connector 
+	unless connector.respond_to?(:'[]')
+	  puts "Connector '#{connector_name}' doesnt support random access."
+	else
+	  value = connector[path]
+	  unless value
+	    puts "Path '#{path}' not found in connector '#{connector_name}'"
+	  else
+	    puts value.to_yaml
+          end
+	end
+      end
+    end
+  end
+
   def pipeline
     name = params[:id]
     vault_name = params[:vault]
@@ -200,8 +223,8 @@ end
 class View < SimpleConsole::View
 
 
-def default
-puts <<"END"
+  def default
+    puts <<"END"
 Usage:
   
     rubysync command name [options]
@@ -222,16 +245,20 @@ Usage:
                           ; Execute the named pipeline within the current
                           ; configuration directory once and then exit
                           
+  * show {name}[{path}]	  ; Display the entry at path for connector specified
+                          ; name
+
   * start {name}          ; Execute the named pipeline
                         
   * example               ; Show an example of how this command might be used
 
+
 END
-end
+  end
 
 
-def example
-puts <<"END"
+  def example
+    puts <<"END"
   This sets up the skeleton of a configuration for importing comma delimeted
   text files into an XML file.
 
@@ -259,38 +286,38 @@ puts <<"END"
   
     $ rubysync start my
 END
+  end
+
+  def fields
+    puts @field_names.join("\n")
+  end
+
 end
 
-def fields
-  puts @field_names.join("\n")
-end
 
-end
-
-
-  def connector_template name, type
-    type_class_name = "RubySync::Connectors::#{type.to_s.camelize}Connector"
-    type_class = eval(type_class_name)
-    sample_config = (type_class && type_class.respond_to?("sample_config")) ?
-      type_class.sample_config : ""
-    return <<-"end;"
+def connector_template name, type
+  type_class_name = "RubySync::Connectors::#{type.to_s.camelize}Connector"
+  type_class = eval(type_class_name)
+  sample_config = (type_class && type_class.respond_to?("sample_config")) ?
+  type_class.sample_config : ""
+  return <<-"end;"
 class #{name.to_s.camelize}Connector < #{type_class_name}
   #{sample_config}
 end
-    end;
-  end
+  end;
+end
 
   
-  def pipeline_template name, vault_name, client_name
-    vault = (vault_name)? ::RubySync::Connectors::BaseConnector.class_for(vault_name) : nil
-    vault_fields = vault && vault.fields || []
+def pipeline_template name, vault_name, client_name
+  vault = (vault_name)? ::RubySync::Connectors::BaseConnector.class_for(vault_name) : nil
+  vault_fields = vault && vault.fields || []
 
-    client = (client_name)? ::RubySync::Connectors::BaseConnector.class_for(client_name) : nil
-    client_fields = client && client.fields || []
+  client = (client_name)? ::RubySync::Connectors::BaseConnector.class_for(client_name) : nil
+  client_fields = client && client.fields || []
 
-    vault_specifier = (vault_name)? "vault :#{vault_name}" : "#vault :vault_connector_name"
-    client_specifier = (client_name)? "client :#{client_name}" : "#client :client_connector_name"
-    return <<-"end;"
+  vault_specifier = (vault_name)? "vault :#{vault_name}" : "#vault :vault_connector_name"
+  client_specifier = (client_name)? "client :#{client_name}" : "#client :client_connector_name"
+  return <<-"end;"
 class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
 
   #{client_specifier}
@@ -352,8 +379,8 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
 
 
 end
-    end;
-  end
+  end;
+end
 
 def allow_through fields
   (fields.empty? ? %w{allow these fields through} : fields).to_ruby

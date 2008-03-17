@@ -24,15 +24,15 @@ require 'irb'
 
 
 module Kernel    
-    # Make the log method globally available
-    def log
-      unless defined? @@log
-        @@log = Logger.new(STDOUT)
-        #@@log.level = Logger::DEBUG
-        @@log.datetime_format = "%H:%M:%S"
-      end
-      @@log
-    end    
+  # Make the log method globally available
+  def log
+    unless defined? @@log
+      @@log = Logger.new(STDOUT)
+      #@@log.level = Logger::DEBUG
+      @@log.datetime_format = "%H:%M:%S"
+    end
+    @@log
+  end    
 end
 
 class Array
@@ -92,12 +92,22 @@ module RubySync
     end
     
     def pipeline_called name
-      something_called name, "pipeline"
+      begin
+	something_called name, "pipeline"
+      rescue
+	log.error "Pipeline named '#{name}' not found."
+	nil
+      end
     end
     
     
     def connector_called name
-      something_called name, "connector"
+      begin
+	something_called name, "connector"
+      rescue
+        log.error "Connector named '#{name}' not found."
+	nil
+      end
     end
 
     # Locates and returns an instance of a class for
@@ -130,7 +140,7 @@ module RubySync
       # Keep going up until we start repeating ourselves
       while File.directory?(bp) && bp != last && bp != "/"
         return bp if File.directory?("#{bp}/pipelines") &&
-        File.directory?("#{bp}/connectors")
+	  File.directory?("#{bp}/connectors")
         last = bp
         bp = File.expand_path("#{bp}/..")
       end
@@ -170,7 +180,7 @@ module RubySync
             existing = as_array(record[op.subject])
             next if existing == op.values # already same so ignore
             (existing & op.values).empty? or
-            raise "Attempt to add duplicate elements to #{name}"
+	      raise "Attempt to add duplicate elements to #{name}"
             record[op.subject] =  existing + op.values
           else
             record[op.subject] = op.values
