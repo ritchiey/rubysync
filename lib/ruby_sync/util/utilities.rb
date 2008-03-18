@@ -101,20 +101,36 @@ module RubySync
     end
     
     
-    def connector_called name
+    def connector_called name, message=nil
       begin
 	something_called name, "connector"
       rescue
-        log.error "Connector named '#{name}' not found."
+	message ||= "Connector named '#{name}' not found."
+        log.error message
 	nil
       end
     end
 
     # Locates and returns an instance of a class for
     # the given name.
-    def something_called name, extension
-      filename = "#{name.to_s}_#{extension}"
-      eval(filename.camelize).new
+    def something_called name, extension, message=nil
+      klass = class_called(name, extension, message) and klass.new()
+    end
+
+    def class_called name, extension, message=nil
+      class_for_name(class_name_for(name, extension), message)
+    end
+      
+    def class_for_name(name, message=nil)
+      eval(name)
+    rescue
+      message ||= "Unable to find class called '#{name}'"
+      log.error message
+      nil
+    end
+
+    def class_name_for name, extension
+      "#{name.to_s}_#{extension}".camelize
     end
     
     # Ensure that path is in the search path

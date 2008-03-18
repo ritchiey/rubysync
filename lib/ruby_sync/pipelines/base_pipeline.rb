@@ -44,8 +44,8 @@ module RubySync
       attr_accessor :delay    # delay in seconds between checking connectors
       
       array_option :dump_before, :dump_after
-      dump_before []
-      dump_after []
+      dump_before HashWithIndifferentAccess.new
+      dump_after HashWithIndifferentAccess.new
       
       def initialize
         @delay = 5
@@ -56,6 +56,7 @@ module RubySync
       end
       
       def self.client(connector_name, options={})
+	options = HashWithIndifferentAccess.new(options)
         class_name = RubySync::Connectors::BaseConnector.class_name_for(connector_name)
         options[:name] ||= "#{self.name}(client)"
         options[:is_vault] = false
@@ -65,6 +66,7 @@ module RubySync
       end
       
       def self.vault(connector_name, options={})
+	options = HashWithIndifferentAccess.new(options)
         class_name = RubySync::Connectors::BaseConnector.class_name_for(connector_name)
         options[:name] ||= "#{self.name}(vault)"
         options[:is_vault] = true
