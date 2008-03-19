@@ -87,12 +87,15 @@ class Controller < SimpleConsole::Controller
 
   before_filter :configure_logging
   
-  params :string => {:p => :pipe,
-    :t => :type,
-    :V => :vault,
-    :C => :client},
-    :int =>{:v => :verbose,
-    :d => :delay}
+  params(
+    :int =>{:v => :verbose, :d => :delay},
+    :string => {:p => :pipe,
+      :t => :type,
+      :V => :vault,
+      :C => :client}, 
+    :bool =>{:n => :no_edit}
+  )
+  
 
   def default
     #RDoc::usage 'Usage'
@@ -124,8 +127,6 @@ class Controller < SimpleConsole::Controller
     end
   end
 
-
-
   # Create a Rubysync project directory
   def create
     config_path = params[:id]
@@ -150,9 +151,13 @@ class Controller < SimpleConsole::Controller
       puts "Usage: rubysync connector connector_name -t connector_type"
       return
     end
-    if base_path
-      File.open("#{base_path}/connectors/#{name}_connector.rb", "w") do |file|
-        file.puts connector_template(name, type)
+    if base_path 
+      if template = connector_template(name, type)
+	filename = "#{base_path}/connectors/#{name}_connector.rb"
+	File.open(filename, "w") do |file|
+	  file.puts template
+	end
+	edit filename
       end
     else
       puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
@@ -184,7 +189,7 @@ class Controller < SimpleConsole::Controller
 	    puts "Path '#{path}' not found in connector '#{connector_name}'"
 	  else
 	    puts value.to_yaml
-          end
+	  end
 	end
       end
     end
@@ -199,8 +204,12 @@ class Controller < SimpleConsole::Controller
       return
     end
     if base_path
-      File.open("#{base_path}/pipelines/#{name}_pipeline.rb", "w") do |file|
-        file.puts pipeline_template(name, vault_name, client_name)
+      if template = pipeline_template(name, vault_name, client_name)
+	filename = "#{base_path}/pipelines/#{name}_pipeline.rb"
+	File.open(filename, "w") do |file|
+	  file.puts template
+	end
+	edit filename
       end
     else
       puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
@@ -210,7 +219,17 @@ class Controller < SimpleConsole::Controller
   
   
   private
-  
+
+  def edit filename
+    unless params[:no_edit]
+      if ENV['EDITOR']
+	exec "#{ENV['EDITOR']} #{filename}"
+      else
+	log.warn "Set the EDITOR environment variable to enable automatic editing of config files."
+      end
+    end
+  end
+
   def configure_logging
     log_levels = [::Logger::WARN, ::Logger::INFO, ::Logger::DEBUG]
     verbosity = [(params[:verbose]||0), log_levels.size-1].min
@@ -296,12 +315,11 @@ end
 
 
 def connector_template name, type
-  type_class_name = "RubySync::Connectors::#{type.to_s.camelize}Connector"
-  type_class = eval(type_class_name)
+  return unless type_class = class_for_name("RubySync::Connectors::#{class_name_for type, 'connector'}")
   sample_config = (type_class && type_class.respond_to?("sample_config")) ?
   type_class.sample_config : ""
   return <<-"end;"
-class #{name.to_s.camelize}Connector < #{type_class_name}
+class #{class_name_for(name, 'connector')} < #{type_class.name}
   #{sample_config}
 end
   end;
@@ -309,11 +327,13 @@ end
 
   
 def pipeline_template name, vault_name, client_name
-  vault = (vault_name)? ::RubySync::Connectors::BaseConnector.class_for(vault_name) : nil
+  vault = (vault_name)? class_for_name("RubySync::Connectors::#{class_name_for vault_name, 'connector'}") : nil
   vault_fields = vault && vault.fields || []
 
-  client = (client_name)? ::RubySync::Connectors::BaseConnector.class_for(client_name) : nil
+  client = (client_name)? class_for_name("RubySync::Connectors::#{class_name_for client_name, 'connector'}") : nil
   client_fields = client && client.fields || []
+
+  return nil if vault_name && !vault or client_name && !client
 
   vault_specifier = (vault_name)? "vault :#{vault_name}" : "#vault :vault_connector_name"
   client_specifier = (client_name)? "client :#{client_name}" : "#client :client_connector_name"
