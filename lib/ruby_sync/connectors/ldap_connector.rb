@@ -33,7 +33,7 @@ require 'net/ldap'
 
 class Net::LDAP::Entry
  def to_hash
-   return @myhash.dup
+   @myhash.dup
  end
 end
 
