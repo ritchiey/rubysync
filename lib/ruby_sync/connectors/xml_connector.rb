@@ -146,9 +146,13 @@ filename "/tmp/rubysync.xml"
       unless @with_xml_invoked
         begin
           @with_xml_invoked = true
-          File.exist?(filename) or File.open(filename,'w') {|file| file.write('<entries/>')}
+	  File.exist?(filename) or File.open(filename,'w') {|file| file.write('<entries/>')}
           File.open(filename, "r") do |file|
-            file.flock(File::LOCK_EX)
+	    # flock behaves differently on 
+            # Windows. Seems to prevent us from reopening the file for
+            # writing even within the same process. Temporarily removed.
+            # TODO: add this again but only if not executing on Windows
+            #file.flock(File::LOCK_EX)
             @xml = Document.new(file)
             begin
               yield @xml
