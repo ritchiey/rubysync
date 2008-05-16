@@ -427,13 +427,17 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
 
    # if this evaluates to false for an outgoing event then it will
   # veto the creation of a new record on the client
-  # out_create_if do
+  # out_create do
   # end
 
  # Should evaluate to the path for placing a new record on the client
   # out_place do
   # end
 
+  # See comment for in_command_transform above
+  out_command_transform do
+  #  drop_changes_to :any, :fields, :you, :dont, :want, :in, :the, :client
+  end
 
 end
   end;
