@@ -23,9 +23,9 @@ module RubySync
     
       def process(event)
         case event.type
-        when :add: return perform_add(event)
-        when :delete: return perform_delete(event)
-        when :modify: return perform_modify(event)
+        when :add then return perform_add(event)
+        when :delete then return perform_delete(event)
+        when :modify then return perform_modify(event)
         else
             raise Exception.new("#{name}: Unknown event type '#{event.type}' received")
         end
@@ -72,7 +72,7 @@ module RubySync
         path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
         raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
         call_if_exists(:target_transform, event)
-        modify path, event.payload
+        modify(path, event.payload)
         update_mirror path
         return (is_vault?)? nil : own_association_key_for(event.target_path)
       end
@@ -87,8 +87,6 @@ module RubySync
         remove_associations if respond_to? :remove_associations
         remove_mirror if respond_to? :remove_mirror
       end
-      
-      
       
     end
   end
