@@ -43,6 +43,7 @@ module RubySync::Connectors
    option  :host,
    :port,
    :bind_method,
+   :encryption,
    :username,
    :password,
    :search_filter,
@@ -96,7 +97,12 @@ module RubySync::Connectors
   password       'secret'
   search_filter  "cn=*"
   search_base    "ou=users,o=my-organization,dc=my-domain,dc=com"
-  #:bind_method  :simple
+  #bind_method  :simple
+  
+  #Uncomment the following for LDAPS. If you do, make sure that
+  #you're using the LDAPS port (probably 636) and be aware that
+  #the server's certificate WON'T be checked for validity.
+  #encryption	 :simple_tls
 END
    end
 
@@ -171,7 +177,9 @@ END
 
   def with_ldap
      result = nil
-     @connections[@connection_index] = Net::LDAP.new(:host=>host, :port=>port, :auth=>auth) unless @connections[@connection_index]
+     connection_options = {:host=>host, :port=>port, :auth=>auth}
+     connection_options[:encryption] = encryption if encryption
+     @connections[@connection_index] = Net::LDAP.new(connection_options) unless @connections[@connection_index]
      if @connections[@connection_index]
        ldap = @connections[@connection_index]
        @connection_index += 1
