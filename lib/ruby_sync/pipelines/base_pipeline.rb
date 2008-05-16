@@ -247,12 +247,12 @@ module RubySync
 
         if associated_entry
           if event.type == :add
-        	log.info "Associated entry in vault for add event. Converting to modify"
+	    log.info "Associated entry in vault for add event. Converting to modify"
             event.convert_to_modify associated_entry, allowed_in
           end
         elsif event.type == :modify
-      	    log.info "No associated entry in vault for modify event. Converting to add"
-      	    event.convert_to_add 
+	  log.info "No associated entry in vault for modify event. Converting to add"
+	  event.convert_to_add 
         end
 
 	perform_transform :in_command_transform, event, event.hint
@@ -287,7 +287,7 @@ module RubySync
 
         log.info "Processing outgoing #{event.type} event "+ event.hint
         perform_transform :out_filter, event, event.hint
-        perform_transform :out_command_transform, event, event.hint
+        perform_transform :out_event_transform, event, event.hint
 
         associated_entry = nil
         unless event.type == :disassociate
@@ -305,12 +305,12 @@ module RubySync
             
         if associated_entry
           if event.type == :add
-        	  log.info "Associated entry in client for add event. Converting to modify"
+	    log.info "Associated entry in client for add event. Converting to modify"
             event.convert_to_modify(associated_entry)
           end
         elsif event.type == :modify
-      	    log.info "No associated entry in client for modify event. Converting to add"
-      	    event.convert_to_add 
+	  log.info "No associated entry in client for modify event. Converting to add"
+	  event.convert_to_add 
         end
 
         perform_transform :out_command_transform, event, event.hint
@@ -456,7 +456,7 @@ module RubySync
       
       
       def in_filter(event)
-          allowed_in == [] or event.drop_all_but_changes_to(allowed_in || [])
+	allowed_in == [] or event.drop_all_but_changes_to(allowed_in || [])
       end
 
 
@@ -472,7 +472,7 @@ module RubySync
       def allowed_out; nil; end
       
       def out_filter(event)
-          allowed_out == [] or event.drop_all_but_changes_to(allowed_out || [])
+	allowed_out == [] or event.drop_all_but_changes_to(allowed_out || [])
       end
 
 
