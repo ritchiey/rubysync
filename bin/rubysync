@@ -147,18 +147,21 @@ class Controller < SimpleConsole::Controller
   def connector
     name = params[:id]
     type = params[:type]
-    unless name and type
-      puts "Usage: rubysync connector connector_name -t connector_type"
+    unless name
+      puts "Usage: rubysync connector connector_name [-t connector_type]"
       return
     end
     if base_path 
-      if template = connector_template(name, type)
-	filename = "#{base_path}/connectors/#{name}_connector.rb"
-	File.open(filename, "w") do |file|
-	  file.puts template
+      filename = "#{base_path}/connectors/#{name}_connector.rb"
+      unless File.exists?(filename)
+	puts "Require -t connector_type when creating a connector" unless type
+	if template = connector_template(name, type)
+	  File.open(filename, "w") do |file|
+	    file.puts template
+	  end
 	end
-	edit filename
       end
+      edit filename
     else
       puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
     end
@@ -204,13 +207,15 @@ class Controller < SimpleConsole::Controller
       return
     end
     if base_path
-      if template = pipeline_template(name, vault_name, client_name)
-	filename = "#{base_path}/pipelines/#{name}_pipeline.rb"
-	File.open(filename, "w") do |file|
-	  file.puts template
-	end
-	edit filename
+      filename = "#{base_path}/pipelines/#{name}_pipeline.rb"
+      unless File.exists?(filename)
+	if template = pipeline_template(name, vault_name, client_name)
+	  File.open(filename, "w") do |file|
+	    file.puts template
+	  end
+        end
       end
+      edit filename
     else
       puts 'Change into a config dir and try again or create a config dir with "rubysync create"'
     end
@@ -317,7 +322,7 @@ end
 def connector_template name, type
   return unless type_class = class_for_name("RubySync::Connectors::#{class_name_for type, 'connector'}")
   sample_config = (type_class && type_class.respond_to?("sample_config")) ?
-  type_class.sample_config : ""
+    type_class.sample_config : ""
   return <<-"end;"
 class #{class_name_for(name, 'connector')} < #{type_class.name}
   #{sample_config}
