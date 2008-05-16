@@ -344,34 +344,75 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
 
   #{vault_specifier}
 
-  # Remove any fields that you don't want to set in the client from the vault
-  allow_out #{allow_through(vault_fields)}
-
-  # Remove any fields that you don't want to set in the vault from the client
+ # Remove any client fields that have no bearing on the final entry in the vault.
   allow_in #{allow_through(client_fields)}
 
+  # "in" means going from client to vault
   # If the client and vault have different names for the same field, define the
-  # the mapping here. For example, if the vault has a field called "first name" and
-  # the client has a field called givenName you may put:
+  # the mapping here. For example, if the vault has a field called "first name" 
+  # and the client has a field called 'givenName' you may write:
+  #
   #    map 'first name', 'givenName'
   #
-  # You can also calculate the values for fields. For more info, see
+  # You can also calculate the values for fields. If the vault has a 'fullname'
+  # and the client has 'givenName' and 'surname' attributes. You might write:
+  #
+  #    map(:fullname) {value_of(:givenName) + " " + value_of(:surname) }
+  #
+  # For more info, see
   # http://rubysync.org/docs/rubysync-transformations/
-  
-  # "in" means going from client to vault
-  in_transform do
+  in_event_transform do
     #{transform_fields(vault_fields, 'vault', 'client')}
   end
 
-  # "out" means going from vault to client
-  out_transform do
-    #{transform_fields(client_fields, 'client', 'vault')}
-  end
-
+  # if the record has been successfully synchronized already, RubySync will
+  # already know about the association and will skip ahead to
+  # in_command_transform.
+  # 
   # if the vault doesn't already hold an association for this record
   # from the client, perform a search here to see if a match can be found
+  # and if so, return its path.
+  # Default behaviour is to attempt to use the value returned by in_place.
   # in_match do
   # end
+
+  # If there was exactly one match, RubySync records the association and skips
+  # ahead to in_command_transform. Otherwise it considers creating the entry in
+  # the vault.
+
+  # If in_create evaluates to false, it will veto the creation of a record on
+  # the vault. This is good for checking you've got the required fields or only
+  # creating a subset of the possible records.
+  # in_create do
+  #   #eg only create entries with a (somewhat) valid email address
+  #   value_of(:email) =~ /%w+@%w+\.%w+/   
+  # end
+
+  # Should evaluate to the path for placing a new record in the vault
+  # in_place do
+  #   value_of(:vault_path_field)
+  # end
+
+  # in_command_transform is the same as in_event_transform but occurs after
+  # any in_match, in_create or in_place invocations.
+  # in_command_transform  do
+  #  drop_changes_to :any, :fields, :you, :dont, :want, :in, :the, :vault
+  # end
+
+
+  # End of client to vault processing
+  # -----------------------------------
+  # Start of vault to client processing
+
+ # Remove any client fields that have no bearing on the final entry in the client.
+  allow_out #{allow_through(vault_fields)}
+
+ 
+  # "out" means going from vault to client
+  # See comment for in_event_transform above
+  out_event_transform do
+    #{transform_fields(client_fields, 'client', 'vault')}
+  end
 
   # if the vault doesn't have an association linking this record to one on
   # the client, perform a search here to see if an existing client record
@@ -379,21 +420,12 @@ class #{name.to_s.camelize}Pipeline < RubySync::Pipelines::BasePipeline
   # out_match do
   # end
 
-  # If this evaluates to false, it will veto the creation of a record on
-  # the vault. Good for checking you've got the required fields etc
-  # in_create_if do
-  # end
-
-  # if this evaluates to false for an outgoing event then it will
+   # if this evaluates to false for an outgoing event then it will
   # veto the creation of a new record on the client
   # out_create_if do
   # end
 
-  # Should evaluate to the path for placing a new record on the vault
-  # in_place do
-  # end
-
-  # Should evaluate to the path for placing a new record on the client
+ # Should evaluate to the path for placing a new record on the client
   # out_place do
   # end
 
