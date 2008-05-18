@@ -55,6 +55,7 @@ module RubySync::Connectors
    host                  'localhost'
    port                  389
    search_filter         "cn=*"
+   encryption		 nil
 
    def initialize options={}
      super options
@@ -90,6 +91,12 @@ module RubySync::Connectors
 
    def self.sample_config
      return <<END
+
+  # Using :memory is ok for testing.
+  # For production, you will need to change to a persistent form of tracking
+  # such as :dbm or :ldap. 
+  track_changes_with :memory
+  track_associations_with :memory
 
   host           'localhost'
   port            389

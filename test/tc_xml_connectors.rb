@@ -25,13 +25,14 @@ require 'ruby_sync/connectors/xml_connector'
 
 
 class XmlTestAConnector < RubySync::Connectors::XmlConnector
-  include RubySync::Connectors::MemoryChangeTracking
+  track_changes_with :memory
   filename "/tmp/rubysync_a.xml"
 end
 
 class XmlTestBConnector < RubySync::Connectors::XmlConnector
-  include RubySync::Connectors::MemoryChangeTracking
-  include RubySync::Connectors::MemoryAssociationTracking
+  track_changes_with :memory
+  track_associations_with :memory
+
   filename "/tmp/rubysync_b.xml"
 end
 

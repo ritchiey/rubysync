@@ -40,6 +40,7 @@ module RubySync
     class BasePipeline
       
       include RubySync::Utilities
+      meta_eval {include(RubySync::Utilities)}
       
       attr_accessor :delay    # delay in seconds between checking connectors
       
@@ -57,22 +58,30 @@ module RubySync
       
       def self.client(connector_name, options={})
 	options = HashWithIndifferentAccess.new(options)
-        class_name = RubySync::Connectors::BaseConnector.class_name_for(connector_name)
+        connector_class = class_called(connector_name, "connector")
+	unless connector_class
+	  log.error "No connector called #connector_name}"
+	  return
+        end
         options[:name] ||= "#{self.name}(client)"
         options[:is_vault] = false
         class_def 'client' do
-          @client ||= eval(class_name).new(options)
+          @client ||= connector_class.new(options)
         end
       end
       
       def self.vault(connector_name, options={})
 	options = HashWithIndifferentAccess.new(options)
-        class_name = RubySync::Connectors::BaseConnector.class_name_for(connector_name)
+        connector_class = class_called(connector_name, "connector")
+	unless connector_class
+	  log.error "No connector called #{connector_name}"
+	  return
+        end
         options[:name] ||= "#{self.name}(vault)"
         options[:is_vault] = true
         class_def 'vault' do
           unless @vault
-            @vault = eval(class_name).new(options)
+            @vault = connector_class.new(options)
             @vault.pipeline = self
           end
           @vault
