@@ -56,8 +56,16 @@ module RubySync::Connectors
     # of configurations based on your connector.
     def self.sample_config
     end
-      
-      
+
+    def self.event_method name,&blk
+      define_method name do |event|
+	event.instance_eval(&blk)
+      end
+    end
+
+     
+    def self.target_transform(&blk) event_method :target_transform,&blk; end
+    
     # Subclasses must override this to
     # interface with the external system and generate entries for every
     # entry in the scope passing the entry path (id) and its data (as a hash of arrays).

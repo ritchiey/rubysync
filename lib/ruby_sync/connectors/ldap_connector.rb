@@ -69,16 +69,6 @@ module RubySync::Connectors
     end
 
 
-    #!!! This bit doesn't work !!!!
-    def self.target_transform(&blk) event_method :target_transform,&blk; end
-    #target_transform do 
-      #log.warn "Here we are in target transform"
-      #if type == :add and sets_value?("objectclass")
-	#log.warn("Add without setting objectclass is unlikely to work.")
-      #end
-    #end
-
-
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
 	ldap.search :base => search_base, :filter => search_filter, :return_result => false do |ldap_entry|
@@ -127,6 +117,7 @@ END
       result = nil
       with_ldap do |ldap|
 	attributes = perform_operations(operations)
+	attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
 	result = ldap.add :dn=>path, :attributes=>attributes
       end
       log.debug("ldap.add returned '#{result}'")
@@ -152,7 +143,8 @@ END
 	return nil if !result or result.size == 0
 	answer = {}
 	result[0].attribute_names.each do |name|
-	  answer[name.to_s] = result[0][name] unless name.to_s.downcase == 'dn'
+	  name = name.to_s.downcase
+	  answer[name] = result[0][name] unless name == 'dn'
 	end
 	answer
       end

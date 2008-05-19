@@ -62,13 +62,6 @@ module RubySync
       end
     end       
 
-    def self.event_method name,&blk
-      define_method name do |event|
-	event.instance_eval(&blk)
-      end
-    end
-
- 
     def dump_before
       []
     end
@@ -210,26 +203,27 @@ module RubySync
           log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
           p op
         end
-        next if subjects and !subjects.include?(op.subject)
+	key = op.subject
+        next if subjects and !subjects.include?(key)
         case op.type
         when :add
-          if record[op.subject]
-            existing = as_array(record[op.subject])
+          if record[key]
+            existing = as_array(record[key])
             next if existing == op.values # already same so ignore
             (existing & op.values).empty? or
 	      raise "Attempt to add duplicate elements to #{name}"
-            record[op.subject] =  existing + op.values
+            record[key] =  existing + op.values
           else
-            record[op.subject] = op.values
+            record[key] = op.values
           end
         when :replace
-          record[op.subject] = op.values
+          record[key] = op.values
         when :delete
-          if record[op.subject]
+          if record[key]
             unless op.value
               record.delete(op.subject)
             else
-              record[op.subject] -= op.values
+              record[key] -= op.values
             end
           end
         else

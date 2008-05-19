@@ -277,7 +277,11 @@ module RubySync
           end
         end
 
-        with_rescue("#{vault.name}: Processing command") {vault.process(event)}
+	if event.effective_operation?
+	  with_rescue("#{vault.name}: Processing command") {vault.process(event)}
+	else
+	  log.info "No change."
+	end
         log.info "---\n"
         
       end

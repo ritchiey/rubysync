@@ -17,11 +17,11 @@
 
 module RubySync
   
-   class Association
+  class Association
     attr_accessor :context, # many associations will share the same context
-                            # it is a function of pipeline and the client connector
-                            # to which the association applies
-                  :key      # the key is unique within the context and vault
+    # it is a function of pipeline and the client connector
+    # to which the association applies
+    :key      # the key is unique within the context and vault
     
     
     def self.delimiter; '$'; end
@@ -47,12 +47,12 @@ module RubySync
     include RubySync::Utilities
 
     attr_accessor :type,        # :delete, :add, :modify, :disassociate
-                  :source,
-                  :target,
-                  :payload,
-                  :source_path,
-                  :target_path,
-                  :association
+    :source,
+      :target,
+      :payload,
+      :source_path,
+      :target_path,
+      :association
 
     def self.force_resync source
       self.new(:force_resync, source)
@@ -184,30 +184,30 @@ module RubySync
       @uncommitted_operations = uncommitted_operations.delete_if {|op| !subjects.include?(op.subject.to_s)}
     end
    
-   def delete_when_blank
-       @uncommitted_operations = uncommitted_operations.map do |op| 
-         if op.sets_blank?
-	   @type == :modify ? op.same_but_as(:delete) : nil
-	 else
-	   op
-	 end
-       end.compact
-   end    
+    def delete_when_blank
+      @uncommitted_operations = uncommitted_operations.map do |op| 
+	if op.sets_blank?
+	  @type == :modify ? op.same_but_as(:delete) : nil
+	else
+	  op
+	end
+      end.compact
+    end    
        
      
-     # Add a value to a given subject unless it already sets a value
-     def add_default field_name, value
-       add_value(field_name.to_s, value) unless sets_value? field_name.to_s
-     end
+    # Add a value to a given subject unless it already sets a value
+    def add_default field_name, value
+      add_value(field_name.to_s, value) unless sets_value? field_name.to_s
+    end
      
      
-     def add_value field_name, value
-       uncommitted_operations << Operation.new(:add, field_name.to_s, as_array(value))
-     end
+    def add_value field_name, value
+      uncommitted_operations << Operation.new(:add, field_name.to_s, as_array(value))
+    end
      
-     def set_value field_name, value
-       uncommitted_operations << Operation.new(:replace, field_name.to_s, as_array(value))
-     end
+    def set_value field_name, value
+      uncommitted_operations << Operation.new(:replace, field_name.to_s, as_array(value))
+    end
 
     def values_for field_name, default=[]
       values = perform_operations @payload, {}, :subjects=>[field_name.to_s]
@@ -268,21 +268,28 @@ module RubySync
     def place(&blk)
       self.target_path = blk.call
     end
-  
-  protected
 
-  # Try to make a sensible association from the passed in object
-  def make_association o  
-    if o.kind_of?(Array) and o.size == 2
-      return Association.new(o[0],o[1])
-    elsif o.kind_of? RubySync::Association
-      return o
-    elsif o
-      return Association.new(nil, o)
-    else
-      nil
+    # true unless this event in its current state would have no impact
+    def effective_operation?
+      !(
+	@type == :modify && @payload.empty?
+      )
     end
-  end
+  
+    protected
+
+    # Try to make a sensible association from the passed in object
+    def make_association o  
+      if o.kind_of?(Array) and o.size == 2
+	return Association.new(o[0],o[1])
+      elsif o.kind_of? RubySync::Association
+	return o
+      elsif o
+	return Association.new(nil, o)
+      else
+	nil
+      end
+    end
       
 
 
