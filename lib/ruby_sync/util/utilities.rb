@@ -41,6 +41,7 @@ class Array
   end
 end
 
+
 # Generally useful methods
 module RubySync
   module Utilities
@@ -59,7 +60,27 @@ module RubySync
         log.warn "#{text}: #{exception.message}"
         log.debug exception.backtrace.join("\n")
       end
-    end    
+    end       
+
+    def self.event_method name,&blk
+      define_method name do |event|
+	event.instance_eval(&blk)
+      end
+    end
+
+ 
+    def dump_before
+      []
+    end
+
+    def dump_after() []; end
+    def perform_transform name, event, hint=""
+      log.info event.to_yaml if dump_before.include?(name.to_sym)
+      log.info "performing #{name}"
+      call_if_exists name, event, hint
+      event.commit_changes
+      log.info event.to_yaml if dump_after.include?(name.to_sym)
+    end
     
     def call_if_exists(method, event, hint="")
       result = nil

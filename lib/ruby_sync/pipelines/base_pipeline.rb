@@ -42,11 +42,9 @@ module RubySync
       include RubySync::Utilities
       meta_eval {include(RubySync::Utilities)}
       
+      #add_dump_options
       attr_accessor :delay    # delay in seconds between checking connectors
       
-      array_option :dump_before, :dump_after
-      dump_before HashWithIndifferentAccess.new
-      dump_after HashWithIndifferentAccess.new
       
       def initialize
         @delay = 5
@@ -88,6 +86,9 @@ module RubySync
         end
       end
       
+      array_option :dump_before, :dump_after
+      dump_before HashWithIndifferentAccess.new
+      dump_after HashWithIndifferentAccess.new
 
       def self.in_transform(&blk) deprecated_event_method :in_transform, :in_event_transform, &blk; end
       def self.in_event_transform(&blk) event_method :in_event_transform,&blk; end
@@ -157,18 +158,10 @@ module RubySync
       def out_place_transform(event)
         event.target_path = out_place(event)
       end
-      
-      def perform_transform name, event, hint=""
-	log.info event.to_yaml if dump_before.include?(name.to_sym)
-	log.info "Performing #{name}"
-        call_if_exists name, event, hint
-        event.commit_changes
-	log.info event.to_yaml if dump_after.include?(name.to_sym)
-      end
             
-      # Execute the pipeline once then return.
+      # execute the pipeline once then return.
       def run_once
-        log.info "Running #{name} pipeline once"
+        log.info "running #{name} pipeline once"
         started
         run_in_once
         run_out_once
@@ -185,26 +178,26 @@ module RubySync
         vault.stopped
       end
       
-      # Execute the in pipe once and then return
+      # execute the in pipe once and then return
       def run_in_once
         return unless allowed_in
-        log.debug "Running #{name} 'in' pipeline once"
+        log.debug "running #{name} 'in' pipeline once"
         client.once_only = true
         client.start {|event| in_handler(event)}
       end
       
-      # Execute the out pipe once and then return
+      # execute the out pipe once and then return
       def run_out_once
         return unless allowed_out
-        log.debug "Running #{name} 'out' pipeline once"
+        log.debug "running #{name} 'out' pipeline once"
         vault.once_only = true
         vault.start {|event| out_handler(event)}
       end
       
       def start
-        log.info "Starting #{name} pipeline"
+        log.info "starting #{name} pipeline"
         @running = true
-        trap("SIGINT") {self.stop}
+        trap("sigint") {self.stop}
         started
         while @running
           run_in_once
@@ -315,7 +308,7 @@ module RubySync
         if associated_entry
           if event.type == :add
 	    log.info "Associated entry in client for add event. Converting to modify"
-            event.convert_to_modify(associated_entry)
+            event.convert_to_modify(associated_entry,allowed_out)
           end
         elsif event.type == :modify
 	  log.info "No associated entry in client for modify event. Converting to add"

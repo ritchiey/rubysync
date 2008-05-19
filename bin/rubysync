@@ -187,7 +187,9 @@ class Controller < SimpleConsole::Controller
 	unless connector.respond_to?(:'[]')
 	  puts "Connector '#{connector_name}' doesnt support random access."
 	else
+	  connector.started
 	  value = connector[path]
+	  connector.stopped
 	  unless value
 	    puts "Path '#{path}' not found in connector '#{connector_name}'"
 	  else

@@ -22,12 +22,13 @@ module RubySync
     module ConnectorEventProcessing
     
       def process(event)
+	perform_transform(:target_transform, event, name)
         case event.type
         when :add then return perform_add(event)
         when :delete then return perform_delete(event)
         when :modify then return perform_modify(event)
         else
-            raise Exception.new("#{name}: Unknown event type '#{event.type}' received")
+	  raise Exception.new("#{name}: Unknown event type '#{event.type}' received")
         end
       end
 
@@ -38,9 +39,10 @@ module RubySync
         log.info "Adding '#{event.target_path}' to '#{name}'"
         raise Exception.new("#{name}: Entry with path '#{event.target_path}' already exists, add failing.") if self[event.target_path]
         if is_vault? && event.association && path_for_association(event.association)
-          raise Exception.new("#{name}: Association (#{event.association.to_s}) already in use. Add failing.") 
+	  log.warn("#{name}: Removing obsolete association (#{event.association.to_s}) found for non-existent #{event.target_path}.")
+	  self.remove_association(event.association)
         end
-        call_if_exists(:target_transform, event)
+	#        call_if_exists(:target_transform, event)
         if add(event.target_path, event.payload)
           log.info "Add succeeded"
           update_mirror event.target_path
@@ -61,7 +63,7 @@ module RubySync
 
       def perform_delete event
         raise Exception.new("#{name}: Delete of unassociated object. No action taken.") unless event.association
-        path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
+        path = associated_path event
         log.info "Deleting '#{path}' from '#{name}'"
         delete(path) or log.warn("#{name}: Attempted to delete non-existent entry '#{path}'\nMay be an echo of a delete from this connector, ignoring.")
         delete_from_mirror path
@@ -69,10 +71,10 @@ module RubySync
       end
       
       def perform_modify event
-        path = (is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
+        path = associated_path event
         raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
-        call_if_exists(:target_transform, event)
-        modify(path, event.payload)
+        #call_if_exists(:target_transform, event)
+        modify path, event.payload
         update_mirror path
         return (is_vault?)? nil : own_association_key_for(event.target_path)
       end
@@ -87,6 +89,11 @@ module RubySync
         remove_associations if respond_to? :remove_associations
         remove_mirror if respond_to? :remove_mirror
       end
+      
+      def associated_path event
+	(is_vault?)? path_for_association(event.association) : path_for_own_association_key(event.association.key)
+      end
+      
       
     end
   end

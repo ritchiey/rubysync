@@ -365,6 +365,14 @@ module RubySync::Connectors
 
     private
 
+    # set a default dbm path in case one of the dbm tracking
+    # modules is used.
+    def dbm_path()
+      p = "#{base_path}/db"
+      ::FileUtils.mkdir_p p
+      ::File.join(p,name)
+    end
+
     def self.include_something_called name, extension, message=nil
       module_name = class_name_for(name, extension)
       m = eval(module_name)

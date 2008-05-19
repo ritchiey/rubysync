@@ -17,18 +17,16 @@
 lib_path = File.dirname(__FILE__) + '/..'
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
-require 'ruby_sync'
-require 'ldap_connector'
-$VERBOSE = false
-require 'net/ldap'
-$VERBOSE = true
+#$VERBOSE = false
+#require 'net/ldap'
+#$VERBOSE = true
 
 
 RUBYSYNC_ASSOCIATION_ATTRIBUTE = "RubySyncAssociation"
 RUBYSYNC_ASSOCIATION_CLASS = "RubySyncSynchable"
 
-
-module LdapAssociations
+module RubySync::Connectors
+  module LdapAssociationTracking
   
 
     def associate association, path
@@ -36,7 +34,7 @@ module LdapAssociations
         # todo: check and warn if path is outside of search_base
         ldap.modify :dn=>path, :operations=>[
           [:add, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s]
-          ]
+	]
       end
     end
     
@@ -45,8 +43,8 @@ module LdapAssociations
         filter = "#{RUBYSYNC_ASSOCIATION_ATTRIBUTE}=#{association.to_s}"
         log.debug "Searching with filter: #{filter}"
         results = ldap.search :base=>@search_base,
-                    :filter=>filter,
-                    :attributes=>[]
+	  :filter=>filter,
+	  :attributes=>[]
         results or return nil
         case results.length
         when 0: return nil
@@ -60,8 +58,8 @@ module LdapAssociations
     def associations_for path
       with_ldap do |ldap|
         results = ldap.search :base=>path,
-                    :scope=>Net::LDAP::SearchScope_BaseObject,
-                    :attributes=>[RUBYSYNC_ASSOCIATION_ATTRIBUTE]
+	  :scope=>Net::LDAP::SearchScope_BaseObject,
+	  :attributes=>[RUBYSYNC_ASSOCIATION_ATTRIBUTE]
         unless results and results.length > 0
           log.warn "Attempted association lookup on non-existent LDAP entry '#{path}'"
           return []
@@ -76,7 +74,7 @@ module LdapAssociations
       with_ldap do |ldap|
         ldap.modify :dn=>path, :modifications=>[
           [:delete, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s]
-          ]
+	]
       end
     end
 
@@ -121,6 +119,7 @@ module LdapAssociations
       end
     end    
 
+  end
+
+
 end
-
-
