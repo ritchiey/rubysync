@@ -34,5 +34,3 @@ Hoe.new('rubysync', RubySync::VERSION) do |p|
     ["contacts", ">=1.0.7"]
     ]
 end
-
-# vim: syntax=Ruby

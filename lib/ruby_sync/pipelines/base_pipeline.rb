@@ -257,8 +257,6 @@ module RubySync
 	  event.convert_to_add 
         end
 
-	perform_transform :in_command_transform, event, event.hint
-
         case event.type
         when :add
           if in_create(event)
@@ -276,6 +274,8 @@ module RubySync
             log.info "---\n"; return
           end
         end
+
+	perform_transform :in_command_transform, event, event.hint
 
 	if event.effective_operation?
 	  with_rescue("#{vault.name}: Processing command") {vault.process(event)}
@@ -319,8 +319,6 @@ module RubySync
 	  event.convert_to_add 
         end
 
-        perform_transform :out_command_transform, event, event.hint
-
         case event.type
         when :add
           if out_create(event)
@@ -338,6 +336,8 @@ module RubySync
             log.info "---\n"; return
           end
         end
+
+        perform_transform :out_command_transform, event, event.hint
 
         with_rescue("#{client.name}: Processing command") {client.process(event)}
         log.info "---\n"
