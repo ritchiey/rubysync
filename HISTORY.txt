@@ -1,3 +1,7 @@
+== 0.2.1 / 2008-06-11
+* Deprecated in_transform and out_transform. Replaced in_trasform with in_event_transform (before other rules) and in_command_transform (after other rules). Likewise, out_transform is replaced by out_event_transform and out_command_transform. The command_transforms are useful for dropping attributes from the final record that were required for rule processing.
+* Improved pipeline template.
+* Various bug fixes.
 == 0.2.0 / 2008-03-17
 * Added show command to do simple record lookups from a connector
 * Extracted out the dbm functionality from base_connector into dbm_change_tracking and dbm_association_tracking

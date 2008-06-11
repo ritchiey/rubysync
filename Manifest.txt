@@ -127,6 +127,10 @@ lib/ruby_sync/connectors/ldap_changelog_connector.rb
 lib/ruby_sync/connectors/ldap_connector.rb
 lib/ruby_sync/connectors/memory_connector.rb
 lib/ruby_sync/connectors/xml_connector.rb
+lib/ruby_sync/connectors/dbm_association_tracking.rb
+lib/ruby_sync/connectors/dbm_change_tracking.rb
+lib/ruby_sync/connectors/memory_association_tracking.rb
+lib/ruby_sync/connectors/memory_change_tracking.rb
 lib/ruby_sync/event.rb
 lib/ruby_sync/operation.rb
 lib/ruby_sync/pipelines/base_pipeline.rb
