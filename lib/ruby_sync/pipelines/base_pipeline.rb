@@ -102,6 +102,14 @@ module RubySync
       def self.out_create(&blk) event_method :out_create,&blk; end
       def self.in_place(&blk) event_method :in_place,&blk; end
       def self.out_place(&blk) event_method :out_place,&blk; end
+      def self.after_vault_add(&blk) event_method :after_vault_add,&blk; end
+      def self.after_vault_modify(&blk) event_method :after_vault_modify,&blk; end
+      def self.after_vault_delete(&blk) event_method :after_vault_delete,&blk; end
+      def self.after_in(&blk) event_method :in_postprocess,&blk; end
+      def self.after_client_add(&blk) event_method :after_client_add,&blk; end
+      def self.after_client_modify(&blk) event_method :after_client_modify,&blk; end
+      def self.after_client_delete(&blk) event_method :after_client_delete,&blk; end
+      def self.after_out(&blk) event_method :out_postprocess,&blk; end
 
       def self.event_method name,&blk
         define_method name do |event|
@@ -282,6 +290,24 @@ module RubySync
 	else
 	  log.info "No change."
 	end
+
+	# Perform post-processing (if any)
+	event.payload = []
+	last_change = event.type
+	event.type = :modify
+	case last_change
+	when :add
+	  call_if_exists :after_vault_add, event, "After add to vault"
+	when :modify
+	  call_if_exists :after_vault_modify, event, "After modify to vault"
+	when :delete
+	  call_if_exists :after_vault_delete, event, "After delete from vault"
+	end
+	call_if_exists :after_in, event, "Post processing (in pipeline)"
+	if event.effective_operation?
+	  with_rescue("#{vault.name}: Processing command") {vault.process(event)}
+	end
+
         log.info "---\n"
         
       end

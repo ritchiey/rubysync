@@ -264,7 +264,16 @@ module RubySync
         uncommitted_operations << RubySync::Operation.replace(left.to_s, blk.call) 
       end
     end
-    
+
+    # Map a value if its currently nil or blank
+    def map_default(left, right=nil, &blk)
+      value = value_of(left)
+      if !value || value.respond_to?(:size) and value.size == 0
+        map(left, right, &blk)
+      end
+    end
+        
+        
     def place(&blk)
       self.target_path = blk.call
     end

@@ -48,6 +48,7 @@ module RubySync::Connectors
       :password,
       :search_filter,
       :search_base,
+      :attributes,
       :association_attribute # name of the attribute in which to store the association key(s)
 
     association_attribute 'RubySyncAssociation'
@@ -71,16 +72,17 @@ module RubySync::Connectors
 
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
-	ldap.search :base => search_base, :filter => search_filter, :return_result => false do |ldap_entry|
-	  yield ldap_entry.dn, to_entry(ldap_entry)
-	end
+	      ldap.search search_args(:return_result => false) do |ldap_entry|
+	        yield ldap_entry.dn, to_entry(ldap_entry)
+	      end
       end
     end
 
     # Runs the query specified by the config, gets the objectclass of the first
     # returned object and returns a list of its allowed attributes
     def self.fields
-      log.warn "Fields method not yet implemented for LDAP - Sorry."
+      return @attributes if @attributes
+      log.warn ":attributes option not set"
       log.warn "Returning a likely sample set."
       %w{ cn givenName sn }
     end
@@ -101,9 +103,10 @@ module RubySync::Connectors
   username       'cn=Manager,dc=my-domain,dc=com'
   password       'secret'
   search_filter  "cn=*"
+  #attributes     :cn, :sn, :objectclass
   search_base    "ou=users,o=my-organization,dc=my-domain,dc=com"
   #bind_method  :simple
-  
+   
   #Uncomment the following for LDAPS. If you do, make sure that
   #you're using the LDAPS port (probably 636) and be aware that
   #the server's certificate WON'T be checked for validity.
@@ -139,16 +142,23 @@ END
 
     def [](path)
       with_ldap do |ldap|
-	result = ldap.search :base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*'
-	return nil if !result or result.size == 0
-	answer = {}
-	result[0].attribute_names.each do |name|
-	  name = name.to_s.downcase
-	  answer[name] = result[0][name] unless name == 'dn'
-	end
-	answer
-      end
+	      result = ldap.search search_args(:base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*')
+	        return nil if !result or result.size == 0
+	        answer = {}
+	        result[0].attribute_names.each do |name|
+	        name = name.to_s.downcase
+	        answer[name] = result[0][name] unless name == 'dn'
+        end
+	    answer
     end
+  end
+
+    def search_args(extras)
+      args = {:base => search_base, :filter => search_filter}
+      @attributes and args[:attributes] = @attributes
+      args.merge(extras)
+    end
+
 
     # Called by unit tests to inject data
     def test_add id, details
