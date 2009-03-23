@@ -44,7 +44,7 @@ class CsvTestPipeline < RubySync::Pipelines::BasePipeline
   allow_in
   allow_out
   
-  in_transform do
+  in_event_transform do
     map :cn, :id
     map :givenName, 'given name'
     map :sn, 'last name'

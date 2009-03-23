@@ -14,23 +14,62 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 require 'rubygems'
-require 'hoe'
-require './lib/ruby_sync.rb'
+require 'rake'
+require 'rake/clean'
+require 'rake/gempackagetask'
+require 'rake/rdoctask'
+require 'rake/testtask'
+require 'spec/rake/spectask'
+require 'lib/ruby_sync.rb'
 
-Hoe.new('rubysync', RubySync::VERSION) do |p|
-  p.rubyforge_name = 'rubysync'
-  p.author = 'Ritchie Young'
-  p.email = 'ritchiey@gmail.com'
-  p.summary = "Event driven identity synchronization engine"
-  p.description = p.paragraphs_of('README.txt', 1..5).join("\n\n")
-  p.url = p.paragraphs_of('README.txt', 0).first.split(/\n/)[1..-1]
-  p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
-  p.remote_rdoc_dir = ""
-  p.extra_deps = [
-    ["ruby-net-ldap", ">=0.0.4"],
-    ["activesupport", ">=1.4.0"],
-    ["activerecord", ">=1.15.3"],
-    ["simpleconsole", ">=0.1.1"],
-    ["contacts", ">=1.0.7"]
-    ]
+spec = Gem::Specification.new do |s|
+  s.name = 'rubysync'
+  s.version = RubySync::VERSION
+  s.has_rdoc = true
+  s.extra_rdoc_files = ['README.txt', 'COPYING']
+  s.summary = 'Event driven identity synchronization engine'
+  s.description = s.summary
+  s.homepage = 'http://rubysync.org/'
+  s.rubyforge_project = 'rubysync'
+  s.author = 'Ritchie Young'
+  s.email = 'ritchiey@gmail.com'
+  # s.executables = ['your_executable_here']
+  s.files = %w(COPYING README.txt Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
+  s.require_path = "lib"
+  s.bindir = "bin"
+  s.add_dependency('ruby-net-ldap', '>=0.0.4')
+  s.add_dependency('activesupport', '>=1.4.0')
+  s.add_dependency('activerecord', '>=1.15.3')
+  s.add_dependency('simpleconsole', '>=0.1.1')
+  s.add_dependency('contacts', '>=1.0.7')
+
 end
+
+Rake::GemPackageTask.new(spec) do |p|
+  p.gem_spec = spec
+  p.need_tar = true
+  p.need_zip = true
+end
+
+Rake::RDocTask.new do |rdoc|
+  files =['README.txt', 'COPYING', 'lib/**/*.rb']
+  rdoc.rdoc_files.add(files)
+  rdoc.main = "README.txt" # page to start on
+  rdoc.title = "RubySync Docs"
+  rdoc.rdoc_dir = 'doc/rdoc' # rdoc output folder
+  rdoc.options << '--line-numbers'
+end
+
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/**/*.rb']
+end
+
+Rake::TestTask.new do |t|
+  t.name ='test:units'
+  t.test_files = FileList['test/ts_rubysync.rb']
+end
+
+Spec::Rake::SpecTask.new do |t|
+  t.spec_files = FileList['spec/**/*.rb']
+end
+

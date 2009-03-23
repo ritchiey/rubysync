@@ -90,7 +90,7 @@ module RubySync
       dump_before HashWithIndifferentAccess.new
       dump_after HashWithIndifferentAccess.new
 
-      def self.in_transform(&blk) deprecated_event_method :in_transform, :in_event_transform, &blk; end
+      def self.in_event_transform(&blk) deprecated_event_method :in_event_transform, :in_event_transform, &blk; end
       def self.in_event_transform(&blk) event_method :in_event_transform,&blk; end
       def self.in_command_transform(&blk) event_method :in_command_transform,&blk; end
       def self.out_transform(&blk) deprecated_event_method :out_transform, :out_event_transform, &blk; end
@@ -470,7 +470,7 @@ module RubySync
       
       
       # Override to perform whatever transformation on the event is required
-      #def in_transform(event); event; end
+      #def in_event_transform(event); event; end
       
       # Convert fields in the incoming event to those used by the identity vault
       #def in_map_schema(event); end

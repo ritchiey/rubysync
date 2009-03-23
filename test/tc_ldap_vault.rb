@@ -59,7 +59,7 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
     event.source_path = $1
   end
   
-  in_transform do
+  in_event_transform do
     if type == :add or type == :modify
       each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
       append RubySync::Operation.new(:add, "objectclass", ['organizationalPerson', 'RubySyncSynchable'])

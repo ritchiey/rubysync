@@ -36,7 +36,7 @@ class ArTestPipeline < RubySync::Pipelines::BasePipeline
   allow_in :givenName, :sn
   allow_out :first_name, :last_name
  
-  in_transform do
+  in_event_transform do
     map :first_name, :givenName
     map :last_name, :sn 
   end

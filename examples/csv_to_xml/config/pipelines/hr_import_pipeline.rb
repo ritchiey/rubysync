@@ -8,7 +8,7 @@ class HrImportPipeline < RubySync::Pipelines::BasePipeline
   allow_in 'id', 'first_name', 'last_name', 'skills'
 
   # "in" means going from client to vault
-  in_transform do
+  in_event_transform do
     map 'cn', 'id'
     map 'sn', 'last_name'
     map 'givenname', 'first_name'

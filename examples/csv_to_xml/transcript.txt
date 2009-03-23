@@ -1,1 +1,158 @@
-$ rubysync create config$ cd config/$ ls -ltotal 0drwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 connectorsdrwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 dbdrwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 logdrwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 pipelinesdrwxr-xr-x   5 ritchiey  ritchiey  170 Sep 26 16:30 shared$ rubysync connector hr -t csv_file$ rubysync connector databank -t xml$ mate ..$ # editing connectors$ cat connectors/hr_connector.rb class HrConnector < RubySync::Connectors::CsvFileConnector              # True if the first line of each file is a header            # and should be ignored            header_line   true            field_names   'id,first_name,last_name,skills'.split(',')            path_field    'id'            in_path       "#{File.dirname(__FILE__)}/../../in"            #out_path      '/directory/to/write/files/to'            in_glob       '*.csv'            out_extension '.csv'end$ $ cat connectors/databank_connector.rb class DatabankConnector < RubySync::Connectors::XmlConnector  ## You would normally specify an absolute pathname here.#filename "#{File.dirname(__FILE__)}/../../databank.xml"      end$ $ rubysync pipeline hr_import -C hr -V databank$ # edit pipeline$ cat pipelines/hr_import_pipeline.rb class HrImportPipeline < RubySync::Pipelines::BasePipeline  client :hr  vault :databank  # Remove any fields that you don't want to set in the vault from the client  allow_in 'id', 'first_name', 'last_name', 'skills'  # "in" means going from client to vault  in_transform do    map 'cn', 'id'    map 'sn', 'last_name'    map 'givenname', 'first_name'    map('employeeType') { value_of('skills').split(':') }    drop_changes_to 'skills'    map('objectclass') { 'inetOrgPerson' }  end  # Should evaluate to the path for placing a new record on the vault  in_place do    "cn=#{source_path},ou=users,o=my-organization,dc=my-domain,dc=com"  endend$ $ rubysync once hr_import -v 3Running HrImportPipeline pipeline onceRunning HrImportPipeline 'in' pipeline onceHrImportPipeline(client): StartedHrImportPipeline(client): Scanning /Users/ritchiey/Projects/rubysync/examples/csv_to_xml/config/connectors/../../in for *.csv files...HrImportPipeline(client): Processing 'henchmen.csv'No source_transform(event) method, continuing Processing incoming modify event (HrImportPipeline(client) => HrImportPipeline(vault)) bobbyPerforming in_filterNo associated entry in vault for modify event. Converting to addConverting 'modify' event to addPerforming in_transformDefault matching rule - source path exists on client?Create allowed through default rulePerforming in_placeCreate on vault allowed. Placing at cn=bobby,ou=users,o=my-organization,dc=my-domain,dc=comAdding 'cn=bobby,ou=users,o=my-organization,dc=my-domain,dc=com' to 'HrImportPipeline(vault)'No target_transform(event) method, continuing Add succeeded---No source_transform(event) method, continuing Processing incoming modify event (HrImportPipeline(client) => HrImportPipeline(vault)) ttPerforming in_filterNo associated entry in vault for modify event. Converting to addConverting 'modify' event to addPerforming in_transformDefault matching rule - source path exists on client?Create allowed through default rulePerforming in_placeCreate on vault allowed. Placing at cn=tt,ou=users,o=my-organization,dc=my-domain,dc=comAdding 'cn=tt,ou=users,o=my-organization,dc=my-domain,dc=com' to 'HrImportPipeline(vault)'No target_transform(event) method, continuing Add succeeded---HrImportPipeline(client): Stoppedrdebug tc_transformation.rb $ $ tidy -xml -i ../databank.xmlNo warnings or errors were found.<entries>  <entry id='cn=bobby,ou=users,o=my-organization,dc=my-domain,dc=com'>    <attr name='cn'>      <value>bobby</value>    </attr>    <attr name='givenname'>      <value>BareKnuckle</value>    </attr>    <attr name='objectclass'>      <value>inetOrgPerson</value>    </attr>    <attr name='sn'>      <value>Bobby</value>    </attr>    <attr name='employeeType'>      <value>pugilism</value>      <value>yoga</value>    </attr>  </entry>  <entry id='cn=tt,ou=users,o=my-organization,dc=my-domain,dc=com'>    <attr name='cn'>      <value>tt</value>    </attr>    <attr name='givenname'>      <value>Testy</value>    </attr>    <attr name='objectclass'>      <value>inetOrgPerson</value>    </attr>    <attr name='sn'>      <value>Terry</value>    </attr>    <attr name='employeeType'>      <value>kidnapping</value>      <value>interrogation</value>      <value>juggling</value>    </attr>  </entry></entries>To learn more about HTML Tidy see http://tidy.sourceforge.netPlease send bug reports to html-tidy@w3.orgHTML and CSS specifications are available from http://www.w3.org/Lobby your company to join W3C, see http://www.w3.org/Consortium$ exitScript done on Wed Sep 26 16:52:43 2007$
+$ rubysync create config
+$ cd config/
+$ ls -l
+total 0
+drwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 connectors
+drwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 db
+drwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 log
+drwxr-xr-x   2 ritchiey  ritchiey   68 Sep 26 16:30 pipelines
+drwxr-xr-x   5 ritchiey  ritchiey  170 Sep 26 16:30 shared
+$ rubysync connector hr -t csv_file
+$ rubysync connector databank -t xml
+$ mate ..
+$ # editing connectors
+$ cat connectors/hr_connector.rb 
+class HrConnector < RubySync::Connectors::CsvFileConnector
+  
+            # True if the first line of each file is a header
+            # and should be ignored
+            header_line   true
+
+            field_names   'id,first_name,last_name,skills'.split(',')
+            path_field    'id'
+            in_path       "#{File.dirname(__FILE__)}/../../in"
+            #out_path      '/directory/to/write/files/to'
+            in_glob       '*.csv'
+            out_extension '.csv'
+
+end
+$ 
+$ cat connectors/databank_connector.rb 
+class DatabankConnector < RubySync::Connectors::XmlConnector
+  
+#
+# You would normally specify an absolute pathname here.
+#
+filename "#{File.dirname(__FILE__)}/../../databank.xml"
+      
+end
+$ 
+$ rubysync pipeline hr_import -C hr -V databank
+$ # edit pipeline
+$ cat pipelines/hr_import_pipeline.rb 
+class HrImportPipeline < RubySync::Pipelines::BasePipeline
+
+  client :hr
+
+  vault :databank
+
+  # Remove any fields that you don't want to set in the vault from the client
+  allow_in 'id', 'first_name', 'last_name', 'skills'
+
+  # "in" means going from client to vault
+  in_event_transform do
+    map 'cn', 'id'
+    map 'sn', 'last_name'
+    map 'givenname', 'first_name'
+    map('employeeType') { value_of('skills').split(':') }
+    drop_changes_to 'skills'
+    map('objectclass') { 'inetOrgPerson' }
+  end
+  # Should evaluate to the path for placing a new record on the vault
+  in_place do
+    "cn=#{source_path},ou=users,o=my-organization,dc=my-domain,dc=com"
+  end
+
+end
+$ 
+$ rubysync once hr_import -v 3
+Running HrImportPipeline pipeline once
+Running HrImportPipeline 'in' pipeline once
+HrImportPipeline(client): Started
+HrImportPipeline(client): Scanning /Users/ritchiey/Projects/rubysync/examples/csv_to_xml/config/connectors/../../in for *.csv files...
+HrImportPipeline(client): Processing 'henchmen.csv'
+No source_transform(event) method, continuing 
+Processing incoming modify event (HrImportPipeline(client) => HrImportPipeline(vault)) bobby
+Performing in_filter
+No associated entry in vault for modify event. Converting to add
+Converting 'modify' event to add
+Performing in_event_transform
+Default matching rule - source path exists on client?
+Create allowed through default rule
+Performing in_place
+Create on vault allowed. Placing at cn=bobby,ou=users,o=my-organization,dc=my-domain,dc=com
+Adding 'cn=bobby,ou=users,o=my-organization,dc=my-domain,dc=com' to 'HrImportPipeline(vault)'
+No target_transform(event) method, continuing 
+Add succeeded
+---
+
+No source_transform(event) method, continuing 
+Processing incoming modify event (HrImportPipeline(client) => HrImportPipeline(vault)) tt
+Performing in_filter
+No associated entry in vault for modify event. Converting to add
+Converting 'modify' event to add
+Performing in_event_transform
+Default matching rule - source path exists on client?
+Create allowed through default rule
+Performing in_place
+Create on vault allowed. Placing at cn=tt,ou=users,o=my-organization,dc=my-domain,dc=com
+Adding 'cn=tt,ou=users,o=my-organization,dc=my-domain,dc=com' to 'HrImportPipeline(vault)'
+No target_transform(event) method, continuing 
+Add succeeded
+---
+
+HrImportPipeline(client): Stopped
+rdebug tc_transformation.rb 
+$ 
+$ tidy -xml -i ../databank.xml
+No warnings or errors were found.
+
+<entries>
+  <entry id='cn=bobby,ou=users,o=my-organization,dc=my-domain,dc=com'>
+
+    <attr name='cn'>
+      <value>bobby</value>
+    </attr>
+    <attr name='givenname'>
+      <value>BareKnuckle</value>
+    </attr>
+    <attr name='objectclass'>
+      <value>inetOrgPerson</value>
+    </attr>
+    <attr name='sn'>
+      <value>Bobby</value>
+    </attr>
+    <attr name='employeeType'>
+      <value>pugilism</value>
+      <value>yoga</value>
+    </attr>
+  </entry>
+  <entry id='cn=tt,ou=users,o=my-organization,dc=my-domain,dc=com'>
+    <attr name='cn'>
+      <value>tt</value>
+    </attr>
+    <attr name='givenname'>
+      <value>Testy</value>
+    </attr>
+    <attr name='objectclass'>
+      <value>inetOrgPerson</value>
+    </attr>
+    <attr name='sn'>
+      <value>Terry</value>
+    </attr>
+    <attr name='employeeType'>
+      <value>kidnapping</value>
+      <value>interrogation</value>
+      <value>juggling</value>
+    </attr>
+  </entry>
+</entries>
+
+To learn more about HTML Tidy see http://tidy.sourceforge.net
+Please send bug reports to html-tidy@w3.org
+HTML and CSS specifications are available from http://www.w3.org/
+Lobby your company to join W3C, see http://www.w3.org/Consortium
+$ exit
+
+Script done on Wed Sep 26 16:52:43 2007
+$
