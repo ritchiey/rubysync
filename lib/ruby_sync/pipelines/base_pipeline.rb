@@ -93,7 +93,7 @@ module RubySync
       def self.in_event_transform(&blk) deprecated_event_method :in_event_transform, :in_event_transform, &blk; end
       def self.in_event_transform(&blk) event_method :in_event_transform,&blk; end
       def self.in_command_transform(&blk) event_method :in_command_transform,&blk; end
-      def self.out_transform(&blk) deprecated_event_method :out_transform, :out_event_transform, &blk; end
+      def self.out_event_transform(&blk) deprecated_event_method :out_event_transform, :out_event_transform, &blk; end
       def self.out_event_transform(&blk) event_method :out_event_transform,&blk; end
       def self.out_command_transform(&blk) event_method :out_command_transform,&blk; end
       def self.in_match(&blk) event_method :in_match,&blk; end
@@ -424,7 +424,7 @@ module RubySync
       #       log.info "Placing new entry at #{event.target_path}"
       #             end
       # 
-      #             perform_transform :out_transform, event
+      #             perform_transform :out_event_transform, event
       #             association_key = nil
       #             with_rescue("#{client.name}: Processing command") do
       #               association_key = client.process(event)

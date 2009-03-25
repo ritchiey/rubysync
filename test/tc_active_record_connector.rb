@@ -41,7 +41,7 @@ class ArTestPipeline < RubySync::Pipelines::BasePipeline
     map :last_name, :sn 
   end
 
-  out_transform do
+  out_event_transform do
     map :givenName, :first_name
     map :sn, :last_name 
   end

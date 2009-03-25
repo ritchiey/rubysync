@@ -44,7 +44,7 @@ class TcPipeline < RubySync::Pipelines::BasePipeline
   
   allow_out :cn, :givenName, :sn
   
-  out_transform do
+  out_event_transform do
     if type == :add or type == :modify
       each_operation_on("givenName") { |operation| append operation.same_but_on('cn') }
       append RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson'])
