@@ -24,12 +24,19 @@ require 'ruby_sync/connectors/memory_connector'
 
 
 class MyLdapConnector < RubySync::Connectors::LdapConnector
-  host          'any_ldap'
-  port          389
-  username      'cn=admin,dc=9to5magic,dc=com,dc=au'
+  host          'localhost'
+  port          10389
+  username      'uid=admin,ou=system'
   password      'secret'
   search_filter "cn=*"
-  search_base   "dc=9to5magic,dc=com,dc=au"
+  search_base   "ou=system"
+#  default config :
+#  host          'any_ldap'
+#  port          389
+#  username      'cn=admin,dc=9to5magic,dc=com,dc=au'
+#  password      'secret'
+#  search_filter "cn=*"
+#  search_base   "dc=9to5magic,dc=com,dc=au"
 end
 
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
@@ -68,14 +75,16 @@ class TcLdapConnector < Test::Unit::TestCase
 
   def vault_path
     # TODO: Try using a different path for the vault that's derived from the client source path
-    'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'
+    #'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'#default
+    'cn=bob,ou=users,ou=system'
   end
 
 
   def client_path
-    'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'
+    #'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'#default
+    'cn=bob,ou=users,ou=system'
   end
-
+  
 
   def test_ldap_add
     assert_nil @client[client_path], "#{client_path} already exists on client"
