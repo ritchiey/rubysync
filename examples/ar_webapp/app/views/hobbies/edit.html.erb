@@ -1,0 +1,16 @@
+<h1>Editing hobby</h1>
+
+<% form_for(@hobby) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @hobby %> |
+<%= link_to 'Back', hobbies_path %>

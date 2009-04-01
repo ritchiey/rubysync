@@ -1,0 +1,19 @@
+<h1>New interest</h1>
+
+<% form_for(@interest) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :person_id %><br />
+    <%= f.text_field :person_id %>
+  </p>
+  <p>
+    <%= f.label :hobby_id %><br />
+    <%= f.text_field :hobby_id %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', interests_path %>

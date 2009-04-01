@@ -26,17 +26,23 @@ module RubySync::Connectors
   # eg: vault :ActiveRecord, :application=>'path/to/rails/application', :model=>:user
   class ActiveRecordConnector < RubySync::Connectors::BaseConnector
 
-
-    option :ar_class, :model, :application, :rails_env, :db_type, :db_host, :db_name, :db_config
+    include ActiveRecordAssociationHandler
+    include ActiveRecordEventHandler
+    
+    option :ar_class, :model, :application, :rails_env, :db_type, :db_host, :db_username, :db_password, :db_name, :db_config
     rails_env 'development'
-    db_type 'mysql'
+    db_type 'postgresql'
+    db_username 'rails_user'
+    db_password 'your_password'
     db_host 'localhost'
     db_name "rubysync_#{get_rails_env}"
     # Default db_config in case we're not sucking the config out of a rails app
     db_config(
       :adapter=>get_db_type,
       :host=>get_db_host,
-      :database=>get_db_name
+      :database=>get_db_name,
+      :username=>get_db_username,
+      :password=>get_db_password
     )
     model :user
 
@@ -64,8 +70,6 @@ module RubySync::Connectors
 
       self.class.ar_class model.to_s.camelize.constantize
     end
-
-
       
       def self.fields
         c = self.new

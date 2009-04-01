@@ -25,5 +25,5 @@ require 'tc_transformation'
 
 # The following require some setup on your computer before they'll work
 
-#require 'tc_ldap_connector'
-#require 'tc_active_record_connector'
+require 'tc_ldap_connector'
+require 'tc_active_record_connector'

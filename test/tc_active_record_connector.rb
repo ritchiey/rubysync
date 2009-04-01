@@ -14,19 +14,19 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 
-lib_path = File.dirname(__FILE__) + '/../lib'
-$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
+#lib_path = File.dirname(__FILE__) + '/../lib'
+#$:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
 require 'ruby_sync_test'
 
 class ArActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
     model :person
     application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
-    dbm_path "/tmp/rubysync_ar_test"
+   # dbm_path "/tmp/rubysync_ar_test"
 end
 
 class ArMemoryConnector < RubySync::Connectors::MemoryConnector
-  dbm_path "/tmp/rubysync_memory_test"
+  #dbm_path "/tmp/rubysync_memory_test"
 end
 
 class ArTestPipeline < RubySync::Pipelines::BasePipeline

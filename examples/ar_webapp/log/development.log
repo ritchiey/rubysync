@@ -5516,3 +5516,279 @@ Processing PeopleController#list (for 127.0.0.1 at 2007-06-05 16:02:08) [GET]
   [4;35;1mPerson Load (0.000499)[0m   [0mSELECT * FROM people LIMIT 0, 10[0m
 Rendering layouts/application
 Completed in 0.07913 (12 reqs/sec) | Rendering: 0.00107 (1%) | DB: 0.00394 (4%) | 200 OK [http://localhost/people/list]
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+  [4;36;1mSQL (97.6ms)[0m   [0;1mCREATE TABLE "schema_migrations" ("version" character varying(255) NOT NULL) [0m
+  [4;35;1mSQL (39.3ms)[0m   [0mCREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")[0m
+  [4;36;1mSQL (0.6ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.2ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (94.5ms)[0m   [0;1mCREATE TABLE "people" ("id" serial primary key, "first_name" character varying(255), "last_name" character varying(255)) [0m
+  [4;35;1mSQL (0.3ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('1')[0m
+  [4;36;1mSQL (2.5ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (1.9ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (13.1ms)[0m   [0;1mCREATE TABLE "interests" ("id" serial primary key, "person_id" integer, "hobby_id" integer) [0m
+  [4;35;1mSQL (0.5ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('2')[0m
+  [4;36;1mSQL (3.4ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.9ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (13.7ms)[0m   [0;1mCREATE TABLE "hobbies" ("id" serial primary key, "name" character varying(255)) [0m
+  [4;35;1mSQL (0.3ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('3')[0m
+  [4;36;1mSQL (1.5ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (1.9ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (14.1ms)[0m   [0;1mCREATE TABLE "ruby_sync_associations" ("id" serial primary key, "context" character varying(255), "key" character varying(255), "synchronizable_id" integer, "synchronizable_type" character varying(255)) [0m
+  [4;35;1mSQL (6.0ms)[0m   [0mCREATE UNIQUE INDEX "index_ruby_sync_associations_on_context_and_key" ON "ruby_sync_associations" ("context", "key")[0m
+  [4;36;1mSQL (5.0ms)[0m   [0;1mCREATE INDEX "index_ruby_sync_associations_on_synchronizable_id" ON "ruby_sync_associations" ("synchronizable_id")[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('4')[0m
+  [4;36;1mSQL (5.5ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;35;1mSQL (1.4ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (12.8ms)[0m   [0;1mCREATE TABLE "ruby_sync_events" ("id" serial primary key, "timestamp" time, "event_type" character varying(8), "trackable_id" integer, "trackable_type" character varying(255)) [0m
+  [4;35;1mSQL (4.5ms)[0m   [0mCREATE INDEX "index_ruby_sync_events_on_timestamp" ON "ruby_sync_events" ("timestamp")[0m
+  [4;36;1mSQL (0.4ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('5')[0m
+  [4;35;1mSQL (2.7ms)[0m   [0mCOMMIT[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.6ms)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (9.0ms)[0m   [0mCREATE TABLE "ruby_sync_operations" ("id" serial primary key, "operation" character varying(8), "field_name" character varying(255), "ruby_sync_event_id" integer) [0m
+  [4;36;1mSQL (4.1ms)[0m   [0;1mCREATE INDEX "index_ruby_sync_operations_on_ruby_sync_event_id" ON "ruby_sync_operations" ("ruby_sync_event_id")[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('6')[0m
+  [4;36;1mSQL (1.7ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.6ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (8.9ms)[0m   [0;1mCREATE TABLE "ruby_sync_values" ("id" serial primary key, "ruby_sync_operation_id" integer, "value" character varying(255)) [0m
+  [4;35;1mSQL (0.4ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('7')[0m
+  [4;36;1mSQL (1.4ms)[0m   [0;1mCOMMIT[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.5ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.9ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('8')[0m
+  [4;35;1mSQL (1.2ms)[0m   [0mCOMMIT[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.2ms)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (10.7ms)[0m   [0mCREATE TABLE "ruby_sync_states" ("id" serial primary key) [0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('9')[0m
+  [4;35;1mSQL (3.0ms)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.5ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (26.1ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+
+
+Processing Rails::InfoController#properties (for ::ffff:127.0.0.1 at 2009-04-01 16:51:53) [GET]
+  [4;36;1mSQL (0.4ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Completed in 472ms (View: 91, DB: 27) | 200 OK [http://localhost/rails/info/properties]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing ApplicationController#index (for ::ffff:127.0.0.1 at 2009-04-01 16:52:06) [GET]
+
+ActionController::RoutingError (No route matches "/person" with {:method=>:get}):
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (not_found)
+  [4;35;1mSQL (0.1ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing ApplicationController#index (for ::ffff:127.0.0.1 at 2009-04-01 16:52:24) [GET]
+
+NoMethodError (undefined method `scaffold' for PeopleController:Class):
+  app/controllers/people_controller.rb:8
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (51.2ms)
+Rendered rescues/_request_and_response (20.8ms)
+Rendering rescues/layout (internal_server_error)
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#index (for ::ffff:127.0.0.1 at 2009-04-01 16:52:55) [GET]
+
+ActionController::UnknownAction (No action responded to index. Actions: show):
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (not_found)
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#show (for ::ffff:127.0.0.1 at 2009-04-01 16:53:04) [GET]
+
+ActiveRecord::RecordNotFound (Couldn't find Person without an ID):
+  app/controllers/people_controller.rb:9:in `show'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (53.3ms)
+Rendered rescues/_request_and_response (0.6ms)
+Rendering rescues/layout (not_found)
+  [4;35;1mSQL (9.7ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#show (for ::ffff:127.0.0.1 at 2009-04-01 17:03:17) [GET]
+  Parameters: {"id"=>"show"}
+  [4;35;1mPerson Load (66.1ms)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 0) [0m
+
+ActiveRecord::RecordNotFound (Couldn't find Person with ID=show):
+  app/controllers/people_controller.rb:16:in `show'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /opt/ruby-enterprise/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (45.7ms)
+Rendered rescues/_request_and_response (17.3ms)
+Rendering rescues/layout (not_found)
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#index (for ::ffff:127.0.0.1 at 2009-04-01 17:03:21) [GET]
+  [4;36;1mPerson Load (3.2ms)[0m   [0;1mSELECT * FROM "people" [0m
+Rendering template within layouts/people
+Rendering people/index
+Completed in 140ms (View: 133, DB: 4) | 200 OK [http://localhost/people]
+  [4;35;1mSQL (0.4ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#new (for ::ffff:127.0.0.1 at 2009-04-01 17:03:24) [GET]
+Rendering template within layouts/people
+Rendering people/new
+Completed in 21ms (View: 11, DB: 1) | 200 OK [http://localhost/people/new]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.6ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#create (for ::ffff:127.0.0.1 at 2009-04-01 17:03:33) [POST]
+  Parameters: {"commit"=>"Create", "person"=>{"first_name"=>"tom", "last_name"=>"bod"}}
+  [4;35;1mSQL (1.3ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (31.3ms)[0m   [0;1mINSERT INTO "people" ("first_name", "last_name") VALUES(E'tom', E'bod') RETURNING "id"[0m
+  [4;35;1mSQL (35.8ms)[0m   [0mINSERT INTO "ruby_sync_events" ("timestamp", "trackable_type", "event_type", "trackable_id") VALUES('2009-04-01 17:03:33.740161', E'Person', E'add', 1) RETURNING "id"[0m
+  [4;36;1mSQL (2.7ms)[0m   [0;1mINSERT INTO "ruby_sync_operations" ("operation", "field_name", "ruby_sync_event_id") VALUES(E'add', E'first_name', 1) RETURNING "id"[0m
+  [4;35;1mSQL (1.5ms)[0m   [0mINSERT INTO "ruby_sync_values" ("value", "ruby_sync_operation_id") VALUES(E'tom', 1) RETURNING "id"[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mINSERT INTO "ruby_sync_operations" ("operation", "field_name", "ruby_sync_event_id") VALUES(E'add', E'last_name', 1) RETURNING "id"[0m
+  [4;35;1mSQL (0.7ms)[0m   [0mINSERT INTO "ruby_sync_values" ("value", "ruby_sync_operation_id") VALUES(E'bod', 2) RETURNING "id"[0m
+  [4;36;1mSQL (40.1ms)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people/1
+Completed in 435ms (DB: 114) | 302 Found [http://localhost/people]
+  [4;35;1mSQL (0.0ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#show (for ::ffff:127.0.0.1 at 2009-04-01 17:03:34) [GET]
+  Parameters: {"id"=>"1"}
+  [4;35;1mPerson Load (1.0ms)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 1) [0m
+Rendering template within layouts/people
+Rendering people/show
+Completed in 20ms (View: 6, DB: 1) | 200 OK [http://localhost/people/1]
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#index (for ::ffff:127.0.0.1 at 2009-04-01 17:03:38) [GET]
+  [4;36;1mPerson Load (10.7ms)[0m   [0;1mSELECT * FROM "people" [0m
+Rendering template within layouts/people
+Rendering people/index
+Completed in 27ms (View: 13, DB: 11) | 200 OK [http://localhost/people]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#edit (for ::ffff:127.0.0.1 at 2009-04-01 17:03:41) [GET]
+  Parameters: {"id"=>"1"}
+  [4;35;1mPerson Load (1.1ms)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 1) [0m
+Rendering template within layouts/people
+Rendering people/edit
+Completed in 22ms (View: 10, DB: 2) | 200 OK [http://localhost/people/1/edit]
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#show (for ::ffff:127.0.0.1 at 2009-04-01 17:03:43) [GET]
+  Parameters: {"id"=>"1"}
+  [4;36;1mPerson Load (2.0ms)[0m   [0;1mSELECT * FROM "people" WHERE ("people"."id" = 1) [0m
+Rendering template within layouts/people
+Rendering people/show
+Completed in 15ms (View: 3, DB: 2) | 200 OK [http://localhost/people/1]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#destroy (for ::ffff:127.0.0.1 at 2009-04-01 17:03:49) [DELETE]
+  Parameters: {"id"=>"1"}
+  [4;35;1mPerson Load (1.0ms)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 1) [0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mBEGIN[0m
+  [4;35;1mRubySyncAssociation Load (16.2ms)[0m   [0mSELECT * FROM "ruby_sync_associations" WHERE ("ruby_sync_associations".synchronizable_id = 1 AND "ruby_sync_associations".synchronizable_type = E'Person') [0m
+  [4;36;1mPerson Destroy (1.1ms)[0m   [0;1mDELETE FROM "people" WHERE "id" = 1[0m
+  [4;35;1mSQL (1.5ms)[0m   [0mINSERT INTO "ruby_sync_events" ("timestamp", "trackable_type", "event_type", "trackable_id") VALUES('2009-04-01 17:03:49.122808', E'Person', E'delete', 1) RETURNING "id"[0m
+  [4;36;1mSQL (1.3ms)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/people
+Completed in 108ms (DB: 22) | 302 Found [http://localhost/people/1]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET client_min_messages TO 'panic'[0m
+  [4;36;1mSQL (1.1ms)[0m   [0;1mSET client_min_messages TO 'notice'[0m
+DEPRECATION WARNING: Disabling sessions for a single controller has been deprecated. Sessions are now lazy loaded. So if you don't access them, consider them off. You can still modify the session cookie options with request.session_options.. (called from /home/CGPA/bodet/NetBeansProjects/rubysync/examples/ar_webapp/app/controllers/application_controller.rb:6)
+
+
+Processing PeopleController#index (for ::ffff:127.0.0.1 at 2009-04-01 17:03:49) [GET]
+  [4;35;1mPerson Load (4.3ms)[0m   [0mSELECT * FROM "people" [0m
+Rendering template within layouts/people
+Rendering people/index
+Completed in 8ms (View: 2, DB: 6) | 200 OK [http://localhost/people]

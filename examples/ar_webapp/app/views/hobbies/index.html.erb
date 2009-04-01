@@ -1,0 +1,20 @@
+<h1>Listing hobbies</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+  </tr>
+
+<% @hobbies.each do |hobby| %>
+  <tr>
+    <td><%=h hobby.name %></td>
+    <td><%= link_to 'Show', hobby %></td>
+    <td><%= link_to 'Edit', edit_hobby_path(hobby) %></td>
+    <td><%= link_to 'Destroy', hobby, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New hobby', new_hobby_path %>

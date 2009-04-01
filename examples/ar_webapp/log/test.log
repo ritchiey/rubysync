@@ -2176,3 +2176,83 @@ Migrating to CreateRubySyncStates (9)
   [4;35;1mRubySyncOperation Load (0.000550)[0m   [0mSELECT * FROM ruby_sync_operations WHERE (ruby_sync_operations.ruby_sync_event_id = 3) AND (ruby_sync_operations.`operation` = 'replace' AND ruby_sync_operations.`field_name` = 'first_name') LIMIT 1[0m
   [4;36;1mRubySyncValue Load (0.000399)[0m   [0;1mSELECT * FROM ruby_sync_values WHERE (ruby_sync_values.ruby_sync_operation_id = 3) [0m
   [4;35;1mSQL (0.000661)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+  [4;36;1mSQL (500.4ms)[0m   [0;1mCREATE TABLE "schema_migrations" ("version" character varying(255) NOT NULL) [0m
+  [4;35;1mSQL (106.6ms)[0m   [0mCREATE UNIQUE INDEX "unique_schema_migrations" ON "schema_migrations" ("version")[0m
+  [4;36;1mSQL (4.8ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (1)
+  [4;35;1mSQL (0.2ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (1134.3ms)[0m   [0;1mCREATE TABLE "people" ("id" serial primary key, "first_name" character varying(255), "last_name" character varying(255)) [0m
+  [4;35;1mSQL (1.0ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('1')[0m
+  [4;36;1mSQL (1.5ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.9ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (30.3ms)[0m   [0;1mCREATE TABLE "interests" ("id" serial primary key, "person_id" integer, "hobby_id" integer) [0m
+  [4;35;1mSQL (21.7ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('2')[0m
+  [4;36;1mSQL (4.1ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.7ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (12.7ms)[0m   [0;1mCREATE TABLE "hobbies" ("id" serial primary key, "name" character varying(255)) [0m
+  [4;35;1mSQL (0.6ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('3')[0m
+  [4;36;1mSQL (1.5ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.9ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (20.8ms)[0m   [0;1mCREATE TABLE "ruby_sync_associations" ("id" serial primary key, "context" character varying(255), "key" character varying(255), "synchronizable_id" integer, "synchronizable_type" character varying(255)) [0m
+  [4;35;1mSQL (5.7ms)[0m   [0mCREATE UNIQUE INDEX "index_ruby_sync_associations_on_context_and_key" ON "ruby_sync_associations" ("context", "key")[0m
+  [4;36;1mSQL (4.8ms)[0m   [0;1mCREATE INDEX "index_ruby_sync_associations_on_synchronizable_id" ON "ruby_sync_associations" ("synchronizable_id")[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('4')[0m
+  [4;36;1mSQL (2.2ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;35;1mSQL (1.1ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (22.3ms)[0m   [0;1mCREATE TABLE "ruby_sync_events" ("id" serial primary key, "timestamp" time, "event_type" character varying(8), "trackable_id" integer, "trackable_type" character varying(255)) [0m
+  [4;35;1mSQL (4.9ms)[0m   [0mCREATE INDEX "index_ruby_sync_events_on_timestamp" ON "ruby_sync_events" ("timestamp")[0m
+  [4;36;1mSQL (0.4ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('5')[0m
+  [4;35;1mSQL (4.8ms)[0m   [0mCOMMIT[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (1.0ms)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (9.1ms)[0m   [0mCREATE TABLE "ruby_sync_operations" ("id" serial primary key, "operation" character varying(8), "field_name" character varying(255), "ruby_sync_event_id" integer) [0m
+  [4;36;1mSQL (6.1ms)[0m   [0;1mCREATE INDEX "index_ruby_sync_operations_on_ruby_sync_event_id" ON "ruby_sync_operations" ("ruby_sync_event_id")[0m
+  [4;35;1mSQL (0.4ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('6')[0m
+  [4;36;1mSQL (2.9ms)[0m   [0;1mCOMMIT[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.8ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (8.4ms)[0m   [0;1mCREATE TABLE "ruby_sync_values" ("id" serial primary key, "ruby_sync_operation_id" integer, "value" character varying(255)) [0m
+  [4;35;1mSQL (0.5ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('7')[0m
+  [4;36;1mSQL (1.6ms)[0m   [0;1mCOMMIT[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.6ms)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('8')[0m
+  [4;35;1mSQL (1.8ms)[0m   [0mCOMMIT[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.2ms)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (29.2ms)[0m   [0mCREATE TABLE "ruby_sync_states" ("id" serial primary key) [0m
+  [4;36;1mSQL (0.4ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('9')[0m
+  [4;35;1mSQL (2.1ms)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.9ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+  [4;36;1mSQL (8.0ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (1)
+Migrating to CreateInterests (2)
+Migrating to CreateHobbies (3)
+Migrating to CreateRubySyncAssociations (4)
+Migrating to CreateRubySyncEvents (5)
+Migrating to CreateRubySyncOperations (6)
+Migrating to CreateRubySyncValues (7)
+Migrating to RubySyncTracking (8)
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.5ms)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET client_min_messages TO 'panic'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET client_min_messages TO 'notice'[0m
+  [4;36;1mSQL (3.2ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (1)
+Migrating to CreateInterests (2)
+Migrating to CreateHobbies (3)
+Migrating to CreateRubySyncAssociations (4)
+Migrating to CreateRubySyncEvents (5)
+Migrating to CreateRubySyncOperations (6)
+Migrating to CreateRubySyncValues (7)
+Migrating to RubySyncTracking (8)
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (0.3ms)[0m   [0mSELECT version FROM schema_migrations[0m

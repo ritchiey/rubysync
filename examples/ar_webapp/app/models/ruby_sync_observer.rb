@@ -1,3 +1,4 @@
+require "person"
 class RubySyncObserver < ActiveRecord::Observer
 
   observe Person
