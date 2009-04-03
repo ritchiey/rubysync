@@ -18,12 +18,11 @@ lib_path = File.dirname(__FILE__)
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
 require 'rubygems'
-#gem 'activesupport', '=2.1.2'
-require 'activesupport'
+require 'active_support'
 require 'ruby_sync/util/utilities'
 require 'ruby_sync/util/metaid'
 require 'ruby_sync/operation'
-require 'ruby_sync/event'
+require 'ruby_sync/event'     
 
 
 module RubySync
@@ -80,11 +79,12 @@ end
 
 
 load_paths = [lib_path]
-if (base_path)
+if (base_path)           
   load_paths << File.join(base_path, 'connectors')
   load_paths << File.join(base_path, 'pipelines')
   load_paths << File.join(base_path, 'shared', 'pipelines')
   load_paths << File.join(base_path, 'shared', 'connectors')
   load_paths << File.join(base_path, 'shared', 'lib')
-end
- ActiveSupport::Dependencies.load_paths = load_paths
+end     
+                                
+ActiveSupport::Dependencies.load_paths = load_paths
