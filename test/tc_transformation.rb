@@ -16,9 +16,9 @@
 #
 # Tests transformation operations in the Event class
 #
-[File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)].each do |lib_path|
-  $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
-end
+[  File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)
+].each {|path| $:.unshift path unless $:.include?(path) || $:.include?(File.expand_path(path))}
+
 require 'ruby_sync_test'
 require 'ruby_sync/connectors/xml_connector'
 

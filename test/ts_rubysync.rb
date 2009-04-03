@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-$:.unshift File.dirname(__FILE__)
+[  File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)
+].each {|path| $:.unshift path unless $:.include?(path) || $:.include?(File.expand_path(path))}
 
 require 'test/unit'
 require 'tc_csv_file_connector'
@@ -26,4 +27,4 @@ require 'tc_transformation'
 # The following require some setup on your computer before they'll work
 
 require 'tc_ldap_connector'
-require 'tc_active_record_connector'
+#require 'tc_active_record_connector'
