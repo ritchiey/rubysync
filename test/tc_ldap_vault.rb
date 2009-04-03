@@ -24,13 +24,20 @@ require 'ruby_sync/connectors/memory_connector'
 
 
 class MyLdapConnector < RubySync::Connectors::LdapConnector
-  host        '10.1.1.4'
-  port        389
-  username    'cn=directory manager'
-  password    'password'
+  host          'localhost'
+  port          10389
+  username      'uid=admin,ou=system'
+  password      'secret'
   changelog_dn 'cn=changelog'
   search_filter "cn=*"
-  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
+  search_base   "ou=system"
+#  host        '10.1.1.4'
+#  port        389
+#  username    'cn=directory manager'
+#  password    'password'
+#  changelog_dn 'cn=changelog'
+#  search_filter "cn=*"
+#  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
   
   def initialize options={}
     super(options)
@@ -51,7 +58,8 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   allow_in :cn, :givenName, :sn, :objectclass
   
   def in_place(event)
-    event.target_path = "cn=#{event.source_path},ou=people,dc=9to5magic,dc=com,dc=au"
+   event.target_path = "cn=#{event.source_path},ou=users,ou=system"
+   #  event.target_path = "cn=#{event.source_path},ou=people,dc=9to5magic,dc=com,dc=au"
   end
   
   def out_place(event)
@@ -84,7 +92,8 @@ class TcLdapVault < Test::Unit::TestCase
   end
   
   def vault_path
-    'cn=bob,ou=people,dc=9to5magic,dc=com,dc=au'
+    'cn=bob,ou=users,ou=system'
+    #'cn=bob,ou=people,dc=9to5magic,dc=com,dc=au'
   end
 
 
