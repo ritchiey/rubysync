@@ -14,7 +14,7 @@ development:
   database: rubysync_development
   pool: 5
   username: rails_user
-  password: my_password
+  password: your_password
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
@@ -40,7 +40,7 @@ test:
   database: rubysync_test
   pool: 5
   username: rails_user
-  password: my_password
+  password: your_password
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
@@ -63,7 +63,7 @@ production:
   database: ar_webapp_production
   pool: 5
   username: rails_user
-  password: my_password
+  password: your_password
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
