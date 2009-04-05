@@ -49,13 +49,13 @@ module RubySync::Connectors
 
     def initialize options={}
       super options
-
+      
       # Rails app specified, use it to configure
-      if application
+      if application          
         # Load the database configuration
-        rails_app_path = File.expand_path(application, File.dirname(__FILE__))
+        rails_app_path = File.expand_path(application)
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
-        db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]
+        new_db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]
         # Require the models
         Dir.chdir(File.join(rails_app_path,'app','models')) do
           Dir.glob('*.rb') do |filename|
@@ -63,11 +63,12 @@ module RubySync::Connectors
             require filename
             class_name = filename[0..-4].camelize
             klass = class_name.constantize
+            self.class.db_config new_db_config
             klass.establish_connection db_config if defined? klass.establish_connection
           end
-        end
+        end    
       end
-
+         
       self.class.ar_class model.to_s.camelize.constantize
     end
       

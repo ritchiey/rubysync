@@ -5792,3 +5792,125 @@ Processing PeopleController#index (for ::ffff:127.0.0.1 at 2009-04-01 17:03:49) 
 Rendering template within layouts/people
 Rendering people/index
 Completed in 8ms (View: 2, DB: 6) | 200 OK [http://localhost/people]
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.4ms)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (20.5ms)[0m   [0;1mCREATE TABLE `people` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255), `last_name` varchar(255)) ENGINE=InnoDB[0m
+  [4;35;1mSQL (1.3ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('1')[0m
+Migrating to CreateInterests (2)
+  [4;36;1mSQL (2.2ms)[0m   [0;1mCREATE TABLE `interests` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `person_id` int(11), `hobby_id` int(11)) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.7ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('2')[0m
+Migrating to CreateHobbies (3)
+  [4;36;1mSQL (2.8ms)[0m   [0;1mCREATE TABLE `hobbies` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255)) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.8ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('3')[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;36;1mSQL (2.4ms)[0m   [0;1mCREATE TABLE `ruby_sync_associations` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `context` varchar(255), `key` varchar(255), `synchronizable_id` int(11), `synchronizable_type` varchar(255)) ENGINE=InnoDB[0m
+  [4;35;1mSQL (7.7ms)[0m   [0mCREATE UNIQUE INDEX `index_ruby_sync_associations_on_context_and_key` ON `ruby_sync_associations` (`context`, `key`)[0m
+  [4;36;1mSQL (6.8ms)[0m   [0;1mCREATE INDEX `index_ruby_sync_associations_on_synchronizable_id` ON `ruby_sync_associations` (`synchronizable_id`)[0m
+  [4;35;1mSQL (0.8ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('4')[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;36;1mSQL (2.3ms)[0m   [0;1mCREATE TABLE `ruby_sync_events` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `timestamp` time, `event_type` varchar(8), `trackable_id` int(11), `trackable_type` varchar(255)) ENGINE=InnoDB[0m
+  [4;35;1mSQL (6.1ms)[0m   [0mCREATE INDEX `index_ruby_sync_events_on_timestamp` ON `ruby_sync_events` (`timestamp`)[0m
+  [4;36;1mSQL (0.7ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('5')[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;35;1mSQL (1.9ms)[0m   [0mCREATE TABLE `ruby_sync_operations` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `operation` varchar(8), `field_name` varchar(255), `ruby_sync_event_id` int(11)) ENGINE=InnoDB[0m
+  [4;36;1mSQL (5.5ms)[0m   [0;1mCREATE INDEX `index_ruby_sync_operations_on_ruby_sync_event_id` ON `ruby_sync_operations` (`ruby_sync_event_id`)[0m
+  [4;35;1mSQL (0.5ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('6')[0m
+Migrating to CreateRubySyncValues (7)
+  [4;36;1mSQL (2.9ms)[0m   [0;1mCREATE TABLE `ruby_sync_values` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `ruby_sync_operation_id` int(11), `value` varchar(255)) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.5ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('7')[0m
+Migrating to RubySyncTracking (8)
+  [4;36;1mSQL (0.7ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('8')[0m
+Migrating to CreateRubySyncStates (9)
+  [4;35;1mSQL (2.2ms)[0m   [0mCREATE TABLE `ruby_sync_states` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.5ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('9')[0m
+  [4;35;1mSQL (0.7ms)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (1.9ms)[0m   [0;1mSHOW FIELDS FROM `hobbies`[0m
+  [4;35;1mSQL (1.8ms)[0m   [0mdescribe `hobbies`[0m
+  [4;36;1mSQL (0.7ms)[0m   [0;1mSHOW KEYS FROM `hobbies`[0m
+  [4;35;1mSQL (1.7ms)[0m   [0mSHOW FIELDS FROM `interests`[0m
+  [4;36;1mSQL (2.2ms)[0m   [0;1mdescribe `interests`[0m
+  [4;35;1mSQL (28.4ms)[0m   [0mSHOW KEYS FROM `interests`[0m
+  [4;36;1mSQL (1.8ms)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mSQL (1.8ms)[0m   [0mdescribe `people`[0m
+  [4;36;1mSQL (1.1ms)[0m   [0;1mSHOW KEYS FROM `people`[0m
+  [4;35;1mSQL (1.7ms)[0m   [0mSHOW FIELDS FROM `ruby_sync_associations`[0m
+  [4;36;1mSQL (1.7ms)[0m   [0;1mdescribe `ruby_sync_associations`[0m
+  [4;35;1mSQL (0.9ms)[0m   [0mSHOW KEYS FROM `ruby_sync_associations`[0m
+  [4;36;1mSQL (1.5ms)[0m   [0;1mSHOW FIELDS FROM `ruby_sync_events`[0m
+  [4;35;1mSQL (2.2ms)[0m   [0mdescribe `ruby_sync_events`[0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSHOW KEYS FROM `ruby_sync_events`[0m
+  [4;35;1mSQL (1.6ms)[0m   [0mSHOW FIELDS FROM `ruby_sync_operations`[0m
+  [4;36;1mSQL (1.6ms)[0m   [0;1mdescribe `ruby_sync_operations`[0m
+  [4;35;1mSQL (0.8ms)[0m   [0mSHOW KEYS FROM `ruby_sync_operations`[0m
+  [4;36;1mSQL (1.3ms)[0m   [0;1mSHOW FIELDS FROM `ruby_sync_states`[0m
+  [4;35;1mSQL (1.7ms)[0m   [0mdescribe `ruby_sync_states`[0m
+  [4;36;1mSQL (0.8ms)[0m   [0;1mSHOW KEYS FROM `ruby_sync_states`[0m
+  [4;35;1mSQL (1.4ms)[0m   [0mSHOW FIELDS FROM `ruby_sync_values`[0m
+  [4;36;1mSQL (1.9ms)[0m   [0;1mdescribe `ruby_sync_values`[0m
+  [4;35;1mSQL (1.2ms)[0m   [0mSHOW KEYS FROM `ruby_sync_values`[0m
+  [4;36;1mSQL (1.5ms)[0m   [0;1mSHOW FIELDS FROM `users`[0m
+  [4;35;1mSQL (2.2ms)[0m   [0mdescribe `users`[0m
+  [4;36;1mSQL (0.7ms)[0m   [0;1mSHOW KEYS FROM `users`[0m
+  [4;36;1mSQL (1.5ms)[0m   [0;1m SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (1)
+  [4;36;1mSQL (0.2ms)[0m   [0;1mselect sqlite_version(*)[0m
+  [4;35;1mSQL (0.9ms)[0m   [0mCREATE TABLE "people" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "first_name" varchar(255), "last_name" varchar(255)) [0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('1')[0m
+Migrating to CreateInterests (2)
+  [4;35;1mSQL (0.6ms)[0m   [0mCREATE TABLE "interests" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "person_id" integer, "hobby_id" integer) [0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('2')[0m
+Migrating to CreateHobbies (3)
+  [4;35;1mSQL (0.7ms)[0m   [0mCREATE TABLE "hobbies" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar(255)) [0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('3')[0m
+Migrating to CreateRubySyncAssociations (4)
+  [4;35;1mSQL (0.6ms)[0m   [0mCREATE TABLE "ruby_sync_associations" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "context" varchar(255), "key" varchar(255), "synchronizable_id" integer, "synchronizable_type" varchar(255)) [0m
+  [4;36;1mSQL (0.6ms)[0m   [0;1mCREATE UNIQUE INDEX "index_ruby_sync_associations_on_context_and_key" ON "ruby_sync_associations" ("context", "key")[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mCREATE INDEX "index_ruby_sync_associations_on_synchronizable_id" ON "ruby_sync_associations" ("synchronizable_id")[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('4')[0m
+Migrating to CreateRubySyncEvents (5)
+  [4;35;1mSQL (0.6ms)[0m   [0mCREATE TABLE "ruby_sync_events" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "timestamp" time, "event_type" varchar(8), "trackable_id" integer, "trackable_type" varchar(255)) [0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mCREATE INDEX "index_ruby_sync_events_on_timestamp" ON "ruby_sync_events" ("timestamp")[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('5')[0m
+Migrating to CreateRubySyncOperations (6)
+  [4;36;1mSQL (0.5ms)[0m   [0;1mCREATE TABLE "ruby_sync_operations" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "operation" varchar(8), "field_name" varchar(255), "ruby_sync_event_id" integer) [0m
+  [4;35;1mSQL (0.2ms)[0m   [0mCREATE INDEX "index_ruby_sync_operations_on_ruby_sync_event_id" ON "ruby_sync_operations" ("ruby_sync_event_id")[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('6')[0m
+Migrating to CreateRubySyncValues (7)
+  [4;35;1mSQL (0.5ms)[0m   [0mCREATE TABLE "ruby_sync_values" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "ruby_sync_operation_id" integer, "value" varchar(255)) [0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('7')[0m
+Migrating to RubySyncTracking (8)
+  [4;35;1mSQL (0.6ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('8')[0m
+Migrating to CreateRubySyncStates (9)
+  [4;36;1mSQL (0.6ms)[0m   [0;1mCREATE TABLE "ruby_sync_states" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL) [0m
+  [4;35;1mSQL (0.1ms)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('9')[0m
+  [4;36;1mSQL (0.8ms)[0m   [0;1m SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+[0m
+  [4;35;1mSQL (0.9ms)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.7ms)[0m   [0;1m SELECT name
+ FROM sqlite_master
+ WHERE type = 'table' AND NOT name = 'sqlite_sequence'
+[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mPRAGMA index_list("hobbies")[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mPRAGMA index_list("interests")[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mPRAGMA index_list("people")[0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mPRAGMA index_list("ruby_sync_associations")[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mPRAGMA index_info('index_ruby_sync_associations_on_synchronizable_id')[0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mPRAGMA index_info('index_ruby_sync_associations_on_context_and_key')[0m
+  [4;35;1mSQL (0.4ms)[0m   [0mPRAGMA index_list("ruby_sync_events")[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mPRAGMA index_info('index_ruby_sync_events_on_timestamp')[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mPRAGMA index_list("ruby_sync_operations")[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mPRAGMA index_info('index_ruby_sync_operations_on_ruby_sync_event_id')[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mPRAGMA index_list("ruby_sync_states")[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mPRAGMA index_list("ruby_sync_values")[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mPRAGMA index_list("users")[0m

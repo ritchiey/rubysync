@@ -42,6 +42,7 @@ class Module
     names.each do |name|
       meta_def name do |value|
         class_def name do
+          
           value
         end
         meta_def "get_#{name}" do

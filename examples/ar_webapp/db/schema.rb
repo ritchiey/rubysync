@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 9) do
+ActiveRecord::Schema.define(:version => 20090401132733) do
 
   create_table "hobbies", :force => true do |t|
     t.string "name"
@@ -58,6 +58,14 @@ ActiveRecord::Schema.define(:version => 9) do
   create_table "ruby_sync_values", :force => true do |t|
     t.integer "ruby_sync_operation_id"
     t.string  "value"
+  end
+
+  create_table "users", :force => true do |t|
+    t.string   "username"
+    t.string   "name"
+    t.string   "email"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end
