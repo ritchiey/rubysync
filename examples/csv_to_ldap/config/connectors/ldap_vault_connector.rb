@@ -5,10 +5,10 @@ class LdapVaultConnector < RubySync::Connectors::LdapConnector
         
    host           'localhost'
    port            10389
-   username       'cn=Manager,dc=my-domain,dc=com'
+   username       'uid=admin,ou=system'
    password       'secret'
    search_filter  "cn=*"
-   search_base    "ou=users,o=my-organization,dc=my-domain,dc=com"
+   search_base    "dc=example,dc=com"
    #:bind_method  :simple
 
 end

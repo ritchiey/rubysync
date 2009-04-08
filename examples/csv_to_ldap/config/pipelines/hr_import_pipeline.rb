@@ -18,7 +18,9 @@ class HrImportPipeline < RubySync::Pipelines::BasePipeline
   end
   # Should evaluate to the path for placing a new record on the vault
   in_place do
-    "cn=#{source_path},ou=users,o=my-organization,dc=my-domain,dc=com"
-  end
+    "cn=#{source_path},dc=example,dc=com"
+  end     
+  
+  dump_after :in_event_transform
 
 end
