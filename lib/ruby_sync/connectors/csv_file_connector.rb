@@ -29,19 +29,23 @@ module RubySync::Connectors
       # Yields an add event for each row found in the file.
       def each_file_change(filename)
         header = header_line
+            
+        fields = (self.respond_to? :field_names and field_names)? field_names : nil        
         CSV.open(filename, 'r') do |row|
-          if header # should we ignore the first line
+          if header
+            # If field names not specified, derive from the header
+            fields ||=  row
             header = false
             next
           end
 
-          if defined? field_name &&row.length > field_names.length
+          if row.length > fields.length
             log.warn "#{name}: Row in file #{filename} exceeds defined field_names"
           end
           
           data = {}
           row.each_index do |i|
-            field_name = (i < field_names.length)? field_names[i] : "field_#{i}"
+            field_name = (i < fields.length)? fields[i] : "field_#{i}"
             row[i] and data[field_name] = row[i].data
           end
           association_key = source_path = path_for(data)
@@ -53,9 +57,10 @@ module RubySync::Connectors
           return <<END
 
             # True if the first line of each file is a header
-            # and should be ignored
             header_line   true
-
+                                                             
+            # If field_names not specified and header_line is true then,
+            # the fields names will be derived from the first line in each CSV file
             field_names   ['names', 'of', 'the', 'columns']
             path_field    'name_of_field_to_use_as_the_id'
             in_path       '/directory/to/read/files/from'
