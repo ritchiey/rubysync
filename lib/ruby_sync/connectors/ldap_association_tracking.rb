@@ -31,20 +31,18 @@ module RubySync::Connectors
 
     def associate association, path
       with_ldap do |ldap|
-        # todo: check and warn if path is outside of search_base
+        # TODO: check and warn if path is outside of search_base
         ldap.modify :dn=>path, :operations=>[
-          [:add, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s]
-	]
+          [:add, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s.sanitize_ldap]
+        ]
       end
     end
     
     def path_for_association association
       with_ldap do |ldap|
-        filter = "#{RUBYSYNC_ASSOCIATION_ATTRIBUTE}=#{association.to_s}"
+        filter = "#{RUBYSYNC_ASSOCIATION_ATTRIBUTE}=#{association.to_s.sanitize_ldap}"
         log.debug "Searching with filter: #{filter}"
-        results = ldap.search :base=>@search_base,
-	  :filter=>filter,
-	  :attributes=>[]
+        results = ldap.search :base => search_base, :filter => filter
         results or return nil
         case results.length
         when 0: return nil
@@ -73,7 +71,7 @@ module RubySync::Connectors
       path = path_for_association association
       with_ldap do |ldap|
         ldap.modify :dn=>path, :modifications=>[
-          [:delete, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s]
+          [:delete, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s.sanitize_ldap]
 	]
       end
     end
