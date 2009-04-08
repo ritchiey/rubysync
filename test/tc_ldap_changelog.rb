@@ -19,18 +19,29 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'ruby_sync_test'
 require 'hashlike_tests'
-require 'ruby_sync/connectors/ldap_connector'
+require 'ruby_sync/connectors/ldap_changelog_connector'
 require 'ruby_sync/connectors/memory_connector'
 
 
-class ChangeLogConnector < RubySync::Connectors::LdapConnector
-  host        'changelog_ldap'
-  port        389
-  username    'cn=directory manager'
-  password    'password'
+class ChangeLogConnector < RubySync::Connectors::LdapChangelogConnector
+  
+  # OpenLDAP config
+  host          'localhost'
+  port          389
+  username      'cn=admin,dc=localhost'
+  password      'secret'
   changelog_dn 'cn=changelog'
   search_filter "cn=*"
-  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
+  search_base   "dc=localhost"
+
+  # Default config
+#  host        'changelog_ldap'
+#  port        389
+#  username    'cn=directory manager'
+#  password    'password'
+#  changelog_dn 'cn=changelog'
+#  search_filter "cn=*"
+#  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
 end
 
 class TcLdapChangelog <  Test::Unit::TestCase

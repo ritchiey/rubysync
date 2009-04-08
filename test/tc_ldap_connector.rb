@@ -24,13 +24,15 @@ require 'ruby_sync/connectors/memory_connector'
 
 
 class MyLdapConnector < RubySync::Connectors::LdapConnector
+  # ApacheDS config
   host          'localhost'
-  port          10389
+  port          10390
   username      'uid=admin,ou=system'
   password      'secret'
   search_filter "cn=*"
   search_base   "ou=system"
-#  default config :
+
+  # Default config
 #  host          'any_ldap'
 #  port          389
 #  username      'cn=admin,dc=9to5magic,dc=com,dc=au'
@@ -76,13 +78,13 @@ class TcLdapConnector < Test::Unit::TestCase
   def vault_path
     # TODO: Try using a different path for the vault that's derived from the client source path
     #'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'#default
-    'cn=bob,ou=users,ou=system'
+    'cn=bob,ou=users,ou=system'#ApacheDS
   end
 
 
   def client_path
     #'cn=bob,ou=users,o=my-organization,dc=my-domain,dc=com'#default
-    'cn=bob,ou=users,ou=system'
+    'cn=bob,ou=users,ou=system'#ApacheDS
   end
   
 
