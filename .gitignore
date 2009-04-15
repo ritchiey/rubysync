@@ -2,5 +2,6 @@
 *.log
 *.db
 *.sqlite3
+!*.yml.sqlite3
 
-/nbproject/
+nbproject/
