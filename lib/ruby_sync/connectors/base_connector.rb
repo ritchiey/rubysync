@@ -84,26 +84,26 @@ module RubySync::Connectors
       @running = true
       sync_started()
       while @running
-	each_change do |event|
-	  if event.type == :force_resync
-	    each_entry(&blk)
-	    next
-	  end
-	  if is_delete_echo?(event) || is_echo?(event)
-	    log.debug "Ignoring echoed event"
-	  else
-	    call_if_exists :source_transform, event
-	    yield(event)
-	  end
-	end
+        each_change do |event|
+          if event.type == :force_resync
+            each_entry(&blk)
+            next
+          end
+          if is_delete_echo?(event) || is_echo?(event)
+            log.debug "Ignoring echoed event"
+          else
+            call_if_exists :source_transform, event
+            yield(event)
+          end
+        end
 
-	if once_only
-	  log.debug "#{name}: Stopped"
-	  @running = false
-	else
-	  log.debug "#{name}: sleeping"
-	  sleep 1
-	end
+        if once_only
+          log.debug "#{name}: Stopped"
+          @running = false
+        else
+          log.debug "#{name}: sleeping"
+          sleep 1
+        end
       end
       sync_stopped
     end

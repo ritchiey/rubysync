@@ -25,14 +25,30 @@ require 'ruby_sync/connectors/ldap_changelog_connector'
 require 'ruby_sync/connectors/memory_connector'
 
 
-class MyChangeLogConnector < RubySync::Connectors::LdapChangelogConnector
-  host        'changelog_ldap'
-  port        389
-  username    'cn=directory manager'
-  password    'password'
-  changelog_dn 'cn=changelog'
+class MyChangelogConnector < RubySync::Connectors::LdapChangelogConnector
+#  ApacheDS config
+  host          'localhost'
+  port          10389
+  username      'uid=admin,ou=system'
+  password      'secret'
   search_filter "cn=*"
-  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
+  search_base   "ou=system"
+#  OpenLdap config
+#  host          'localhost'
+#  port          389
+#  username      'cn=admin,dc=localhost'
+#  password      'secret'
+#  changelog_dn 'cn=changelog'
+#  search_filter "cn=*"
+#  search_base   "dc=localhost"
+#  Ritchie config
+#  host        'changelog_ldap'
+#  port        389
+#  username    'cn=directory manager'
+#  password    'password'
+#  changelog_dn 'cn=changelog'
+#  search_filter "cn=*"
+#  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
 end
 
 class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
@@ -61,18 +77,26 @@ class TestLdapChangelogConnector < Test::Unit::TestCase
   include RubySyncTest
   include HashlikeTests
 
+  def testPipeline
+    TcPipeline
+  end
+  
   def unsynchable
-    [:objectclass, :interests, :cn, :dn]
+    [:objectclass, :interests, :cn, :dn, :uid]
   end
 
 
   def vault_path
-    'uid=bob,ou=People,dc=9to5magic,dc=com,dc=au'
+    'uid=bob,ou=users,ou=system'
+    #'uid=bob,dc=localhost'
+    #'uid=bob,ou=People,dc=9to5magic,dc=com,dc=au'
   end
 
 
   def client_path
-    'uid=bob,ou=People,dc=9to5magic,dc=com,dc=au'
+    'uid=bob,ou=users,ou=system'
+    #'uid=bob,dc=localhost'
+    #'uid=bob,ou=People,dc=9to5magic,dc=com,dc=au'
   end
 
 
@@ -89,6 +113,12 @@ class TestLdapChangelogConnector < Test::Unit::TestCase
 
 private
 
-
-
+ def ldap_attr
+    {
+      "objectclass"=>['inetOrgPerson'],
+      "cn"=>'bob',
+      "sn"=>'roberts'
+      #"mail"=>"bob@roberts.com"
+    }
+ end
 end

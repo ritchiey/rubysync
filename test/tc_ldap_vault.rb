@@ -20,18 +20,29 @@
 
 require 'ruby_sync_test'
 require 'hashlike_tests'
-require 'ruby_sync/connectors/ldap_connector'
+require 'ruby_sync/connectors/ldap_changelog_connector'
 require 'ruby_sync/connectors/memory_connector'
 
 
-class MyLdapConnector < RubySync::Connectors::LdapConnector
-  host        '10.1.1.4'
-  port        389
-  username    'cn=directory manager'
-  password    'password'
+class MyLdapConnector < RubySync::Connectors::LdapChangelogConnector
+  
+  # OpenLDAP config
+  host          'localhost'
+  port          389
+  username      'cn=admin,dc=localhost'
+  password      'secret'
   changelog_dn 'cn=changelog'
   search_filter "cn=*"
-  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
+  search_base   "dc=localhost"
+
+  # Default config
+#  host        '10.1.1.4'
+#  port        389
+#  username    'cn=directory manager'
+#  password    'password'
+#  changelog_dn 'cn=changelog'
+#  search_filter "cn=*"
+#  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
   
   def initialize options={}
     super(options)
@@ -40,7 +51,8 @@ class MyLdapConnector < RubySync::Connectors::LdapConnector
 
 end
 
-class MyMemoryConnector < RubySync::Connectors::MemoryConnector; end
+class MyMemoryConnector < RubySync::Connectors::MemoryConnector;
+end
 
 class TestPipeline < RubySync::Pipelines::BasePipeline
   
@@ -52,7 +64,8 @@ class TestPipeline < RubySync::Pipelines::BasePipeline
   allow_in :cn, :givenName, :sn, :objectclass
   
   def in_place(event)
-    event.target_path = "cn=#{event.source_path},ou=people,dc=9to5magic,dc=com,dc=au"
+   event.target_path = "cn=#{event.source_path},dc=localhost"#OpenLDAP
+   #  event.target_path = "cn=#{event.source_path},ou=people,dc=9to5magic,dc=com,dc=au"#Default
   end
   
   def out_place(event)
@@ -74,19 +87,22 @@ class TcLdapVault < Test::Unit::TestCase
 
   include RubySyncTest
   include HashlikeTests
- 
-  
-  def unsynchable
-    ["objectclass", "interests", "cn", "dn", "rubysyncassociation"]
-  end  
   
   def client_path
     'bob'
   end
-  
+
   def vault_path
-    'cn=bob,ou=people,dc=9to5magic,dc=com,dc=au'
+    'cn=bob,dc=localhost'#OpenLDAP
+    #'cn=bob,ou=people,dc=9to5magic,dc=com,dc=au'#Default
+  end
+  
+  def testPipeline
+    TestPipeline
   end
 
+  def unsynchable
+    ["objectclass", "interests", "cn", "dn", "rubysyncassociation"]
+  end
 
 end

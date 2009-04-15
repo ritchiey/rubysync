@@ -205,12 +205,12 @@ module RubySync
       def start
         log.info "starting #{name} pipeline"
         @running = true
-        trap("sigint") {self.stop}
+        trap("SIGINT") {self.stop}
         started
         while @running
           run_in_once
           run_out_once
-          sleep delay
+          sleep delay if delay
         end
         stopped
         log.info "#{name} stopped."
@@ -257,12 +257,12 @@ module RubySync
 
         if associated_entry
           if event.type == :add
-	    log.info "Associated entry in vault for add event. Converting to modify"
+            log.info "Associated entry in vault for add event. Converting to modify"
             event.convert_to_modify associated_entry, allowed_in
           end
         elsif event.type == :modify
-	  log.info "No associated entry in vault for modify event. Converting to add"
-	  event.convert_to_add 
+          log.info "No associated entry in vault for modify event. Converting to add"
+          event.convert_to_add
         end
 
         case event.type

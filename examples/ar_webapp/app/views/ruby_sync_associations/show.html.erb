@@ -1,0 +1,28 @@
+<p>
+  <b>Context:</b>
+  <%=h @ruby_sync_association.context %>
+</p>
+
+<p>
+  <b>Key:</b>
+  <%=h @ruby_sync_association.key %>
+</p>
+
+<p>
+  <b>Synchronizable:</b>
+  <%=h @ruby_sync_association.synchronizable_id %>
+</p>
+
+<p>
+  <b>Synchronizable type:</b>
+  <%=h @ruby_sync_association.synchronizable_type %>
+</p>
+
+<p>
+  <b>Synchronizable:</b>
+  <%=h @ruby_sync_association.synchronizable %>
+</p>
+
+
+<%= link_to 'Edit', edit_ruby_sync_association_path(@ruby_sync_association) %> |
+<%= link_to 'Back', ruby_sync_associations_path %>

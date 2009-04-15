@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  context: MyString
+  key: MyString
+  synchronizable_id: 1
+  synchronizable_type: MyString
+  synchronizable: 
+
+two:
+  context: MyString
+  key: MyString
+  synchronizable_id: 1
+  synchronizable_type: MyString
+  synchronizable: 

@@ -20,13 +20,15 @@
 require 'ruby_sync_test'
 
 class ArActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
-    model :person
-    application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
-   # dbm_path "/tmp/rubysync_ar_test"
+  option :dbm_path
+  model :person
+  application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
+  dbm_path "/tmp/rubysync_ar_test"
 end
 
 class ArMemoryConnector < RubySync::Connectors::MemoryConnector
-  #dbm_path "/tmp/rubysync_memory_test"
+  option :dbm_path
+  dbm_path "/tmp/rubysync_memory_test"
 end
 
 class ArTestPipeline < RubySync::Pipelines::BasePipeline

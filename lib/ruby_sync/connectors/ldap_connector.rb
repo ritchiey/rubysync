@@ -40,6 +40,8 @@ end
 module RubySync::Connectors
   class LdapConnector < RubySync::Connectors::BaseConnector
 
+    include LdapAssociationTracking
+
     option  :host,
       :port,
       :bind_method,
@@ -54,7 +56,8 @@ module RubySync::Connectors
     association_attribute 'RubySyncAssociation'
     bind_method           :simple
     host                  'localhost'
-    port                  389
+    port                  10389
+    #port                  389
     search_filter         "cn=*"
     encryption		 nil
 
@@ -119,13 +122,14 @@ END
     def add(path, operations)
       result = nil
       with_ldap do |ldap|
-	attributes = perform_operations(operations)
-	attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
-	result = ldap.add :dn=>path, :attributes=>attributes
+        operations << RubySync::Operation.add('objectclass', RUBYSYNC_ASSOCIATION_CLASS)
+        attributes = perform_operations(operations)
+        attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
+        result = ldap.add :dn=>path, :attributes=>attributes
       end
       log.debug("ldap.add returned '#{result}'")
       return result
-    rescue Exception
+      rescue Exception
       log.warn "Exception occurred while adding LDAP record"
       log.debug $!
       false
@@ -133,7 +137,19 @@ END
 
     def modify(path, operations)
       log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
-      with_ldap {|ldap| ldap.modify :dn=>path, :operations=>to_ldap_operations(operations) }
+      with_ldap do |ldap|
+        operations.each do |op|
+          found=false
+          if op.subject == 'objectclass' and op.type == :replace
+            op.values.each { |value| found=true if value == RUBYSYNC_ASSOCIATION_CLASS}
+            op.values << RUBYSYNC_ASSOCIATION_CLASS unless found
+          end
+        end
+        
+        unless ldap.modify :dn=>path, :operations=>to_ldap_operations(operations)
+          log.warn "Ldap Modification fails:  #{ldap.get_operation_result.message}"#debug
+        end
+      end
     end
 
     def delete(path)
@@ -143,9 +159,9 @@ END
     def [](path)
       with_ldap do |ldap|
 	      result = ldap.search search_args(:base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*')
-	        return nil if !result or result.size == 0
-	        answer = {}
-	        result[0].attribute_names.each do |name|
+        return nil if !result or result.size == 0
+        answer = {}
+        result[0].attribute_names.each do |name|
 	        name = name.to_s.downcase
 	        answer[name] = result[0][name] unless name == 'dn'
         end
@@ -168,7 +184,13 @@ END
 
     def target_transform event
       #event.add_default 'objectclass', 'inetOrgUser'
-      #is_vault? and event.add_value 'objectclass', RUBYSYNC_ASSOCIATION_CLASS
+#      if is_vault?
+#        event.payload.each do |op|
+#          if op.subject=='objectclass' and op.values.to_s==RUBYSYNC_ASSOCIATION_CLASS
+#            event.add_value 'objectclass', RUBYSYNC_ASSOCIATION_CLASS
+#          end
+#        end
+#      end
     end
 
 
@@ -178,7 +200,7 @@ END
     def to_entry ldap_entry
       entry = {}
       ldap_entry.each do |name, values|
-	entry[name.to_s] = values.map {|v| String.new(v)}
+        entry[name.to_s] = values.map {|v| String.new(v)}
       end
       entry
     end
@@ -186,7 +208,7 @@ END
     def operations_for_entry entry
       ops = []
       entry.each do |name, values|
-	ops << RubySync::Operation.add(name, values)
+        ops << RubySync::Operation.add(name, values)
       end
       ops
     end
@@ -196,12 +218,13 @@ END
       result = nil
       connection_options = {:host=>host, :port=>port, :auth=>auth}
       connection_options[:encryption] = encryption if encryption
+      started unless @connection_index #debug
       @connections[@connection_index] = Net::LDAP.new(connection_options) unless @connections[@connection_index]
       if @connections[@connection_index]
-	ldap = @connections[@connection_index]
-	@connection_index += 1
-	result = yield ldap
-	@connection_index -= 1
+        ldap = @connections[@connection_index]
+        @connection_index += 1
+        result = yield ldap
+        @connection_index -= 1
       end
       result
     end
