@@ -1,4 +1,3 @@
-#require 'person'#Uncomment for run RubySync's test case
 class RubySyncObserver < ActiveRecord::Observer
 
   observe Person

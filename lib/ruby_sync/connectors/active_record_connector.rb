@@ -19,7 +19,6 @@ require "active_record"
 #$VERBOSE=true
 require "ruby_sync/connectors/base_connector"
 
-
 module RubySync::Connectors
 
   # You can initialize this connector with the name of a model and the path to a rails application:
@@ -29,20 +28,22 @@ module RubySync::Connectors
     include ActiveRecordAssociationHandler
     include ActiveRecordEventHandler
     
-    option :ar_class, :model, :application, :rails_env, :db_type, :db_host, :db_username, :db_password, :db_name, :db_config
+    option :ar_class, :model, :application, :rails_env, :db_type, :db_host, :db_username, :db_password, :db_name, :db_pool, :db_config
     rails_env 'development'
     db_type 'postgresql'
     db_username 'rails_user'
     db_password 'your_password'
     db_host 'localhost'
     db_name "rubysync_#{get_rails_env}"
+    db_pool 5    
     # Default db_config in case we're not sucking the config out of a rails app
     db_config(
       :adapter=>get_db_type,
       :host=>get_db_host,
       :database=>get_db_name,
       :username=>get_db_username,
-      :password=>get_db_password
+      :password=>get_db_password,
+      :pool=>get_db_pool
     )
     model :user
 
@@ -52,12 +53,14 @@ module RubySync::Connectors
       
       # Rails app specified, use it to configure
       if application          
+        
         # Load the database configuration
-        rails_app_path = File.expand_path(application)
+        RAILS_ROOT rails_app_path = File.expand_path(application)
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
-        new_db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]
+        new_db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]               
         # Require the models
         Dir.chdir(File.join(rails_app_path,'app','models')) do
+          require model.to_s #Require client model before others models
           Dir.glob('*.rb') do |filename|
             log.debug("\t#{filename}")
             require filename
@@ -71,14 +74,14 @@ module RubySync::Connectors
          
       self.class.ar_class model.to_s.camelize.constantize
     end
-      
-      def self.fields
-        c = self.new
-        c.ar_class.content_columns.map {|col| col.name }
-      end
-      
-      def self.sample_config
-          return <<END
+
+    def self.fields
+      c = self.new
+      c.ar_class.content_columns.map {|col| col.name }
+    end
+
+    def self.sample_config
+        return <<END
 
     # Uncomment and adjust the following if your app is a Ruby on Rails
     # application. It will grab the config from the RoR database.yml.
@@ -165,6 +168,10 @@ private
         entry[key.to_s] = value if key and value
       end
       entry
+    end
+
+    def RAILS_ROOT(value)
+       Object.const_set(:RAILS_ROOT, value) unless Object.const_defined? :RAILS_ROOT
     end
     
   end
