@@ -25,7 +25,7 @@ require 'net/ldap'
 #$VERBOSE = true
 
 module RubySync::Connectors
-  class RubySync::Connectors::LdapChangelogConnector < RubySync::Connectors::LdapConnector
+  class LdapChangelogConnector < RubySync::Connectors::LdapConnector
 
     option             :changelog_dn
     changelog_dn          "cn=changelog"
@@ -54,26 +54,26 @@ module RubySync::Connectors
         first = true
         @full_refresh_required = false
         ldap.search :base => changelog_dn, :filter =>filter do |change|
-    change_number = change.changenumber[0].to_i
-    if first
-      first = false
-      # TODO: Persist the change_number so that we don't do a full resync everytime rubysync starts
-      if change_number != @last_change_number
-        log.warn "Earliest change number (#{change_number}) differs from that recorded (#{@last_change_number})."
-        log.warn "A full refresh is required."
-        @full_refresh_required = true
-        break
-      end
-    else
-      @last_change_number = change_number if change_number > @last_change_number
-      # TODO: A proper DN object would be nice instead of string manipulation
-      target_dn = change.targetdn[0].gsub(/\s*,\s*/,',')
-      if target_dn =~ /#{search_base}$/oi
-        change_type = change.changetype[0]
-        event = event_for_changelog_entry(change)
-        yield event
-      end
-    end
+          change_number = change.changenumber[0].to_i
+          if first
+            first = false
+            # TODO: Persist the change_number so that we don't do a full resync everytime rubysync starts
+            if change_number != @last_change_number
+              log.warn "Earliest change number (#{change_number}) differs from that recorded (#{@last_change_number})."
+              log.warn "A full refresh is required."
+              @full_refresh_required = true
+              break
+            end
+          else
+            @last_change_number = change_number if change_number > @last_change_number
+            # TODO: A proper DN object would be nice instead of string manipulation
+            target_dn = change.targetdn[0].gsub(/\s*,\s*/,',')
+            if target_dn =~ /#{search_base}$/oi
+              change_type = change.changetype[0]
+              event = event_for_changelog_entry(change)
+              yield event
+            end
+          end
         end
       end
       each_entry if @full_refresh_required
@@ -85,8 +85,8 @@ module RubySync::Connectors
         filter = "(changenumber>=#{@last_change_number})"
         @full_refresh_required = false
         ldap.search :base => changelog_dn, :filter =>filter do |change|
-    change_number = change.changenumber[0].to_i
-    @last_change_number = change_number if change_number > @last_change_number
+          change_number = change.changenumber[0].to_i
+          @last_change_number = change_number if change_number > @last_change_number
         end
       end
     end

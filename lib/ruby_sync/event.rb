@@ -186,11 +186,11 @@ module RubySync
    
     def delete_when_blank
       @uncommitted_operations = uncommitted_operations.map do |op| 
-	if op.sets_blank?
-	  @type == :modify ? op.same_but_as(:delete) : nil
-	else
-	  op
-	end
+        if op.sets_blank?
+          @type == :modify ? op.same_but_as(:delete) : nil
+        else
+          op
+        end
       end.compact
     end    
        
@@ -281,7 +281,7 @@ module RubySync
     # true unless this event in its current state would have no impact
     def effective_operation?
       !(
-	@type == :modify && @payload.empty?
+        @type == :modify && @payload.empty?
       )
     end
   
@@ -290,13 +290,13 @@ module RubySync
     # Try to make a sensible association from the passed in object
     def make_association o  
       if o.kind_of?(Array) and o.size == 2
-	return Association.new(o[0],o[1])
+        return Association.new(o[0],o[1])
       elsif o.kind_of? RubySync::Association
-	return o
+        return o
       elsif o
-	return Association.new(nil, o)
+        return Association.new(nil, o)
       else
-	nil
+        nil
       end
     end
       

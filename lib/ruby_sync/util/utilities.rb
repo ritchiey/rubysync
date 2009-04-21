@@ -48,7 +48,7 @@ class String
     values = replace_pairs.map {|a, b| b }
     self.gsub(
       /(#{keys.map{|a| Regexp.quote(a) }.join( ')|(' )})/
-      ) { |match| values[keys.index(match)] }
+    ) { |match| values[keys.index(match)] }
   end
 
   #Convert specials chars to be compliant with Ldap
@@ -123,21 +123,21 @@ module RubySync
     
     def pipeline_called name
       begin
-	something_called name, "pipeline"
+        something_called name, "pipeline"
       rescue
-	log.error "Pipeline named '#{name}' not found."
-	nil
+        log.error "Pipeline named '#{name}' not found."
+        nil
       end
     end
     
     
     def connector_called name, message=nil
       begin
-	something_called name, "connector"
+        something_called name, "connector"
       rescue
-	message ||= "Connector named '#{name}' not found."
+        message ||= "Connector named '#{name}' not found."
         log.error message
-	nil
+        nil
       end
     end
 
@@ -186,7 +186,7 @@ module RubySync
       # Keep going up until we start repeating ourselves
       while File.directory?(bp) && bp != last && bp != "/"
         return bp if File.directory?("#{bp}/pipelines") &&
-	  File.directory?("#{bp}/connectors")
+          File.directory?("#{bp}/connectors")
         last = bp
         bp = File.expand_path("#{bp}/..")
       end
@@ -219,7 +219,7 @@ module RubySync
           log.warn "!!!!!!!!!!  PROBLEM, DUMP FOLLOWS: !!!!!!!!!!!!!!"
           p op
         end
-	key = op.subject
+        key = op.subject
         next if subjects and !subjects.include?(key)
         case op.type
         when :add
@@ -227,7 +227,7 @@ module RubySync
             existing = as_array(record[key])
             next if existing == op.values # already same so ignore
             (existing & op.values).empty? or
-	      raise "Attempt to add duplicate elements to #{name}"
+              raise "Attempt to add duplicate elements to #{name}"
             record[key] =  existing + op.values
           else
             record[key] = op.values

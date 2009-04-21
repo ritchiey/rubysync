@@ -21,7 +21,7 @@ module RubySync
   module Connectors
     module DbmAssociationTracking
         
-            # Store association for the given path
+      # Store association for the given path
       def associate association, path
         YAML::DBM.open(path_to_association_dbm_filename) do |dbm|
           assocs = dbm[path.to_s] || {}
@@ -71,15 +71,15 @@ module RubySync
       end
 
       
-            # Stores association keys indexed by path:association_context
-        def path_to_association_dbm_filename
-          dbm_path + "_path_to_assoc"
-        end
+      # Stores association keys indexed by path:association_context
+      def path_to_association_dbm_filename
+        dbm_path + "_path_to_assoc"
+      end
 
       # Stores paths indexed by association_context:association_key
-        def association_to_path_dbm_filename
-          dbm_path + "_assoc_to_path"
-        end
+      def association_to_path_dbm_filename
+        dbm_path + "_assoc_to_path"
+      end
 
 
       

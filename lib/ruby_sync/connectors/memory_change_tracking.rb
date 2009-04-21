@@ -45,21 +45,21 @@ module RubySync::Connectors::MemoryChangeTracking
     each_entry do |path, entry|
       digest = digest(entry)
       unless stored_digest = shadow[path.to_s] and digest == stored_digest
-	operations = create_operations_for(entry)
-	yield RubySync::Event.add(self, path, nil, operations) 
-	shadow[path.to_s] = digest
+        operations = create_operations_for(entry)
+        yield RubySync::Event.add(self, path, nil, operations)
+        shadow[path.to_s] = digest
       end
     end
           
     # scan shadow to find deleted
     shadow.each do |key, stored_hash|
       unless self[key]
-	yield RubySync::Event.delete(self, key)
-	shadow.delete key
-	if is_vault? and @pipeline
-	  association = association_for @pipeline.association_context, key
-	  remove_association association
-	end
+        yield RubySync::Event.delete(self, key)
+        shadow.delete key
+        if is_vault? and @pipeline
+          association = association_for @pipeline.association_context, key
+          remove_association association
+        end
       end
     end
   end

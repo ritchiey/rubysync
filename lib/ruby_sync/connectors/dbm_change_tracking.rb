@@ -56,24 +56,24 @@ module RubySync::Connectors::DbmChangeTracking
     DBM.open(self.mirror_dbm_filename) do |dbm|
       # scan existing entries to see if any new or modified
       each_entry do |path, entry|
-	digest = digest(entry)
-	unless stored_digest = dbm[path.to_s] and digest == stored_digest
-	  operations = create_operations_for(entry)
-	  yield RubySync::Event.add(self, path, nil, operations) 
-	  dbm[path.to_s] = digest
-	end
+        digest = digest(entry)
+        unless stored_digest = dbm[path.to_s] and digest == stored_digest
+          operations = create_operations_for(entry)
+          yield RubySync::Event.add(self, path, nil, operations)
+          dbm[path.to_s] = digest
+        end
       end
           
       # scan dbm to find deleted
       dbm.each do |key, stored_hash|
-	unless self[key]
-	  yield RubySync::Event.delete(self, key)
-	  dbm.delete key
-	  if is_vault? and @pipeline
-	    association = association_for @pipeline.association_context, key
-	    remove_association association
-	  end
-	end
+        unless self[key]
+          yield RubySync::Event.delete(self, key)
+          dbm.delete key
+          if is_vault? and @pipeline
+            association = association_for @pipeline.association_context, key
+            remove_association association
+          end
+        end
       end
     end        
   end
@@ -97,7 +97,7 @@ module RubySync::Connectors::DbmChangeTracking
   def update_mirror path
     if entry = self[path]
       DBM.open(self.mirror_dbm_filename) do |dbm|
-	dbm[path.to_s] = digest(entry)
+        dbm[path.to_s] = digest(entry)
       end
     end
   end
@@ -106,5 +106,4 @@ module RubySync::Connectors::DbmChangeTracking
     dbm_path + "_mirror"
   end
 
-
-end 
+end

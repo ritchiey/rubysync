@@ -34,27 +34,27 @@ module RubySync
       
 
       def initialize options={}
-	super options
+        super options
       end
    
 
       def started
-	target.started
-	report.started
+        target.started
+        report.started
       end
 
       def each_entry(&blk)
-	target.each_entry(&blk)
+        target.each_entry(&blk)
       end
 
       def self.fields
-	target.class.fields
+        target.class.fields
       end
 
 
 
       def self.sample_config
-	return <<END
+        return <<END
      #The compare connector is for internal use only. 
      #You probably don't want to do what you seem to be doing.
 END
@@ -63,19 +63,19 @@ END
 
 
       def add(path, operations)
-	report.add(path, operations)
+        report.add(path, operations)
       end
 
       def modify(path, operations)
-	report.modify(path, operations)
+        report.modify(path, operations)
       end
 
       def delete(path)
-	report.delete(path)
+        report.delete(path)
       end
 
       def [](path)
-	target[path]
+        target[path]
       end
 
       # Called by unit tests to inject data
@@ -83,7 +83,7 @@ END
       end
 
       def target_transform event
-	target.target_transform(event)
+        target.target_transform(event)
       end
 
     end

@@ -55,11 +55,11 @@ module RubySync
       end
       
       def self.client(connector_name, options={})
-	options = HashWithIndifferentAccess.new(options)
+        options = HashWithIndifferentAccess.new(options)
         connector_class = class_called(connector_name, "connector")
-	unless connector_class
-	  log.error "No connector called #connector_name}"
-	  return
+        unless connector_class
+          log.error "No connector called #connector_name}"
+          return
         end
         options[:name] ||= "#{self.name}(client)"
         options[:is_vault] = false
@@ -69,11 +69,11 @@ module RubySync
       end
       
       def self.vault(connector_name, options={})
-	options = HashWithIndifferentAccess.new(options)
+        options = HashWithIndifferentAccess.new(options)
         connector_class = class_called(connector_name, "connector")
-	unless connector_class
-	  log.error "No connector called #{connector_name}"
-	  return
+        unless connector_class
+          log.error "No connector called #{connector_name}"
+          return
         end
         options[:name] ||= "#{self.name}(vault)"
         options[:is_vault] = true
@@ -118,23 +118,23 @@ module RubySync
       end
 
       def self.deprecated_event_method name, replacement, &blk
-	log.warn "'#{name}' has been deprecated. Use '#{replacement}' instead."
-	event_method(replacement, &blk)
+        log.warn "'#{name}' has been deprecated. Use '#{replacement}' instead."
+        event_method(replacement, &blk)
       end
 
 
       def in_match(event)
         log.debug "Default matching rule - vault[in_place] exists?"
-	if vault.respond_to?('[]')
+        if vault.respond_to?('[]')
           path = in_place(event) 
-	  if path
-	    log.debug "Checking for object at '#{path}' on vault."
-	    vault[path] and path
-	  end
-	else
-	  log.debug "Vault doesn't support random access - no match"
-	  nil
-	end
+          if path
+            log.debug "Checking for object at '#{path}' on vault."
+            vault[path] and path
+          end
+        else
+          log.debug "Vault doesn't support random access - no match"
+          nil
+        end
       end
       
       def out_match(event)
@@ -283,30 +283,30 @@ module RubySync
           end
         end
 
-	perform_transform :in_command_transform, event, event.hint
+        perform_transform :in_command_transform, event, event.hint
 
-	if event.effective_operation?
-	  with_rescue("#{vault.name}: Processing command") {vault.process(event)}
-	else
-	  log.info "No change."
-	end
+        if event.effective_operation?
+          with_rescue("#{vault.name}: Processing command") {vault.process(event)}
+        else
+          log.info "No change."
+        end
 
-	# Perform post-processing (if any)
-	event.payload = []
-	last_change = event.type
-	event.type = :modify
-	case last_change
-	when :add
-	  call_if_exists :after_vault_add, event, "After add to vault"
-	when :modify
-	  call_if_exists :after_vault_modify, event, "After modify to vault"
-	when :delete
-	  call_if_exists :after_vault_delete, event, "After delete from vault"
-	end
-	call_if_exists :after_in, event, "Post processing (in pipeline)"
-	if event.effective_operation?
-	  with_rescue("#{vault.name}: Processing command") {vault.process(event)}
-	end
+        # Perform post-processing (if any)
+        event.payload = []
+        last_change = event.type
+        event.type = :modify
+        case last_change
+        when :add
+          call_if_exists :after_vault_add, event, "After add to vault"
+        when :modify
+          call_if_exists :after_vault_modify, event, "After modify to vault"
+        when :delete
+          call_if_exists :after_vault_delete, event, "After delete from vault"
+        end
+        call_if_exists :after_in, event, "Post processing (in pipeline)"
+        if event.effective_operation?
+          with_rescue("#{vault.name}: Processing command") {vault.process(event)}
+        end
 
         log.info "---\n"
         
@@ -337,12 +337,12 @@ module RubySync
             
         if associated_entry
           if event.type == :add
-	    log.info "Associated entry in client for add event. Converting to modify"
+            log.info "Associated entry in client for add event. Converting to modify"
             event.convert_to_modify(associated_entry,allowed_out)
           end
         elsif event.type == :modify
-	  log.info "No associated entry in client for modify event. Converting to add"
-	  event.convert_to_add 
+          log.info "No associated entry in client for modify event. Converting to add"
+          event.convert_to_add
         end
 
         case event.type
@@ -488,7 +488,7 @@ module RubySync
       
       
       def in_filter(event)
-	allowed_in == [] or event.drop_all_but_changes_to(allowed_in || [])
+        allowed_in == [] or event.drop_all_but_changes_to(allowed_in || [])
       end
 
 
@@ -504,7 +504,7 @@ module RubySync
       def allowed_out; nil; end
       
       def out_filter(event)
-	allowed_out == [] or event.drop_all_but_changes_to(allowed_out || [])
+        allowed_out == [] or event.drop_all_but_changes_to(allowed_out || [])
       end
 
 
