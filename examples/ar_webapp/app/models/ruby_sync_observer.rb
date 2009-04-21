@@ -3,7 +3,7 @@ class RubySyncObserver < ActiveRecord::Observer
   observe Person
 
   def after_create record
-    event = RubySyncEvent.create  :timestamp=> Time.now,
+    RubySyncEvent.create  :timestamp=> Time.now,
                           :event_type=>'add',
                           :trackable_id=>record.id,
                           :trackable_type=>record.class.name,
@@ -23,6 +23,15 @@ class RubySyncObserver < ActiveRecord::Observer
                           :event_type=>'delete',
                           :trackable_id=>record.id,
                           :trackable_type=>record.class.name
+  end
+
+  def after_destroy_all records
+    record.each do |record|
+      RubySyncEvent.create  :timestamp=> Time.now,
+                          :event_type=>'delete',
+                          :trackable_id=>record.id,
+                          :trackable_type=>record.class.name
+    end
   end
 
 end
