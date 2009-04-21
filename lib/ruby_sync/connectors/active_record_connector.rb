@@ -25,10 +25,10 @@ module RubySync::Connectors
   # eg: vault :ActiveRecord, :application=>'path/to/rails/application', :model=>:user
   class ActiveRecordConnector < RubySync::Connectors::BaseConnector
 
-    include ActiveRecordAssociationHandler
-    include ActiveRecordEventHandler
+    include ActiveRecordAssociationTracking
+    include ActiveRecordChangeTracking
     
-    option :ar_class, :model, :application, :rails_env, :db_type, :db_host, :db_username, :db_password, :db_name, :db_pool, :db_config
+    option :ar_class, :model, :changes_model, :associations_model, :application, :rails_env, :db_type, :db_host, :db_username, :db_password, :db_name, :db_pool, :db_config
     rails_env 'development'
     db_type 'postgresql'
     db_username 'rails_user'
@@ -45,26 +45,48 @@ module RubySync::Connectors
       :password=>get_db_password,
       :pool=>get_db_pool
     )
-    model :user
 
+    def method_missing(name)
+      if name == :model and respond_to? :changes_model
+        changes_model
+      elsif name == :changes_model and respond_to? :model
+        model
+      else
+        super
+      end
+    end
+
+    def track_class
+      if respond_to? :track
+        track.ar_class
+        #    elsif is_vault? and @pipeline
+        #      @pipeline.client.track_class
+      end
+    end
 
     def initialize options={}
       super options
-      
+     
       # Rails app specified, use it to configure
       if application          
         
         # Load the database configuration
-        RAILS_ROOT rails_app_path = File.expand_path(application)
+        rails_app_path = File.expand_path(application)
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
-        new_db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]               
+        new_db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]
+        #Add rails application relative path for sqlite databases
+        if new_db_config['adapter'].match('^(jdbc)?sqlite(2|3)?$')
+          new_db_config['database'] = rails_app_path + '/' + new_db_config['database'] if Pathname.new(new_db_config['database']).relative?
+        end
         # Require the models
+        @models||=[]
         Dir.chdir(File.join(rails_app_path,'app','models')) do
-          require model.to_s #Require client model before others models
-          Dir.glob('*.rb') do |filename|
+          require model.to_s if models=Dir.glob('*.rb') and models.include?(model.to_s + '.rb') #Require main model before others models
+          models.each do |filename|
             log.debug("\t#{filename}")
             require filename
             class_name = filename[0..-4].camelize
+            @models << class_name
             klass = class_name.constantize
             self.class.db_config new_db_config
             klass.establish_connection db_config if defined? klass.establish_connection
@@ -81,7 +103,7 @@ module RubySync::Connectors
     end
 
     def self.sample_config
-        return <<END
+      return <<END
 
     # Uncomment and adjust the following if your app is a Ruby on Rails
     # application. It will grab the config from the RoR database.yml.
@@ -103,15 +125,14 @@ module RubySync::Connectors
     # end
     
 END
-      end
+    end
       
     
     def each_entry
       ar_class.find :all do |record|
         yield entry_from_active_record(record)
       end
-    end
-      
+    end     
 
 
     # Override default perform_add because ActiveRecord is different in that
@@ -123,7 +144,7 @@ END
         populate(record, perform_operations(event.payload))
         log.info(record.inspect)
         record.save!
-        update_mirror record.id
+        update_track record.id
         if is_vault?
           associate event.association, record.id
         end
@@ -143,7 +164,11 @@ END
     end
     
     def delete(path)
-      ar_class.destroy path
+      if path.is_a?(Hash)
+        ar_class.destroy_all path[:conditions] if path.key?(:conditions)
+      else
+        ar_class.destroy path
+      end
     end
 
     def [](path)
@@ -152,7 +177,29 @@ END
       return nil
     end
 
-private
+    def self.track_with(connector_name, options={})
+      options = HashWithIndifferentAccess.new(options)
+      connector_class = class_called(connector_name, "connector")
+      unless connector_class
+        log.error "No connector called #connector_name}"
+        return
+      end
+      options[:name] ||= "#{self.name}(track)"
+      options[:is_vault] = false
+      class_def 'track' do
+        @track ||= connector_class.new(options)
+      end
+    end
+    
+    #    def Object.const_missing(name)
+    #      if name == :RAILS_ROOT
+    #        File.expand_path(application)
+    #      else
+    #        super
+    #      end
+    #    end
+
+    private
 
     def populate record, content
       ar_class.content_columns.each do |c|
@@ -170,9 +217,10 @@ private
       entry
     end
 
-    def RAILS_ROOT(value)
-       Object.const_set(:RAILS_ROOT, value) unless Object.const_defined? :RAILS_ROOT
-    end
+    #    def RAILS_ROOT(value)
+    #       Object.const_set(:RAILS_ROOT, value) unless Object.const_defined? :RAILS_ROOT
+    #    end
     
   end
+
 end
