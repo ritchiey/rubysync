@@ -19,46 +19,65 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'ruby_sync'
 
-module RubySync::Connectors::ActiveRecordAssociationHandler
+module RubySync::Connectors::ActiveRecordAssociationTracking
   
   def associate association, path
     log.debug "Associating '#{association}' with '#{path}'"
     ruby_sync_association.create :synchronizable_id=>path, :synchronizable_type=>ar_class.name,
-                                 :context=>association.context, :key=>association.key
+      :context=>association.context, :key=>association.key.to_s
   end
   
   def find_associated association
-    ruby_sync_association.find_by_context_and_key association.context, association.key
+    ruby_sync_association.find_by_context_and_key association.context, association.key.to_s
   end
   
   def path_for_association association
-    assoc = ruby_sync_association.find_by_context_and_key association.context, association.key
+    assoc = ruby_sync_association.find_by_context_and_key association.context, association.key.to_s
     (assoc)? assoc.synchronizable_id : nil
   end
   
   def association_key_for context, path
-    record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context path, model.to_s, context
+    record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context path, ar_class.name, context
     record and record.key
   end
   
   def associations_for(path)
-    ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path, model.to_s)
+    ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path, ar_class.name)
   rescue ActiveRecord::RecordNotFound
     return nil
   end
   
   def remove_association association
-     ruby_sync_association.find_by_context_and_key(association.context, association.key).destroy
+    ruby_sync_association.find_by_context_and_key(association.context, association.key.to_s).destroy
   rescue ActiveRecord::RecordNotFound
-     return nil
+    return nil
   end
-  
-private
+
+  def self.track(connector_name, options={})
+    options = HashWithIndifferentAccess.new(options)
+    connector_class = class_called(connector_name, "connector")
+    unless connector_class
+      log.error "No connector called #connector_name}"
+      return
+    end
+    options[:name] ||= "#{self.name}(track)"
+    options[:is_vault] = false
+    class_def 'track' do
+      @track ||= connector_class.new(options)
+    end
+  end
+
+  private
 
   def ruby_sync_association
     unless @ruby_sync_association
-      @ruby_sync_association = ::RubySyncAssociation
-      ::RubySyncAssociation.establish_connection(db_config)
+      if Object.const_defined?(:RubySyncAssociation) and @models.include?('RubySyncAssociation')
+        @ruby_sync_association = ::RubySyncAssociation
+        @ruby_sync_association.establish_connection(db_config)
+      elsif track.respond_to? :associations_model
+        @ruby_sync_association = track.associations_model.to_s.camelize.constantize
+        @ruby_sync_association.establish_connection(track.db_config)
+      end
     end
     @ruby_sync_association
   end
