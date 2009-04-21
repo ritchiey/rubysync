@@ -1,7 +1,7 @@
 class LdapVaultConnector < RubySync::Connectors::LdapConnector
   
-  #track_changes_with :dbm
-  #track_associations_with :dbm  
+  track_changes_with :dbm
+  track_associations_with :dbm  
 
   # ApacheDS config
   host          'localhost'
