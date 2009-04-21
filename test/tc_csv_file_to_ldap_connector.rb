@@ -73,7 +73,6 @@ class CsvToLdapTestPipeline < RubySync::Pipelines::BasePipeline
 
   end
 
-
   # Should evaluate to the path for placing a new record on the vault
   in_place do
 #    "cn=#{source_path},dc=localhost"#OpenLDAP
@@ -86,7 +85,7 @@ class TcCsvToLdapConnector < Test::Unit::TestCase
   include RubySyncTest
 
   def unsynchable
-    ['modifier', 'objectclass', 'rubysyncassociation']
+    [:modifier, :objectclass, :rubysyncassociation]
   end 
   
   def vault_path
