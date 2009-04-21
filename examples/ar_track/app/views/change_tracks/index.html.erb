@@ -1,0 +1,18 @@
+<h1>Listing change_tracks</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @change_tracks.each do |change_track| %>
+  <tr>
+    <td><%= link_to 'Show', change_track %></td>
+    <td><%= link_to 'Edit', edit_change_track_path(change_track) %></td>
+    <td><%= link_to 'Destroy', change_track, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New change_track', new_change_track_path %>

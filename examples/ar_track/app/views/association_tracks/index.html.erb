@@ -1,0 +1,18 @@
+<h1>Listing association_tracks</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @association_tracks.each do |association_track| %>
+  <tr>
+    <td><%= link_to 'Show', association_track %></td>
+    <td><%= link_to 'Edit', edit_association_track_path(association_track) %></td>
+    <td><%= link_to 'Destroy', association_track, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New association_track', new_association_track_path %>

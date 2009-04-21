@@ -1,0 +1,12 @@
+<h1>Editing change_track</h1>
+
+<% form_for(@change_track) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @change_track %> |
+<%= link_to 'Back', change_tracks_path %>
