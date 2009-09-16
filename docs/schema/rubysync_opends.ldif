@@ -1,0 +1,33 @@
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+cn: schema
+attributeTypes: ( 1.3.6.1.4.1.33635.1.1.1 NAME 'rubySyncAssociation' 
+  DESC 'Context:Key provided by connected system' 
+  EQUALITY caseExactMatch 
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+attributeTypes: ( 1.3.6.1.4.1.33635.1.1.2 NAME 'rubySyncLastSync' 
+  DESC 'Save informations about last synchronization of a client' 
+  EQUALITY caseExactMatch 
+  SUBSTR caseExactSubstringsMatch 
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+attributeTypes: ( 1.3.6.1.4.1.33635.1.1.3 NAME 'rubySyncContext' 
+  DESC 'Context (client and vault connectors) provided by connected system' 
+  EQUALITY caseExactMatch 
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+attributeTypes: ( 1.3.6.1.4.1.33635.1.1.4 NAME 'rubySyncDumpEntry' 
+  DESC 'a dump entry' 
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
+objectClasses: ( 1.3.6.1.4.1.33635.1.2.1 NAME 'rubySyncSynchable' 
+  DESC 'Object can preserve links to other objects via rubySync' 
+  AUXILIARY 
+  MAY rubySyncAssociation )
+objectClasses: ( 1.3.6.1.4.1.33635.1.2.2 NAME 'rubySyncConnectorState' 
+  DESC 'Synchronization informations between client and vault connectors' 
+  AUXILIARY 
+  MAY rubySyncLastSync )
+objectClasses: ( 1.3.6.1.4.1.33635.1.2.3 NAME 'rubySyncChangeLogEntry' 
+  DESC 'Useful for LDAP server without native public changelog support (see https://opends.dev.java.net/public/standards/draft-good-ldap-changelog.txt)' 
+  AUXILIARY 
+  MAY ( rubySyncContext $ rubySyncDumpEntry ) )

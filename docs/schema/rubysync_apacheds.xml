@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema name="rubysync">
+   <attributetypes>
+      <attributetype oid="1.3.6.1.4.1.33635.1.1.1" obsolete="false" singlevalue="false" collective="false" nousermodification="false">
+         <aliases>
+            <alias>rubySyncAssociation</alias>
+         </aliases>
+         <description>Context:Key provided by connected system</description>
+         <usage>USER_APPLICATIONS</usage>
+         <syntax>1.3.6.1.4.1.1466.115.121.1.15</syntax>
+         <equality>caseExactMatch</equality>
+      </attributetype>
+      <attributetype oid="1.3.6.1.4.1.33635.1.1.2" obsolete="false" singlevalue="true" collective="false" nousermodification="false">
+         <aliases>
+            <alias>rubySyncLastSync</alias>
+         </aliases>
+         <description>Save informations about last synchronization of a client</description>
+         <usage>USER_APPLICATIONS</usage>
+         <syntax>1.3.6.1.4.1.1466.115.121.1.15</syntax>
+         <equality>caseExactMatch</equality>
+         <substring>caseExactSubstringsMatch</substring>
+      </attributetype>
+      <attributetype oid="1.3.6.1.4.1.33635.1.1.3" obsolete="false" singlevalue="false" collective="false" nousermodification="false">
+         <aliases>
+            <alias>rubySyncContext</alias>
+         </aliases>
+         <description>Context (client and vault connectors) provided by connected system</description>
+         <usage>USER_APPLICATIONS</usage>
+         <syntax>1.3.6.1.4.1.1466.115.121.1.15</syntax>
+         <equality>caseExactMatch</equality>
+      </attributetype>
+      <attributetype oid="1.3.6.1.4.1.33635.1.1.4" obsolete="false" singlevalue="false" collective="false" nousermodification="false">
+         <aliases>
+            <alias>rubySyncDumpEntry</alias>
+         </aliases>
+         <description>a dump entry</description>
+         <usage>USER_APPLICATIONS</usage>
+         <syntax>1.3.6.1.4.1.1466.115.121.1.40</syntax>
+      </attributetype>
+   </attributetypes>
+   <objectclasses>
+      <objectclass oid="1.3.6.1.4.1.33635.1.2.1" obsolete="false">
+         <aliases>
+            <alias>rubySyncSynchable</alias>
+         </aliases>
+         <description>Object can preserve links to other objects via rubySync</description>
+         <type>AUXILIARY</type>
+         <optional>
+            <attributetype>rubySyncAssociation</attributetype>
+         </optional>
+      </objectclass>
+      <objectclass oid="1.3.6.1.4.1.33635.1.2.2" obsolete="false">
+         <aliases>
+            <alias>rubySyncConnectorState</alias>
+         </aliases>
+         <description>Synchronization informations between client and vault connectors</description>
+         <type>AUXILIARY</type>
+         <optional>
+            <attributetype>rubySyncLastSync</attributetype>
+         </optional>
+      </objectclass>
+      <objectclass oid="1.3.6.1.4.1.33635.1.2.3" obsolete="false">
+         <aliases>
+            <alias>rubySyncChangeLogEntry</alias>
+         </aliases>
+         <description>Useful for LDAP server without native public changelog support (see https://opends.dev.java.net/public/standards/draft-good-ldap-changelog.txt)</description>
+         <type>AUXILIARY</type>
+         <optional>
+            <attributetype>rubySyncContext</attributetype>
+            <attributetype>rubySyncDumpEntry</attributetype>
+         </optional>
+      </objectclass>
+   </objectclasses>
+</schema>
