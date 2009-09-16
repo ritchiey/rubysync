@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -w
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
@@ -26,14 +27,23 @@ require 'ruby_sync/connectors/memory_connector'
 
 class ChangeLogConnector < RubySync::Connectors::LdapChangelogConnector
   
-  # OpenLDAP config
-  host          'localhost'
-  port          389
-  username      'cn=admin,dc=localhost'
-  password      'secret'
-  changelog_dn 'cn=changelog'
-  search_filter "cn=*"
-  search_base   "dc=localhost"
+    # ApacheDS config
+    host          'localhost'
+    port          10389
+    username      'uid=admin,ou=system'
+    password      'secret'
+    changelog_dn 'cn=changelog,ou=system'
+    search_filter "cn=*"
+    search_base   "ou=users,ou=system"
+
+#  # OpenLDAP config
+#  host          'localhost'
+#  port          389
+#  username      'cn=admin,dc=localhost'
+#  password      'secret'
+#  changelog_dn 'cn=changelog'
+#  search_filter "cn=*"
+#  search_base   "dc=localhost"
 
   # Default config
 #  host        'changelog_ldap'

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
@@ -19,16 +20,17 @@
 
 require 'ruby_sync_test'
 require 'hashlike_tests'
-require 'ruby_sync/connectors/ldap_connector'
+require 'ruby_sync/connectors/ldap_changelog_connector'
 require 'ruby_sync/connectors/memory_connector'
 
 
-class MyLdapConnector < RubySync::Connectors::LdapConnector
+class MyLdapConnector < RubySync::Connectors::LdapChangelogConnector
   # ApacheDS config
   host          'localhost'
   port          10389
   username      'uid=admin,ou=system'
   password      'secret'
+  changelog_dn 'cn=changelog,ou=system'
   search_filter "cn=*"
   search_base   "ou=system"
 
