@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
@@ -32,14 +33,14 @@ module RubySync::Connectors
       self.name = options[:name]
       self.is_vault = options[:is_vault]
       if is_vault && !can_act_as_vault?
-	raise "#{self.class.name} can't act as an identity vault."
+        raise "#{self.class.name} can't act as an identity vault."
       end
       options.each do |key, value|
-	if self.respond_to? "#{key}="
-	  self.send("#{key}=", value) 
-	else
-	  log.debug "#{name}: doesn't respond to #{key}="
-	end
+        if self.respond_to? "#{key}="
+          self.send("#{key}=", value)
+        else
+          log.debug "#{name}: doesn't respond to #{key}="
+        end
       end
     end      
       
@@ -59,7 +60,7 @@ module RubySync::Connectors
 
     def self.event_method name,&blk
       define_method name do |event|
-	event.instance_eval(&blk)
+        event.instance_eval(&blk)
       end
     end
 
@@ -385,8 +386,8 @@ module RubySync::Connectors
       module_name = class_name_for(name, extension)
       m = eval(module_name)
       unless include(m)
-	message ||= "Couldn't find a module called #{module_name}"
-	log.error message
+        message ||= "Couldn't find a module called #{module_name}"
+        log.error message
       end
     end
 
