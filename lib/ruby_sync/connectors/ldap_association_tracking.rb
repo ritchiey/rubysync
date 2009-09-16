@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
@@ -22,8 +23,8 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 #$VERBOSE = true
 
 
-RUBYSYNC_ASSOCIATION_ATTRIBUTE = "RubySyncAssociation"
-RUBYSYNC_ASSOCIATION_CLASS = "RubySyncSynchable"
+RUBYSYNC_ASSOCIATION_CLASS = "rubySyncSynchable"
+RUBYSYNC_ASSOCIATION_ATTRIBUTE = "rubySyncAssociation"
 
 module RubySync::Connectors
   module LdapAssociationTracking
@@ -33,20 +34,20 @@ module RubySync::Connectors
       with_ldap do |ldap|
         # TODO: check and warn if path is outside of search_base
         ldap.modify :dn=>path, :operations=>[
-          [:add, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s.sanitize_ldap]
+          [:add, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s.ldap_encode]
         ]
       end
     end
     
     def path_for_association association
       with_ldap do |ldap|
-        filter = "#{RUBYSYNC_ASSOCIATION_ATTRIBUTE}=#{association.to_s.sanitize_ldap}"
+        filter = "#{RUBYSYNC_ASSOCIATION_ATTRIBUTE}=#{association.to_s.ldap_encode}"
         log.debug "Searching with filter: #{filter}"
         results = ldap.search :base => search_base, :filter => filter
         results or return nil
         case results.length
-        when 0: return nil
-        when 1: return results[0].dn
+        when 0 then return nil
+        when 1 then return results[0].dn
         else
           raise Exception.new("Duplicate association found for #{association.to_s}")
         end
@@ -62,7 +63,7 @@ module RubySync::Connectors
           log.warn "Attempted association lookup on non-existent LDAP entry '#{path}'"
           return []
         end
-        associations = results[0][RUBYSYNC_ASSOCIATION_ATTRIBUTE]
+        associations = results[0][RUBYSYNC_ASSOCIATION_ATTRIBUTE].to_s.ldap_decode
         return (associations)? as_array(associations) : []
       end
     end
@@ -70,9 +71,24 @@ module RubySync::Connectors
     def remove_association association
       path = path_for_association association
       with_ldap do |ldap|
-        ldap.modify :dn=>path, :modifications=>[
-          [:delete, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s.sanitize_ldap]
-	]
+        ldap.replace_attribute path, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s.ldap_encode
+      end
+    end
+
+    def association_key_for context, path
+      with_ldap do |ldap|
+        filter = "#{RUBYSYNC_ASSOCIATION_ATTRIBUTE}=#{(context+'$*').ldap_encode}"
+        results = ldap.search :base=>path,
+          :scope=>Net::LDAP::SearchScope_BaseObject,
+          :attributes=>[RUBYSYNC_ASSOCIATION_ATTRIBUTE],
+          :filter=>filter
+        results or return nil
+        case results.length
+        when 0 then return nil
+        when 1 then return results[0][RUBYSYNC_ASSOCIATION_ATTRIBUTE].to_s.ldap_decode.match('^.*\$(.*)$')[1]
+        else
+          raise Exception.new("Duplicate association found for context '#{context.to_s}' and path '#{path.to_s}'")
+        end
       end
     end
 

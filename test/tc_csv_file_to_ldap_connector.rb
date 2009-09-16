@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-#  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
