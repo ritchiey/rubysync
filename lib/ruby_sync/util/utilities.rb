@@ -20,6 +20,7 @@ require 'fileutils'
 require 'rubygems'
 require 'active_support'
 require 'irb'
+require 'net/ldap'
 
 
 
@@ -35,11 +36,131 @@ module Kernel
   end    
 end
 
+module Net
+  class LDAP
+    
+    # Update the value of an attribute.
+    # #update_attribute can be thought of as equivalent to calling #add_attribute
+    # followed by #delete_value. It takes the full DN of the entry to modify,
+    # the name (Symbol or String) of the attribute, and the value (String or
+    # Array). If the attribute does not exist, it will be created with the
+    # caller-specified value(s). If the attribute does exist, its values will be
+    # _discarded_ and replaced with the caller-specified values.
+    #
+    # Returns True or False to indicate whether the operation
+    # succeeded or failed, with extended information available by calling
+    # #get_operation_result. See also #add_attribute and #delete_value.
+    #
+    #  dn = "cn=modifyme,dc=example,dc=com"
+    #  ldap.update_attribute dn, :mail, "oldmailaddress@example.com", "newmailaddress@example.com"
+    #
+    def update_attribute dn, attribute, old_value, new_value
+
+      unless result=(add_attribute(dn, attribute, new_value) and delete_value(dn, attribute, old_value))
+         log.error "Result: #{get_operation_result.code}"
+         log.error "Message: #{get_operation_result.message}"
+         raise Exception.new("Unable to update attribute: #{attribute}")
+      end
+
+      result
+    end
+
+    # Delete a value of an attribute.
+    # Takes the full DN of the entry to modify, and the
+    # name (Symbol or String) of the value to delete.
+    #
+    # Returns True or False to indicate whether the operation
+    # succeeded or failed, with extended information available by calling
+    # #get_operation_result. See also #add_attribute and #update_attribute.
+    #
+    #  dn = "cn=modifyme,dc=example,dc=com"
+    #  ldap.delete_value dn, :mail, "oldmailaddress@example.com"
+    #
+    def delete_value dn, attribute, value
+      unless result = (modify :dn => dn, :operations => [[:delete, attribute, value]])
+         log.error "Result: #{get_operation_result.code}"
+         log.error "Message: #{get_operation_result.message}"
+         raise Exception.new("Unable to delete value: #{value} of attribute: #{attribute}")
+      end
+      
+      result
+    end
+  end
+end
+
 class Array
   def to_ruby
     map {|f| "'#{f}'"}.join(', ')    
   end
 end
+
+class Object
+  #deep copy for a data structure, eg. Hash or Array
+  #Authors GOTO Kentaro and Robert Feldt
+  def deep_dup
+    Marshal::load(Marshal.dump(self))
+  end
+end
+
+
+class Hash
+  
+  # Returns a Hash that represents the difference between two Hashes who have Array values
+  def deep_diff(h2)
+    h1 = self.deep_dup
+    h1.each do |k, v|
+#      if( v == h2[k])
+#        h1.delete(k)
+#      else
+        h1_values = v.to_a
+        h2_values = h2[k].to_a
+        
+      #Experimental
+        old_values =  h1_values - h2_values
+        new_values =  h2_values - h1_values
+#        delete_values = old_values.uniq! & add_values.uniq!
+#        add_values.each{|v1| h1_values << v1}
+#        delete_values.to_a.each{|v1| h1_values.delete(v1)}
+        h1_values = (old_values).uniq
+        
+          
+#        h2_values.each do |v2|
+#          h1_values.each do |v1|
+#            (v1 == v2) ? h1_values.delete(v1) :  h1_values << v2
+#          end
+#        end
+
+        #Replace array wich has only one element by element value
+        if h1_values.empty?
+          h1.delete(k)
+        elsif(h1_values.size == 1)
+          h1[k]=h1_values.at(0)
+        else
+          h1[k] = h1_values
+        end
+      end
+     
+#    end
+    h1
+  end
+
+  #convert Hash to Ldif syntax
+  def to_ldif
+    ary = []
+
+    keys.sort.each {|attr|
+      self[attr].each {|val|
+        #TODO Not Ruby 1.9 compliant
+        ary << "#{attr}: #{val}" if attr != 'dn'
+      }
+    }
+
+    block_given? and ary.each {|line| yield line}
+
+    ary
+  end
+end
+
 
 class String
   # PHP's two argument version of strtr
@@ -51,10 +172,15 @@ class String
     ) { |match| values[keys.index(match)] }
   end
 
-  #Convert specials chars to be compliant with Ldap
-  def sanitize_ldap
+  #Convert specials chars to be compliant with Ldap filter
+  def ldap_encode
     #self.strtr("*"=>"\\2a","\\"=>"\5c","NUL"=>"\\00","("=> "\\28",")"=>"\\29")
     self.strtr("$"=>"_24","("=> "_28",")"=>"_29")
+  end
+
+  #Restore specials chars from Ldap entry
+  def ldap_decode
+    self.strtr("_24"=>"$","_28"=> "(","_29"=>")")
   end
 end
 
