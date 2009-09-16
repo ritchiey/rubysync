@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
@@ -144,7 +145,7 @@ END
         populate(record, perform_operations(event.payload))
         log.info(record.inspect)
         record.save!
-        update_track record.id
+        update_mirror record.id
         if is_vault?
           associate event.association, record.id
         end

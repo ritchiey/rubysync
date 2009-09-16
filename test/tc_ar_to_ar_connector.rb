@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-#  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
@@ -21,8 +21,8 @@ require 'ruby_sync_test'
 
 class ArTrackConnector < RubySync::Connectors::ActiveRecordConnector
   #  model :change_track
-  changes_model :change_track
-  associations_model :association_track
+  changes_model :change_track#Alias of model's option
+  associations_model :association_track#Only usefull for vault connector
   application "#{File.dirname(__FILE__)}/../examples/ar_track"
 end
 

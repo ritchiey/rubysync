@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 #
-#  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man. All rights reserved.
 #
 # This file is part of RubySync.
 # 
@@ -22,9 +22,9 @@ require 'digest/md5'
 
 module RubySync::Connectors::ActiveRecordChangeTracking
 
-  # Disable track updates for incoming events
-  def update_track(path); end
-  def delete_from_track(path); end
+  # Disable mirror updates for incoming events
+  def update_mirror(path); end
+  def delete_from_mirror(path); end
 
   def each_change
     # Process each RubySyncEvent and then delete it from the db.
