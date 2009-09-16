@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 # 
@@ -26,6 +27,7 @@ require 'net/ldap'
 
 module RubySync::Connectors
   class LdapChangelogConnector < RubySync::Connectors::LdapConnector
+    include LdapChangelogNumberTracking
 
     option             :changelog_dn
     changelog_dn          "cn=changelog"
@@ -94,7 +96,7 @@ module RubySync::Connectors
 
     # Called by unit tests to inject data
     def test_add id, details
-      details << RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson', 'organizationalPerson', 'person', 'top', 'RubySyncSynchable'])
+      details << RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson', 'organizationalPerson', 'person', 'top', 'rubySyncSynchable'])
       add id, details
     end
 
