@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
 #
@@ -76,7 +77,7 @@ module RubySync::Connectors
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
 	      ldap.search search_args(:return_result => false) do |ldap_entry|
-	        yield ldap_entry.dn, to_entry(ldap_entry)
+	        yield to_entry(ldap_entry)
 	      end
       end
     end
@@ -138,9 +139,9 @@ END
     def modify(path, operations)
       log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
       with_ldap do |ldap|
-        operations.each do |op|
-          found=false
+        operations.each do |op|          
           if op.subject == 'objectclass' and op.type == :replace
+            found=false
             op.values.each { |value| found=true if value == RUBYSYNC_ASSOCIATION_CLASS}
             op.values << RUBYSYNC_ASSOCIATION_CLASS unless found
           end
@@ -169,7 +170,7 @@ END
     end
   end
 
-    def search_args(extras)
+    def search_args(extras={})
       args = {:base => search_base, :filter => search_filter}
       @attributes and args[:attributes] = @attributes
       args.merge(extras)
@@ -200,7 +201,7 @@ END
     def to_entry ldap_entry
       entry = {}
       ldap_entry.each do |name, values|
-        entry[name.to_s] = values.map {|v| String.new(v)}
+        entry[name.to_s] =  values.map {|v| String.new(v)} 
       end
       entry
     end
@@ -237,7 +238,7 @@ END
     # Produce an array of operation arrays suitable for the LDAP library
     def to_ldap_operations operations
       operations.map {|op| [op.type, op.subject, op.values]}
-    end
+    end    
 
   end
 end
