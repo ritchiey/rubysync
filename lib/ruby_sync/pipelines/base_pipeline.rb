@@ -90,10 +90,10 @@ module RubySync
       dump_before HashWithIndifferentAccess.new
       dump_after HashWithIndifferentAccess.new
 
-      def self.in_event_transform(&blk) deprecated_event_method :in_event_transform, :in_event_transform, &blk; end
+      def self.in_transform(&blk) deprecated_event_method :in_transform, :in_event_transform, &blk; end
       def self.in_event_transform(&blk) event_method :in_event_transform,&blk; end
       def self.in_command_transform(&blk) event_method :in_command_transform,&blk; end
-      def self.out_event_transform(&blk) deprecated_event_method :out_event_transform, :out_event_transform, &blk; end
+      def self.out_transform(&blk) deprecated_event_method :out_transform, :out_event_transform, &blk; end
       def self.out_event_transform(&blk) event_method :out_event_transform,&blk; end
       def self.out_command_transform(&blk) event_method :out_command_transform,&blk; end
       def self.in_match(&blk) event_method :in_match,&blk; end
