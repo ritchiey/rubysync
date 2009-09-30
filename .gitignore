@@ -1,7 +1,7 @@
-
 *.log
 *.db
-*.sqlite3
-!*.yml.sqlite3
+*.sqlite*
+!*.yml.sqlite*
 
+private/
 nbproject/
