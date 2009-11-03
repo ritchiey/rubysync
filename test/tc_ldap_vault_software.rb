@@ -63,7 +63,6 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogRubyConnector
   
   def initialize options={}
     super(options)
-#    skip_existing_changelog_entries
   end
 
 end
@@ -89,16 +88,13 @@ class LdapSoftwareTestPipeline < RubySync::Pipelines::BasePipeline
   
   def out_place(event)
     event.target_path = event.source_path.scan(/cn=(.+?),/oi).to_s
-   # event.source_path = $1
   end
   
-#  in_event_transform do
-#    if type == :add or type == :modify
-#      each_operation_on('givenName') { |operation| append operation.same_but_on('cn') }
-#      append RubySync::Operation.new(:add, 'objectclass', ['inetOrgPerson'])
-#    end
-#  end
-  
+  in_event_transform do    
+    if type == :add or type == :modify
+       @payload << RubySync::Operation.new(:add, 'objectclass', ['inetOrgPerson'])
+    end
+  end
 end
 
 
@@ -108,44 +104,25 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
   include HashlikeTests
 
   def initialize(test)
-    super(test)
-    
-    # Removing previous LDAP entries
-      pipeline = testPipeline.new
-      vault = pipeline.vault
-
-      with_ldap(vault) do |ldap|
-        filter = Net::LDAP::Filter.eq(RUBYSYNC_LAST_SYNC_ATTRIBUTE, "#{vault.association_context.ldap_encode},*")
-        unless (entry = ldap.search(:base => vault.search_base, :filter => filter, :scope => Net::LDAP::SearchScope_BaseObject)).empty?
-          entry[0][RUBYSYNC_LAST_SYNC_ATTRIBUTE].each do |last_sync|
-            unless last_sync.match(/^#{vault.association_context.ldap_encode},.*$/).nil?
-              ldap.delete_value(entry[0].dn, RUBYSYNC_LAST_SYNC_ATTRIBUTE.downcase.to_sym, last_sync)
-              break
-            end
-          end
-
-        end
-
-        ldap.search(:base => vault.changelog_dn, :filter => "objectClass = changeLogEntry") { |entry| ldap.delete(:dn => entry.dn)}
-        ldap.search(:base => vault.search_base, :filter => "objectClass = inetOrgPerson") { |entry| ldap.delete(:dn => entry.dn)}
-      end
+    super(test)    
+    delete_all_ldap_entries
   end
   
   def setup
     super
     @bob_details = {
-      "objectclass"=>['inetOrgPerson'],
       "cn"=>['bob'],
       "sn"=>['roberts']
       #"mail"=>['bob@roberts.com']
       }
       
      @joe_details = { :dn =>"cn=joe,#{@vault.search_base}",
-      :objectclass => 'inetOrgPerson',
       :cn=>'joe',
       :sn=>'bigjim',
       :mail => 'joe@bigjim.com'
       }
+      
+      @last_change_number = @vault.last_change_number
   end
 
   def testPipeline
@@ -168,24 +145,29 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
   end
 
    def test_client_to_vault
+    assert_equal @last_change_number, @vault.last_change_number
     banner "test_client_to_vault"
     assoc_key = @client.add client_path, @client.create_operations_for(@bob_details)
     assert_not_nil @client.entry_for_own_association_key(assoc_key)
     assert_nil @vault[vault_path], "Vault already contains bob"
     @pipeline.run_once
+    assert_equal @last_change_number+=1, @vault.last_change_number
     assert_not_nil @vault[vault_path], "#{vault_path} wasn't created on the vault"
     assert_equal normalise(@bob_details), normalise(@vault[vault_path].reject {|k,v| ['modifier',:association].include? k})
 
     add_ldap_entry(@joe_details)
     @pipeline.run_once
+    assert_equal @last_change_number+=1, @vault.last_change_number
 
     @bob_details['sn']=['robertos']
     @client.modify(client_path, [RubySync::Operation.replace('sn', 'robertos')])
     @pipeline.run_once
+    assert_equal @last_change_number+=1, @vault.last_change_number
     assert_equal @bob_details['sn'].to_s, @vault[vault_path]['sn'].to_s
     
     @client.modify(client_path, [RubySync::Operation.replace('sn', 'robertas'),RubySync::Operation.add('givenName', "Robert")])
     @pipeline.run_once
+    assert_equal @last_change_number+=1, @vault.last_change_number
     assert_equal 'robertas', @vault[vault_path]['sn'].to_s
     @bob_details['sn']=['robertas']
     @bob_details['givenName']=['Robert']
@@ -195,33 +177,37 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
     assert_equal normalise(@bob_details), normalise(@vault[vault_path].reject {|k,v| ['modifier',:association].include? k})
     assert_nil @client[client_path], "Bob wasn't deleted from the client"
     @pipeline.run_once
+    assert_equal @last_change_number+=1, @vault.last_change_number
     assert_nil @client[client_path], "Bob reappeared on the client"
     assert_nil @vault[vault_path], "Bob wasn't deleted from the vault"
     @pipeline.run_once # run again in case of echoes
+    assert_equal @last_change_number, @vault.last_change_number
     assert_nil @client[client_path], "Bob reappeared on the client"
     assert_nil @vault[vault_path], "Bob reappeared in the vault. He may have been created by an echoed add event"
     
     person = @joe_details.dup
-    person[:cn] = 'jojo'
-    person[:objectclass] << RUBYSYNC_ASSOCIATION_CLASS
-    op1 = [:add, :objectclass, RUBYSYNC_ASSOCIATION_CLASS]
-    modify_ldap_entry(person, [op1])
+    person[:sn] = 'bigjimmy'
+#    person[:objectclass] = [RUBYSYNC_ASSOCIATION_CLASS]
+#    op1 = [:add, :objectclass, person[:objectclass].first]
+    modify_ldap_entry(person)
     @pipeline.run_once
+    assert_equal @last_change_number+=1, @vault.last_change_number
 
     delete_ldap_entry(@joe_details)
     @pipeline.run_once
+    assert_equal @last_change_number+=1, @vault.last_change_number
     with_ldap(@vault) do |ldap|
       assert_equal(true,ldap.search(:base => @vault.search_base, :filter => "(& (cn = #{@bob_details['cn']}) (objectClass = inetOrgPerson))").empty?)
-    end
-    
+    end    
   end
 
   def test_vault
-    #super
   end
 
   def test_vault_to_client
+    @bob_details[:objectclass] = ['inetOrgPerson']
     super
+    @bob_details.delete(:objectclass)
   end
 
   #Helpers
@@ -229,33 +215,58 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
   def add_ldap_entry(entry)
     person = entry.dup
     person_dn = person.delete(:dn)
+    person["objectclass"] = ['inetOrgPerson']
 
     with_ldap(@vault) do |ldap|
-      ldap.add(:dn => person_dn, :attributes => person)
+      assert ldap.add(:dn => person_dn, :attributes => person)
       filter = Net::LDAP::Filter.pres("objectclass") & Net::LDAP::Filter.eq("cn", person[:cn])
       assert_equal(false,ldap.search(:base => @vault.search_base, :filter => filter).empty?)
     end
   end
 
-  def modify_ldap_entry(entry, operations)
+  def modify_ldap_entry(entry, operations = nil)
     person = entry.dup
-    #person_dn = person.delete(:dn)
+    person_dn = person.delete(:dn)
+
+    operations = @vault.create_operations_for(person).map {|op| [:replace, op.subject, op.values]} if operations.nil?
 
     with_ldap(@vault) do |ldap|
-      ldap.modify(:dn => person[:dn], :operations => operations)
+      assert ldap.modify(:dn => person_dn, :operations => operations)
       filter = Net::LDAP::Filter.pres("objectclass") & Net::LDAP::Filter.eq("cn", person[:cn])
       ldap.search(:base => @vault.search_base, :filter => filter) do |ldap_entry|
-        assert_equal(normalise(person[:objectclass]), normalise(ldap_entry.objectclass))
+        assert_equal(person[:sn].to_s, ldap_entry.sn.to_s)
       end
     end
   end
 
   def delete_ldap_entry(entry)
     with_ldap(@vault) do |ldap|
-      ldap.delete(:dn => entry[:dn])
+      assert ldap.delete(:dn => entry[:dn])
       filter = Net::LDAP::Filter.pres("objectclass") & Net::LDAP::Filter.eq("cn", entry[:cn])
       assert_equal(true,ldap.search(:base => @vault.search_base, :filter => filter).empty?)
     end    
+  end
+
+  # Removing previous LDAP entries
+  def delete_all_ldap_entries
+      pipeline = testPipeline.new
+      vault = pipeline.vault
+
+      with_ldap(vault) do |ldap|
+        filter = Net::LDAP::Filter.eq(RUBYSYNC_LAST_SYNC_ATTRIBUTE, "#{vault.association_context.ldap_encode},*")
+        unless (entry = ldap.search(:base => vault.search_base, :filter => filter, :scope => Net::LDAP::SearchScope_BaseObject)).empty?
+          entry[0][RUBYSYNC_LAST_SYNC_ATTRIBUTE].each do |last_sync|
+            unless last_sync.match(/^#{vault.association_context.ldap_encode},.*$/).nil?
+              ldap.delete_value(entry[0].dn, RUBYSYNC_LAST_SYNC_ATTRIBUTE.downcase.to_sym, last_sync)
+              break
+            end
+          end
+
+        end
+
+        ldap.search(:base => vault.changelog_dn, :filter => "objectClass = changeLogEntry") { |entry| ldap.delete(:dn => entry.dn)}
+        ldap.search(:base => vault.search_base, :filter => "objectClass = inetOrgPerson") { |entry| ldap.delete(:dn => entry.dn)}
+      end
   end
 
   private
