@@ -71,8 +71,9 @@ module RubySync
         return nil # don't want to create any new associations
       end
       
-      def perform_modify event
+      def perform_modify event        
         path = associated_path event
+        log.info "Modifying '#{path}' from '#{name}'"
         raise Exception.new("#{name}: Attempted to modify non-existent entry '#{path}'") unless self[path]
         #call_if_exists(:target_transform, event)
         modify path, event.payload

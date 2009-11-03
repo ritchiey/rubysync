@@ -143,7 +143,7 @@ END
       log.info "Adding '#{event.target_path}' to '#{name}'"
       ar_class.new() do |record|
         populate(record, perform_operations(event.payload))
-        log.info(record.inspect)
+        #log.info(record.inspect)
         record.save!
         update_mirror record.id
         if is_vault?

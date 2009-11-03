@@ -137,7 +137,7 @@ END
     end
 
     def modify(path, operations)
-      log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
+      #log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
       with_ldap do |ldap|
         operations.each do |op|          
           if op.subject == 'objectclass' and op.type == :replace
