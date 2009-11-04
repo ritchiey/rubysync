@@ -39,9 +39,13 @@ class Module
   # and accessible as an instance method
   def option *names
     names.each do |name|
-      meta_def name do |value|
-        class_def name do
-          
+      meta_def name do |*values|
+        if values.is_a?(Enumerable) && values.length > 1
+          value= values
+        elsif values
+          value = values.first
+        end
+        class_def name do          
           value
         end
         meta_def "get_#{name}" do

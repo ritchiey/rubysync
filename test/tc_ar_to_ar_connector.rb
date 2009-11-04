@@ -21,7 +21,7 @@ require 'ruby_sync_test'
 
 class ArTrackConnector < RubySync::Connectors::ActiveRecordConnector
   #  model :change_track
-  changes_model :change_track#Alias of model's option
+  changes_model :change_track#Alias of model's method
   associations_model :association_track#Only usefull for vault connector
   application "#{File.dirname(__FILE__)}/../examples/ar_track"
 end

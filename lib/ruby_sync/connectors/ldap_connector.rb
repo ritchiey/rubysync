@@ -43,7 +43,7 @@ module RubySync::Connectors
 
     include LdapAssociationTracking
 
-    option  :host,
+    option :host,
       :port,
       :bind_method,
       :encryption,
@@ -54,7 +54,7 @@ module RubySync::Connectors
       :attributes,
       :association_attribute # name of the attribute in which to store the association key(s)
 
-    association_attribute 'RubySyncAssociation'
+    association_attribute RUBYSYNC_ASSOCIATION_ATTRIBUTE
     bind_method           :simple
     host                  'localhost'
     port                  10389
@@ -85,7 +85,7 @@ module RubySync::Connectors
     # Runs the query specified by the config, gets the objectclass of the first
     # returned object and returns a list of its allowed attributes
     def self.fields
-      return @attributes if @attributes
+      return get_attributes if respond_to? :get_attributes
       log.warn ":attributes option not set"
       log.warn "Returning a likely sample set."
       %w{ cn givenName sn }
@@ -124,9 +124,9 @@ END
       result = nil
       with_ldap do |ldap|
         operations << RubySync::Operation.add('objectclass', RUBYSYNC_ASSOCIATION_CLASS)
-        attributes = perform_operations(operations)
-        attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
-        result = ldap.add :dn=>path, :attributes=>attributes
+        ldap_attributes = perform_operations(operations)
+        ldap_attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
+        result = ldap.add :dn=>path, :attributes => ldap_attributes
       end
       log.debug("ldap.add returned '#{result}'")
       return result
@@ -172,7 +172,7 @@ END
 
     def search_args(extras={})
       args = {:base => search_base, :filter => search_filter}
-      @attributes and args[:attributes] = @attributes
+      get_attributes and args[:attributes] = get_attributes
       args.merge(extras)
     end
 
@@ -219,7 +219,7 @@ END
       result = nil
       connection_options = {:host=>host, :port=>port, :auth=>auth}
       connection_options[:encryption] = encryption if encryption
-      started unless @connection_index #debug
+      started unless @connection_index
       @connections[@connection_index] = Net::LDAP.new(connection_options) unless @connections[@connection_index]
       if @connections[@connection_index]
         ldap = @connections[@connection_index]
