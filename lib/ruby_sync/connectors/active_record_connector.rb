@@ -29,13 +29,15 @@ module RubySync::Connectors
     include ActiveRecordAssociationTracking
     include ActiveRecordChangeTracking
     
-    option :ar_class, :model, :changes_model, :associations_model, :application, :rails_env, :db_type, :db_host, :db_username, :db_password, :db_name, :db_pool, :db_config
+    option :ar_class, :model, :changes_model, :associations_model, :application, :rails_env, :columns,
+      :db_type, :db_host, :db_username, :db_password, :db_name, :db_encoding, :db_pool, :db_config
     rails_env 'development'
     db_type 'postgresql'
     db_username 'rails_user'
     db_password 'your_password'
     db_host 'localhost'
     db_name "rubysync_#{get_rails_env}"
+    db_encoding "utf8"
     db_pool 5    
     # Default db_config in case we're not sucking the config out of a rails app
     db_config(
@@ -44,6 +46,7 @@ module RubySync::Connectors
       :database=>get_db_name,
       :username=>get_db_username,
       :password=>get_db_password,
+      :encoding=>get_db_encoding,
       :pool=>get_db_pool
     )
 
@@ -73,32 +76,44 @@ module RubySync::Connectors
         
         # Load the database configuration
         rails_app_path = File.expand_path(application)
+        ::Module.rails_app_path = rails_app_path
+        log.debug(self.name)
+        log.debug(::Module.rails_app_path)
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
-        new_db_config = YAML::load(ERB.new(IO.read(db_config_filename)).result)[rails_env]
+        new_db_config = YAML.load(File.read(db_config_filename)).with_indifferent_access[rails_env]
+
         #Add rails application relative path for sqlite databases
         if new_db_config['adapter'].match('^(jdbc)?sqlite(2|3)?$')
           new_db_config['database'] = rails_app_path + '/' + new_db_config['database'] if Pathname.new(new_db_config['database']).relative?
         end
+        
+        # Load db config
+        self.class.db_config new_db_config
+       
         # Require the models
         @models||=[]
-        Dir.chdir(File.join(rails_app_path,'app','models')) do
-          require model.to_s if models=Dir.glob('*.rb') and models.include?(model.to_s + '.rb') #Require main model before others models
-          models.each do |filename|
-            log.debug("\t#{filename}")
-            require filename
-            class_name = filename[0..-4].camelize
+        Dir[File.join(rails_app_path, 'app','models', '*.rb')].each do |filepath|
+          require_dependency filepath
+          filepath = filepath.gsub("\\","/")#For Windows
+          filename = File.basename(filepath,File.extname(filepath))
+          class_name = filename.camelize          
+          klass = class_name.constantize        
+          
+          if(klass.respond_to?(:descends_from_active_record?) && klass.descends_from_active_record?)
             @models << class_name
-            klass = class_name.constantize
-            self.class.db_config new_db_config
-            klass.establish_connection db_config if defined? klass.establish_connection
+            # Establish connection
+            klass.establish_connection db_config# if defined? klass.establish_connection
+            # Setup logger for activerecord
+            klass.logger = Logger.new(File.open(File.join(rails_app_path, 'log', "#{rails_env}.log"), 'a'))
           end
-        end    
+        end
       end
          
-      self.class.ar_class model.to_s.camelize.constantize
+      self.class.ar_class model.to_s.camelize.constantize      
     end
 
     def self.fields
+      return get_columns if respond_to? :get_columns
       c = self.new
       c.ar_class.content_columns.map {|col| col.name }
     end
@@ -221,7 +236,7 @@ END
     #    def RAILS_ROOT(value)
     #       Object.const_set(:RAILS_ROOT, value) unless Object.const_defined? :RAILS_ROOT
     #    end
-    
+
   end
 
 end

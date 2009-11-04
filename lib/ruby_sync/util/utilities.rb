@@ -33,7 +33,26 @@ module Kernel
       @@log.datetime_format = "%H:%M:%S"
     end
     @@log
-  end    
+  end
+
+  alias_method(:method_missing_original, :method_missing)
+  def method_missing(method_id, *args)
+    loaded = false
+    unless Module.rails_app_path.nil?
+      begin
+        loaded = true
+        require_dependency "#{Module.rails_app_path}/app/models/#{method_id.to_s}"
+      rescue MissingSourceFile
+        loaded = false
+      end
+    end
+
+    if loaded
+      method_id
+    else
+      method_missing_original method_id, *args
+    end
+  end
 end
 
 module Net
@@ -162,6 +181,38 @@ class Hash
 end
 
 
+class Module
+  alias_method(:const_missing_old, :const_missing)
+#  attr_accessor :rails_app_path
+  @@rails_app_path = nil
+  
+  def self.rails_app_path=(value)
+    @@rails_app_path = value
+  end
+
+  def self.rails_app_path
+    @@rails_app_path
+  end
+
+  def const_missing(const_id)  
+    return const_missing_old(const_id) if @@rails_app_path.nil?
+
+    begin
+      loaded = true
+      require_dependency("#{@@rails_app_path}/app/models/#{const_id.to_s.underscore}")
+    rescue MissingSourceFile
+      loaded = false
+    end
+
+    if loaded
+      const_id.to_s.constantize
+    else
+      const_missing_old const_id
+    end
+
+  end
+end
+
 class String
   # PHP's two argument version of strtr
   def strtr(replace_pairs)
@@ -279,9 +330,10 @@ module RubySync
       
     def class_for_name(name, message=nil)
       eval(name)
-    rescue
+    rescue Exception => e
       message ||= "Unable to find class called '#{name}'"
       log.error message
+      log.error e.message#debug
       nil
     end
 
