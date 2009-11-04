@@ -131,15 +131,15 @@ class Controller < SimpleConsole::Controller
   def create
     config_path = params[:id]
     ensure_dir_exists([
-	config_path,
-	"#{config_path}/pipelines",
-	"#{config_path}/connectors",
-	"#{config_path}/shared",
-	"#{config_path}/shared/pipelines",
-	"#{config_path}/shared/connectors",
-	"#{config_path}/shared/lib",
-	"#{config_path}/log",
-	"#{config_path}/db"
+        config_path,
+        "#{config_path}/pipelines",
+        "#{config_path}/connectors",
+        "#{config_path}/shared",
+        "#{config_path}/shared/pipelines",
+        "#{config_path}/shared/connectors",
+        "#{config_path}/shared/lib",
+        "#{config_path}/log",
+        "#{config_path}/db"
       ])
   end
   
@@ -154,12 +154,12 @@ class Controller < SimpleConsole::Controller
     if base_path 
       filename = "#{base_path}/connectors/#{name}_connector.rb"
       unless File.exists?(filename)
-	puts "Require -t connector_type when creating a connector" unless type
-	if template = connector_template(name, type)
-	  File.open(filename, "w") do |file|
-	    file.puts template
-	  end
-	end
+        puts "Require -t connector_type when creating a connector" unless type
+        if template = connector_template(name, type)
+          File.open(filename, "w") do |file|
+            file.puts template
+          end
+        end
       end
       edit filename
     else
@@ -184,18 +184,18 @@ class Controller < SimpleConsole::Controller
     else
       connector = connector_called(connector_name)
       if connector 
-	unless connector.respond_to?(:'[]')
-	  puts "Connector '#{connector_name}' doesnt support random access."
-	else
-	  connector.started
-	  value = connector[path]
-	  connector.stopped
-	  unless value
-	    puts "Path '#{path}' not found in connector '#{connector_name}'"
-	  else
-	    puts value.to_yaml
-	  end
-	end
+        unless connector.respond_to?(:'[]')
+          puts "Connector '#{connector_name}' doesnt support random access."
+        else
+          connector.started
+          value = connector[path]
+          connector.stopped
+          unless value
+            puts "Path '#{path}' not found in connector '#{connector_name}'"
+          else
+            puts value.to_yaml
+          end
+        end
       end
     end
   end
@@ -211,10 +211,10 @@ class Controller < SimpleConsole::Controller
     if base_path
       filename = "#{base_path}/pipelines/#{name}_pipeline.rb"
       unless File.exists?(filename)
-	if template = pipeline_template(name, vault_name, client_name)
-	  File.open(filename, "w") do |file|
-	    file.puts template
-	  end
+        if template = pipeline_template(name, vault_name, client_name)
+          File.open(filename, "w") do |file|
+            file.puts template
+          end
         end
       end
       edit filename
@@ -230,9 +230,9 @@ class Controller < SimpleConsole::Controller
   def edit filename
     unless params[:no_edit]
       if ENV['EDITOR']
-	exec "#{ENV['EDITOR']} #{filename}"
+        exec "#{ENV['EDITOR']} #{filename}"
       else
-	log.warn "Set the EDITOR environment variable to enable automatic editing of config files."
+        log.warn "Set the EDITOR environment variable to enable automatic editing of config files."
       end
     end
   end
