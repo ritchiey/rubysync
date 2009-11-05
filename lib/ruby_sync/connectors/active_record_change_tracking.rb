@@ -45,10 +45,10 @@ module RubySync::Connectors::ActiveRecordChangeTracking
       # scan existing entries to see if any new or modified
       each_entry.each do |entry|
         digest = digest(entry)
-        unless stored_digest = track_class.find_by_key(entry.id) and digest == stored_digest
+        unless stored_digest = track_class.find_by_key(entry.send(:"#{ar_class.primary_key}")) and digest == stored_digest
           operations = create_operations_for(entry_from_active_record(entry))
-          yield RubySync::Event.add(self, entry.id, nil, operations)
-          track_class.create(:key => entry.id, :digest => digest)
+          yield RubySync::Event.add(self, entry.send(:"#{ar_class.primary_key}"), nil, operations)
+          track_class.create(:key => entry.send(:"#{ar_class.primary_key}"), :digest => digest)
         end
       end
 
