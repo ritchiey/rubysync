@@ -23,8 +23,8 @@ module RubySync::Connectors::ActiveRecordAssociationTracking
   
   def associate association, path
     log.debug "Associating '#{association}' with '#{path}'"
-    ruby_sync_association.create :synchronizable_id=>path, :synchronizable_type=>ar_class.name,
-      :context=>association.context, :key=>association.key.to_s
+    ruby_sync_association.create :synchronizable_id => path, :synchronizable_type => ar_class.name,
+      :context => association.context, :key => association.key.to_s
   end
   
   def find_associated association
