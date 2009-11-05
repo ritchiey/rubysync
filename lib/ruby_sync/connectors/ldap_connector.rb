@@ -85,7 +85,7 @@ module RubySync::Connectors
     # Runs the query specified by the config, gets the objectclass of the first
     # returned object and returns a list of its allowed attributes
     def self.fields
-      return get_attributes if respond_to? :get_attributes
+      return get_attributes if respond_to?(:get_attributes)
       log.warn ":attributes option not set"
       log.warn "Returning a likely sample set."
       %w{ cn givenName sn }
@@ -172,7 +172,7 @@ END
 
     def search_args(extras={})
       args = {:base => search_base, :filter => search_filter}
-      get_attributes and args[:attributes] = get_attributes
+      args[:attributes] = get_attributes if respond_to?(:get_attributes)
       args.merge(extras)
     end
 
