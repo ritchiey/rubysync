@@ -30,11 +30,19 @@ class ArClientConnector < RubySync::Connectors::ActiveRecordConnector
   application "#{File.dirname(__FILE__)}/../examples/ar_client_webapp"
   model :user
   columns :username, :name, :email
+
 #  find_method :all
 #  find_filter :conditions => "username LIKE 'b%'"
 
-  track_with :ar_track
+  find_method :find_chaining
+  find_filter 'b', :order => :email
+  
+  find_chaining do |model, args|
+#    model.username_begin_by('b').all(:order => :email, :select => args.first[:select])
+    model.username_begin_by(args.first).all(args.second)
+  end
 
+  track_with :ar_track
   #  track_changes_with :active_record
   #  track_associations_with :active_record
 end

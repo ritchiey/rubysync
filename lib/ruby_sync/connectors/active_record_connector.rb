@@ -34,8 +34,8 @@ module RubySync::Connectors
       :db_type, :db_host, :db_username, :db_password, :db_name, :db_encoding, :db_pool, :db_config
 
     rails_env 'development'
-    find_method :find
-    find_filter :all
+    find_method :all
+    find_filter nil
     db_type 'postgresql'
     db_username 'rails_user'
     db_password 'your_password'
@@ -70,6 +70,24 @@ module RubySync::Connectors
         #    elsif is_vault? and @pipeline
         #      @pipeline.client.track_class
       end
+    end
+
+    def self.find_chaining(&block)
+      self.new.find_chaining(&block) if get_find_method == :find_chaining
+    end
+
+    def find_chaining
+      ar_class.class_eval do
+        meta_def :find_chaining do |*args|
+          yield(self,args)
+        end
+      end
+#      ar_class.class_eval <<-END
+#        meta_def :find_chaining do
+#          yield(self, #{find_args})
+#        end
+#      END
+      
     end
 
     def initialize options={}
@@ -111,7 +129,7 @@ module RubySync::Connectors
         end
       end
          
-      self.class.ar_class model.to_s.camelize.constantize      
+      self.class.ar_class model.to_s.camelize.constantize
     end
 
     def self.fields
@@ -147,13 +165,14 @@ END
       
     
     def each_entry
+#      puts find_args.inspect#debug
       ar_class.send(:"#{find_method}", *find_args) do |record|
         yield entry_from_active_record(record)
       end
     end     
 
     def find_args(extras=[])
-      args = [find_filter]
+      args = find_filter.is_a?(Array) ? find_filter : [find_filter]
       if respond_to?(:columns)
         columns << ar_class.primary_key.to_sym unless columns.include?(ar_class.primary_key.to_sym)
         args << {:select => columns.join(", ")}      
