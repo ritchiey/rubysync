@@ -27,16 +27,21 @@ class ArTrackConnector < RubySync::Connectors::ActiveRecordConnector
 end
 
 class ArClientConnector < RubySync::Connectors::ActiveRecordConnector
-  model :user
   application "#{File.dirname(__FILE__)}/../examples/ar_client_webapp"
+  model :user
+  columns :username, :name, :email
+#  find_method :all
+#  find_filter :conditions => "username LIKE 'b%'"
+
   track_with :ar_track
+
   #  track_changes_with :active_record
   #  track_associations_with :active_record
 end
 
 class ArVaultConnector < RubySync::Connectors::ActiveRecordConnector
-  model :person
   application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
+  model :person
 end
 
 class ArToArTestPipeline < RubySync::Pipelines::BasePipeline
@@ -91,7 +96,7 @@ class TcArToArConnector < Test::Unit::TestCase
   
   def test_client_to_vault
     banner "test_client_to_vault"
-    User.create(@bob_details)
+    ::User.create(@bob_details)
     assert_nil find_bob, "Vault already contains bob"
     @pipeline.run_once
     assert_not_nil find_bob, "#{vault_path} wasn't created on the vault"
@@ -106,6 +111,8 @@ class TcArToArConnector < Test::Unit::TestCase
       @pipeline.run_once # run again in case of echoes
       assert_nil @client[client_path], "Bob reappeared on the client"
       assert_nil find_bob, "Bob reappeared in the vault. He may have been created by an echoes add event"
+    else
+      flunk "client must have a 'delete' method"
     end
   end
   
@@ -129,7 +136,7 @@ class TcArToArConnector < Test::Unit::TestCase
   #  end
 
   def find_bob
-    Person.find_by_first_name "bob"
+    ::Person.find_by_first_name "bob"
     #    User.find_by_username "Ritchie"
   end
 

@@ -111,6 +111,15 @@ class Array
   def to_ruby
     map {|f| "'#{f}'"}.join(', ')    
   end
+
+  # Returns an array with his hashes merged
+  # Eg.
+  # [{:hash1 => 1},{:hash2 => 2}].merge_hashes
+  # Return [{:hash1 => 1, :hash2 => 2}]
+  def merge_hashes
+    hash = Hash.new
+    self.select{ |h| h if !h.is_a?(Hash) || !hash.merge!(h) } + [hash]
+  end
 end
 
 class Object

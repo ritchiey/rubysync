@@ -29,9 +29,13 @@ module RubySync::Connectors
     include ActiveRecordAssociationTracking
     include ActiveRecordChangeTracking
     
-    option :ar_class, :model, :changes_model, :associations_model, :application, :rails_env, :columns,
+    option :ar_class, :model, :changes_model, :associations_model, 
+      :application, :rails_env, :columns, :find_method, :find_filter,
       :db_type, :db_host, :db_username, :db_password, :db_name, :db_encoding, :db_pool, :db_config
+
     rails_env 'development'
+    find_method :find
+    find_filter :all
     db_type 'postgresql'
     db_username 'rails_user'
     db_password 'your_password'
@@ -77,8 +81,6 @@ module RubySync::Connectors
         # Load the database configuration
         rails_app_path = File.expand_path(application)
         ::Module.rails_app_path = rails_app_path
-        log.debug(self.name)
-        log.debug(::Module.rails_app_path)
         db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
         new_db_config = YAML.load(File.read(db_config_filename)).with_indifferent_access[rails_env]
 
@@ -113,8 +115,8 @@ module RubySync::Connectors
     end
 
     def self.fields
-      return get_columns if respond_to? :get_columns
       c = self.new
+      return get_columns if respond_to? :get_columns
       c.ar_class.content_columns.map {|col| col.name }
     end
 
@@ -145,11 +147,20 @@ END
       
     
     def each_entry
-      ar_class.find :all do |record|
+      ar_class.send(:"#{find_method}", *find_args) do |record|
         yield entry_from_active_record(record)
       end
     end     
 
+    def find_args(extras=[])
+      args = [find_filter]
+      if respond_to?(:columns)
+        columns << ar_class.primary_key.to_sym unless columns.include?(ar_class.primary_key.to_sym)
+        args << {:select => columns.join(", ")}      
+      end
+      args + extras
+      args.merge_hashes
+    end
 
     # Override default perform_add because ActiveRecord is different in that
     # the target path is ignored when adding a record. ActiveRecord determines
@@ -160,11 +171,11 @@ END
         populate(record, perform_operations(event.payload))
         #log.info(record.inspect)
         record.save!
-        update_mirror record.id
+        update_mirror record.send(:"#{ar_class.primary_key}")
         if is_vault?
-          associate event.association, record.id
+          associate event.association, record.send(:"#{ar_class.primary_key}")
         end
-        record.id
+        record.send(:"#{ar_class.primary_key}")
       end
     rescue => ex
       log.warn ex
@@ -219,7 +230,9 @@ END
 
     def populate record, content
       ar_class.content_columns.each do |c|
-        record[c.name] = content[c.name][0] if content[c.name]
+        if !respond_to?(:columns) || self.class.fields.include?(c.name.to_sym)
+          record[c.name] = content[c.name][0] if content[c.name]
+        end
       end
     end
 
@@ -227,8 +240,10 @@ END
       entry = {}
       record.class.content_columns.each do |col|
         key = col.name
-        value = record.send key
-        entry[key.to_s] = value if key and value
+        if !respond_to?(:columns) || self.class.fields.include?(key.to_sym)
+          value = record.send key
+          entry[key.to_s] = value if key and value
+        end
       end
       entry
     end
