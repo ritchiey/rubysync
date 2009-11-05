@@ -118,7 +118,7 @@ class Array
   # Return [{:hash1 => 1, :hash2 => 2}]
   def merge_hashes
     hash = Hash.new
-    self.select{ |h| h if !h.is_a?(Hash) || !hash.merge!(h) } + [hash]
+    self.select{ |h| h if !h.is_a?(Hash) || !hash.merge!(h) }  + (!hash.empty? ? [hash] : [])
   end
 end
 
