@@ -19,7 +19,7 @@
 
 require 'ruby_sync_test'
 
-class ArTrackConnector < RubySync::Connectors::ActiveRecordConnector
+class ActiveRecordTrackingConnector < RubySync::Connectors::ActiveRecordConnector
   #  model :change_track
   changes_model :change_track#Alias of model's method
   associations_model :association_track#Only usefull for vault connector
@@ -42,7 +42,7 @@ class ArClientConnector < RubySync::Connectors::ActiveRecordConnector
     model.username_begin_by(args.first).all(args.second)
   end
 
-  track_with :ar_track
+  track_with :active_record_tracking
   #  track_changes_with :active_record
   #  track_associations_with :active_record
 end
@@ -66,9 +66,9 @@ class ArToArTestPipeline < RubySync::Pipelines::BasePipeline
   end
 
   # Should evaluate to the path for placing a new record on the vault
-  in_place do
-    {:conditions => {:first_name => source_path}}
-  end
+#  in_place do
+#    {:conditions => {:first_name => source_path}}
+#  end
 
 end
 
@@ -149,7 +149,7 @@ class TcArToArConnector < Test::Unit::TestCase
   end
 
   def test_fields
-    assert_equal(%w{first_name last_name}.sort, ::ArVaultConnector.fields.sort)
+    assert_equal(%w{first_name last_name id}.sort, ::ArVaultConnector.fields.sort)
   end
   
 end
