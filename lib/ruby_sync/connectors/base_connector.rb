@@ -22,6 +22,7 @@ module RubySync::Connectors
     include RubySync::Utilities
     meta_eval {include RubySync::Utilities}
     include ConnectorEventProcessing
+    include CopyEntryChangeTracking
       
     attr_accessor :once_only, :name, :is_vault, :pipeline
       
