@@ -263,15 +263,10 @@ END
       end
     end
 
-    def entry_from_active_record record
-      entry = {}
-      record.class.content_columns.each do |col|
-        key = col.name
-        if !respond_to?(:columns) || self.class.fields.include?(key.to_sym)
-          value = record.send key
-          entry[key.to_s] = value if key and value
-        end
-      end
+    def to_entry active_record
+      entry = active_record.attributes
+      entry.from_keys(*columns) if respond_to?(:columns) && !columns.empty?
+
       entry
     end
 
