@@ -35,7 +35,7 @@ module Kernel
     @@log
   end
 
-  alias_method(:method_missing_original, :method_missing)
+  alias_method(:method_missing_without_dependency, :method_missing)
   def method_missing(method_id, *args)
     loaded = false
     unless Module.rails_app_path.nil?
@@ -49,8 +49,8 @@ module Kernel
 
     if loaded
       method_id
-    else
-      method_missing_original method_id, *args
+    else      
+      method_missing_without_dependency method_id, *args
     end
   end
 end
@@ -174,12 +174,12 @@ class Hash
 
   #convert Hash to Ldif syntax
   def to_ldif
+    hash = self.stringify_keys
     ary = []
-
-    keys.sort.each {|attr|
-      self[attr].each {|val|
+    hash.keys.sort.each {|attr|
+      hash[attr].each {|val|
         #TODO Not Ruby 1.9 compliant
-        ary << "#{attr}: #{val}" if attr != 'dn'
+        ary << "#{attr}: #{val}" unless attr.to_sym == :dn
       }
     }
 
@@ -187,11 +187,28 @@ class Hash
 
     ary
   end
+
+  #Select the keys in params and only return the hash with corresponding key=>value
+  #Eg. {:last_name => 'Robert', :first_name => 'Bob', :age => 55}.from_keys(:last_name, :age)
+  #Will return {:last_name => 'Robert', :age => 55}
+  def from_keys(*keys)
+    self.to_options!.reject { |k,v| !keys.collect{ |v| v.to_sym}.include?(k) }
+  end
 end
 
+#class Symbol
+#  include Comparable
+#
+#  #Fix #sort method for an Array of symbols who raised: undefined method `<=>' for :my_symbol:Symbol
+#  #now [:c, :a, :d, :b, :e].sort
+#  #return [:a, :b, :c, :d, :e]
+#  def <=>(other)
+#    self.to_s <=> other.to_s
+#  end
+#end
 
 class Module
-  alias_method(:const_missing_old, :const_missing)
+  alias_method(:const_missing_without_rails_app_path, :const_missing)
 #  attr_accessor :rails_app_path
   @@rails_app_path = nil
   
@@ -204,7 +221,7 @@ class Module
   end
 
   def const_missing(const_id)  
-    return const_missing_old(const_id) if @@rails_app_path.nil?
+    return const_missing_without_rails_app_path(const_id) if @@rails_app_path.nil?
 
     begin
       loaded = true
@@ -216,7 +233,7 @@ class Module
     if loaded
       const_id.to_s.constantize
     else
-      const_missing_old const_id
+      const_missing_without_rails_app_path const_id
     end
 
   end
@@ -242,6 +259,13 @@ class String
   def ldap_decode
     self.strtr("_24"=>"$","_28"=> "(","_29"=>")")
   end
+
+  #remove every special French letters
+  def replace_accents
+     return self.strtr("¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ",
+"YuAAAAAAACEEEEIIIIDNOOOOOOUUUUYsaaaaaaaceeeeiiiionoooooouuuuyy");
+  end
+  
 end
 
 # Generally useful methods
