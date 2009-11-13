@@ -34,7 +34,7 @@ module RubySync::Connectors
     def associate association, path
       with_ldap do |ldap|
         # TODO: check and warn if path is outside of search_base
-        ldap.modify :dn=>path, :operations=>[
+        ldap.modify :dn => path, :operations => [
           [:add, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s.ldap_encode]
         ]
       end
@@ -57,7 +57,7 @@ module RubySync::Connectors
     
     def associations_for path
       with_ldap do |ldap|
-        results = ldap.search :base=>path,
+        results = ldap.search :base => path,
 	  :scope=>Net::LDAP::SearchScope_BaseObject,
 	  :attributes=>[RUBYSYNC_ASSOCIATION_ATTRIBUTE]
         unless results and results.length > 0
