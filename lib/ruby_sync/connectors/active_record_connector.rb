@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-require 'erb'
 $VERBOSE=false
 require "active_record"
 #$VERBOSE=true
@@ -30,7 +29,7 @@ module RubySync::Connectors
     include ActiveRecordChangeTracking
     
     option :ar_class, :model, :changes_model, :associations_model, 
-      :application, :rails_env, :columns, :find_method, :find_filter,
+      :application, :rails_env, :columns, :path_column, :find_method, :find_filter,
       :db_type, :db_host, :db_username, :db_password, :db_name, :db_encoding, :db_pool, :db_config
 
     rails_env 'development'
@@ -66,9 +65,17 @@ module RubySync::Connectors
 
     def track_class
       if respond_to? :track
-        track.ar_class
+        if track.respond_to?(:ar_class) && track.ar_class.respond_to?(:descends_from_active_record?) && track.ar_class.descends_from_active_record?
+          return track.ar_class
+        else
+          log.warn "No tracking class"
+          return
+        end
         #    elsif is_vault? and @pipeline
         #      @pipeline.client.track_class
+      else
+         log.error "No track method"
+         return
       end
     end
 
@@ -82,11 +89,11 @@ module RubySync::Connectors
           yield(self,args)
         end
       end
-#      ar_class.class_eval <<-END
-#        meta_def :find_chaining do
-#          yield(self, #{find_args})
-#        end
-#      END
+      #      ar_class.class_eval <<-END
+      #        meta_def :find_chaining do
+      #          yield(self, #{find_args})
+      #        end
+      #      END
       
     end
 
@@ -117,25 +124,26 @@ module RubySync::Connectors
           filepath = filepath.gsub("\\","/")#For Windows
           filename = File.basename(filepath,File.extname(filepath))
           class_name = filename.camelize          
-          klass = class_name.constantize        
+          class_model = class_name.constantize
           
-          if(klass.respond_to?(:descends_from_active_record?) && klass.descends_from_active_record?)
+          if(class_model.respond_to?(:descends_from_active_record?) && class_model.descends_from_active_record?)
             @models << class_name
             # Establish connection
-            klass.establish_connection db_config# if defined? klass.establish_connection
+            class_model.establish_connection db_config# if defined? class_model.establish_connection
             # Setup logger for activerecord
-            klass.logger = Logger.new(File.open(File.join(rails_app_path, 'log', "#{rails_env}.log"), 'a'))
+            class_model.logger = Logger.new(File.open(File.join(rails_app_path, 'log', "#{rails_env}.log"), 'a'))
           end
         end
       end
          
       self.class.ar_class model.to_s.camelize.constantize
+      self.class.path_column ar_class.primary_key unless respond_to?(:path_column)
     end
 
     def self.fields
       c = self.new
       return get_columns if respond_to? :get_columns
-      c.ar_class.content_columns.map {|col| col.name }
+      c.ar_class.column_names
     end
 
     def self.sample_config
@@ -165,16 +173,16 @@ END
       
     
     def each_entry
-#      puts find_args.inspect#debug
-      ar_class.send(:"#{find_method}", *find_args) do |record|
-        yield entry_from_active_record(record)
+      #      puts find_args.inspect#debug
+      ar_class.send(:"#{find_method}", *find_args).each do |record|
+        yield record.send(:"#{path_column}"), to_entry(record)
       end
     end     
 
     def find_args(extras=[])
       args = find_filter.is_a?(Array) ? find_filter : [find_filter]
       if respond_to?(:columns)
-        columns << ar_class.primary_key.to_sym unless columns.include?(ar_class.primary_key.to_sym)
+        columns << path_column.to_sym unless columns.include?(path_column.to_sym)
         args << {:select => columns.join(", ")}      
       end
       args + extras
@@ -190,11 +198,11 @@ END
         populate(record, perform_operations(event.payload))
         #log.info(record.inspect)
         record.save!
-        update_mirror record.send(:"#{ar_class.primary_key}")
+        update_mirror record.send(:"#{path_column}")
         if is_vault?
-          associate event.association, record.send(:"#{ar_class.primary_key}")
+          associate event.association, record.send(:"#{path_column}")
         end
-        record.send(:"#{ar_class.primary_key}")
+        record.send(:"#{path_column}")
       end
     rescue => ex
       log.warn ex
@@ -218,7 +226,7 @@ END
     end
 
     def [](path)
-      entry_from_active_record(ar_class.find(path))
+      to_entry(ar_class.find(path))
     rescue ActiveRecord::RecordNotFound
       return nil
     end
