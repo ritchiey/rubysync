@@ -53,20 +53,6 @@ module RubySync::Connectors::ActiveRecordAssociationTracking
     return nil
   end
 
-  def self.track(connector_name, options={})
-    options = HashWithIndifferentAccess.new(options)
-    connector_class = class_called(connector_name, "connector")
-    unless connector_class
-      log.error "No connector called #connector_name}"
-      return
-    end
-    options[:name] ||= "#{self.name}(track)"
-    options[:is_vault] = false
-    class_def 'track' do
-      @track ||= connector_class.new(options)
-    end
-  end
-
   private
 
   def ruby_sync_association

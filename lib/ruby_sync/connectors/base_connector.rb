@@ -371,6 +371,19 @@ module RubySync::Connectors
       include_something_called method, "association_tracking"
     end
 
+    def self.track_with(tracking_name, options={})
+      options = HashWithIndifferentAccess.new(options)
+      tracking_class = class_called(tracking_name, "connector")
+      unless tracking_class
+        log.error "No tracker called #{tracking_name}"
+        return
+      end
+      options[:name] ||= "#{self.name}(track)"
+      options[:is_vault] = false
+      class_def 'track' do
+        @track ||= tracking_class.new(options)
+      end      
+    end
 
     private
 
