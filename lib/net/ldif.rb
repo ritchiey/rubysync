@@ -146,9 +146,9 @@ module Net
 
     #FILL = '\s*'
     # TODO: Attribute description should be more structured than this
-    ATTRIBUTE_DESCRIPTION = '[a-zA-Z0-9.;-]+'
+    ATTRIBUTE_DESCRIPTION = '[a-zA-Z0-9.;\-\'µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ]+'
     SAFE_INIT_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x1f\x21-\x39\x3b\x3d-\x7f]'
-    SAFE_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x7f]'
+    SAFE_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x7f\'\-\.µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ]'
     SAFE_STRING = "#{SAFE_INIT_CHAR}#{SAFE_CHAR}*"
     BASE64_STRING = '[\x2b\x2f\x30-\x39\x3d\x41-\x5a\x61-\x7a]*'
 

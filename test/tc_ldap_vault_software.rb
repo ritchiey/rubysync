@@ -76,8 +76,8 @@ class LdapSoftwareTestPipeline < RubySync::Pipelines::BasePipeline
 
   vault :my_ldap
   
-  allow_out :cn, :givenName, :sn, :objectclass
-  allow_in :cn, :givenName, :sn, :objectclass
+  allow_in :cn, :givenname, :sn
+  allow_out :cn, :givenname, :sn, :objectclass
   
   def in_place(event)
 #    event.target_path = "cn=#{event.source_path},ou=users,ou=system"#ApacheDS
@@ -118,7 +118,7 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
       
      @joe_details = { :dn =>"cn=joe,#{@vault.search_base}",
       :cn=>'joe',
-      :sn=>'bigjim',
+      :sn=>'bigjém',
       :mail => 'joe@bigjim.com'
       }
       
@@ -165,12 +165,12 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
     assert_equal @last_change_number+=1, @vault.last_change_number
     assert_equal @bob_details['sn'].to_s, @vault[vault_path]['sn'].to_s
     
-    @client.modify(client_path, [RubySync::Operation.replace('sn', 'robertas'),RubySync::Operation.add('givenName', "Robert")])
+    @client.modify(client_path, [RubySync::Operation.replace('sn', 'robertas'),RubySync::Operation.add('givenname', "Robert")])
     @pipeline.run_once
     assert_equal @last_change_number+=1, @vault.last_change_number
     assert_equal 'robertas', @vault[vault_path]['sn'].to_s
     @bob_details['sn']=['robertas']
-    @bob_details['givenName']=['Robert']
+    @bob_details['givenname']=['Robert']
 
     assert_respond_to @client, :delete
     @client.delete client_path
