@@ -52,7 +52,8 @@ module RubySync::Connectors
       :search_filter,
       :search_base,
       :attributes,
-      :association_attribute # name of the attribute in which to store the association key(s)
+      :association_attribute, # name of the attribute in which to store the association key(s)
+      :path_field # The name of the field to use as the source_path
 
     association_attribute RUBYSYNC_ASSOCIATION_ATTRIBUTE
     bind_method           :simple
@@ -60,8 +61,9 @@ module RubySync::Connectors
     port                  10389
     #port                  389
     search_filter         "cn=*"
-    encryption		 nil
-
+    encryption            nil
+    path_field            :dn
+    
     def initialize options={}
       super options
     end
@@ -77,7 +79,7 @@ module RubySync::Connectors
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
 	      ldap.search search_args(:return_result => false) do |ldap_entry|
-	        yield to_entry(ldap_entry)
+	        yield ldap_entry[path_field][0], to_entry(ldap_entry)
 	      end
       end
     end
@@ -126,18 +128,22 @@ END
         operations << RubySync::Operation.add('objectclass', RUBYSYNC_ASSOCIATION_CLASS)
         ldap_attributes = perform_operations(operations)
         ldap_attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
-        result = ldap.add :dn=>path, :attributes => ldap_attributes
+        result = ldap.add path_field => path, :attributes => ldap_attributes
+#        log.debug path
+        log.debug ldap_attributes.inspect
+        log.debug ldap.get_operation_result.message unless ldap.get_operation_result.code == 0
       end
-      log.debug("ldap.add returned '#{result}'")
+      
+      log.debug("ldap.add returned '#{result}'")      
       return result
-      rescue Exception
+    rescue Exception
       log.warn "Exception occurred while adding LDAP record"
       log.debug $!
       false
     end
 
     def modify(path, operations)
-      #log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
+      log.debug "Modifying #{path} with the following operations:\n#{operations.inspect}"
       with_ldap do |ldap|
         operations.each do |op|          
           if op.subject == 'objectclass' and op.type == :replace
@@ -147,25 +153,35 @@ END
           end
         end
         
-        unless ldap.modify :dn=>path, :operations=>to_ldap_operations(operations)
+        unless ldap.modify path_field=>path, :operations=>to_ldap_operations(operations)
           log.warn "Ldap Modification fails:  #{ldap.get_operation_result.message}"#debug
         end
+        log.debug ldap.get_operation_result.message unless ldap.get_operation_result.code == 0
       end
     end
 
     def delete(path)
-      with_ldap {|ldap| ldap.delete :dn=>path }
+      with_ldap {|ldap| ldap.delete path_field => path }
     end
 
     def [](path)
       with_ldap do |ldap|
-	      result = ldap.search search_args(:base=>path, :scope=>Net::LDAP::SearchScope_BaseObject, :filter=>'objectclass=*')
+        
+        base_path = path
+        filter = 'objectclass=*'
+        scope = Net::LDAP::SearchScope_BaseObject
+        
+	      result = ldap.search search_args(:base => base_path, :scope => scope, :filter => filter)
         return nil if !result or result.size == 0
         answer = {}
         result[0].attribute_names.each do |name|
 	        name = name.to_s.downcase
-	        answer[name] = result[0][name] unless name == 'dn'
+	        answer[name] = result[0][name] unless name == path_field.to_s
         end
+        answer
+      end
+    end
+
 	    answer
     end
   end
@@ -185,13 +201,13 @@ END
 
     def target_transform event
       #event.add_default 'objectclass', 'inetOrgUser'
-#      if is_vault?
-#        event.payload.each do |op|
-#          if op.subject=='objectclass' and op.values.to_s==RUBYSYNC_ASSOCIATION_CLASS
-#            event.add_value 'objectclass', RUBYSYNC_ASSOCIATION_CLASS
-#          end
-#        end
-#      end
+      #      if is_vault?
+      #        event.payload.each do |op|
+      #          if op.subject=='objectclass' and op.values.to_s==RUBYSYNC_ASSOCIATION_CLASS
+      #            event.add_value 'objectclass', RUBYSYNC_ASSOCIATION_CLASS
+      #          end
+      #        end
+      #      end
     end
 
 

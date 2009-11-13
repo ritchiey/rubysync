@@ -90,14 +90,14 @@ module RubySync::Connectors
     end
 
     #Compare current entry with last entry store in changeLogEntry and return a ldif_entry
-    def compare_changes(entry, change)
+    def compare_changes(path, entry, change)
       ldif_entry = ''
       if change.attribute_names.include? :changes or change.attribute_names.include? RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym
 
         # using RUBYSYNC_DUMP_ENTRY_ATTRIBUTE only for change_type :modify
         change.changetype[0].to_sym == :add ? changes_attribute = 'changes' : changes_attribute = RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym
 
-        last_entry = Net::LDIF.parse("dn: #{entry['dn'][0]}\nchangetype: add\n#{change.send(changes_attribute)[0]}")[0].data
+        last_entry = Net::LDIF.parse("dn: #{path}\nchangetype: add\n#{change.send(changes_attribute)[0]}")[0].data
         raise Exception.new("Wrong type for last_entry and/or entry") unless last_entry.respond_to?(:deep_diff) and entry.respond_to?(:deep_diff)
 
         #TODO Moving this stuff into an Module, named HashComparator with methods like those of Helpers section in #TcHashComparator, because it'll be useful for other connectors or pipelines? (eg: #BaseConnector, #BasePipeline)
@@ -155,14 +155,14 @@ module RubySync::Connectors
     end
     
     def save_changelog_entries(&blk)
-      each_entry do |entry|
+      each_entry do |path, entry|
   #          operations = operations_for_entry(entry)
         #          yield RubySync::Event.add(self, entry['dn'].to_s, nil, operations)
         #          perform_operations(operations
         with_ldap do |ldap|
           ldif_entry = ''
 
-          filter = Net::LDAP::Filter.eq("targetdn", entry['dn'][0]) & Net::LDAP::Filter.eq("objectclass", "changeLogEntry")
+          filter = Net::LDAP::Filter.eq("targetdn", path) & Net::LDAP::Filter.eq("objectclass", "changeLogEntry")
           #filter = filter & Net::LDAP::Filter.ge("changenumber", @last_change_number.to_i.to_s) unless @full_refresh_required
           if (ldap_result=ldap.search(:base => changelog_dn, :filter => filter)).empty?
             type='add'# Create entry
@@ -176,7 +176,7 @@ module RubySync::Connectors
                 type='add'# Recreate entry
               when :add, :modify
                 type = 'modify'# Update existing entry
-                ldif_entry = compare_changes(entry,change)
+                ldif_entry = compare_changes(path, entry,change)
               else
                 raise Exception.new("Invalid changelog type")
               end
@@ -185,16 +185,16 @@ module RubySync::Connectors
 #            end
             #end
           end
-          save_changelog_entry(type,entry,ldif_entry,&blk)
+          save_changelog_entry(type, path, entry, ldif_entry, &blk)
         end
       end
     end
 
-    def save_changelog_entry(type, entry, ldif_entry = '')
+    def save_changelog_entry(type, path, entry, ldif_entry = '')
       with_ldap do |ldap|
         if type
           change_number = @last_change_number + 1
-          changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, 'targetdn' => entry['dn'].to_s,
+          changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, 'targetdn' => path.to_s,
             'changenumber' => change_number.to_s,'objectclass'=>['changeLogEntry', RUBYSYNC_CHANGELOG_CLASS],
             RUBYSYNC_CONTEXT_ATTRIBUTE => self.association_context.ldap_encode, 'changetype'=>type}
 
