@@ -182,9 +182,22 @@ END
       end
     end
 
-	    answer
+    def search(filter)
+      with_ldap do |ldap|        
+        result = ldap.search search_args(:filter => filter)
+        log.debug result
+        log.debug ldap.get_operation_result.code
+        log.debug ldap.get_operation_result.message
+        return nil if !result or result.size == 0
+        answer = {}
+        result[0].attribute_names.each do |name|
+          name = name.to_s.downcase
+          answer[name] = result[0][name] unless name == path_field.to_s
+        end
+        answer
+      end
+      
     end
-  end
 
     def search_args(extras={})
       args = {:base => search_base, :filter => search_filter}
