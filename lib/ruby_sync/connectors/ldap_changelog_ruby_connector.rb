@@ -159,33 +159,38 @@ module RubySync::Connectors
   #          operations = operations_for_entry(entry)
         #          yield RubySync::Event.add(self, entry['dn'].to_s, nil, operations)
         #          perform_operations(operations
-        with_ldap do |ldap|
-          ldif_entry = ''
 
-          filter = Net::LDAP::Filter.eq("targetdn", path) & Net::LDAP::Filter.eq("objectclass", "changeLogEntry")
-          #filter = filter & Net::LDAP::Filter.ge("changenumber", @last_change_number.to_i.to_s) unless @full_refresh_required
-          if (ldap_result=ldap.search(:base => changelog_dn, :filter => filter)).empty?
-            type='add'# Create entry
-          else
-            #changes = ldap_result
-            #changes.each do |change|
-            change = ldap_result.last
-#            if change.changenumber[0].to_i < @last_change_number.to_i
-              case change.changetype[0].to_sym
-              when :delete
-                type='add'# Recreate entry
-              when :add, :modify
-                type = 'modify'# Update existing entry
-                ldif_entry = compare_changes(path, entry,change)
-              else
-                raise Exception.new("Invalid changelog type")
-              end
-#            else
-#              log.debug("@last_change_number is lesser than current change number")
-#            end
-            #end
+        if path != search_base
+          with_ldap do |ldap|
+            ldif_entry = ''
+
+            filter = Net::LDAP::Filter.eq("targetdn", path) & Net::LDAP::Filter.eq("objectclass", "changeLogEntry")
+            #filter = filter & Net::LDAP::Filter.ge("changenumber", @last_change_number.to_i.to_s) unless @full_refresh_required
+            if !(ldap_result=ldap.search(:base => changelog_dn, :filter => filter)) || ldap_result.empty?
+              type='add'# Create entry
+            else
+              #changes = ldap_result
+              #changes.each do |change|
+              change = ldap_result.last
+  #            if change.changenumber[0].to_i < @last_change_number.to_i
+                case change.changetype[0].to_sym
+                when :delete
+                  type='add'# Recreate entry
+                when :add, :modify
+                  type = 'modify'# Update existing entry
+                  ldif_entry = compare_changes(path, entry,change)
+                else
+                  raise Exception.new("Invalid changelog type")
+                end
+  #            else
+  #              log.debug("@last_change_number is lesser than current change number")
+  #            end
+              #end
+            end
+            save_changelog_entry(type, path, entry, ldif_entry, &blk)
           end
-          save_changelog_entry(type, path, entry, ldif_entry, &blk)
+        else
+          log.debug "Skip this entry, it should have a path"
         end
       end
     end
