@@ -45,11 +45,20 @@ class Module
         elsif values
           value = values.first
         end
-        class_def name do          
-          value
+        
+        class_variable_set("@@meta_#{name}", value)
+
+        class_def name do
+          class_eval("class_variable_get('@@meta_#{name}')")
         end
+
+        class_def "set_#{name}" do |v|
+          class_eval("class_variable_set('@@meta_#{name}', '#{v}')")
+        end
+        class_eval("alias :#{name}= :set_#{name}")
+        
         meta_def "get_#{name}" do
-          value
+          class_variable_get("@@meta_#{name}")
         end
       end
     end
