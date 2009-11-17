@@ -79,7 +79,11 @@ module RubySync::Connectors
     def each_entry
       Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
 	      ldap.search search_args(:return_result => false) do |ldap_entry|
-	        yield ldap_entry[path_field][0], to_entry(ldap_entry)
+          if ldap_entry[path_field] && ldap_entry[path_field][0]
+            yield ldap_entry[path_field][0], to_entry(ldap_entry)
+          else
+            log.debug "Skip this entry, it should have a path"
+          end
 	      end
       end
     end
@@ -182,21 +186,21 @@ END
       end
     end
 
-    def search(filter)
+    def search(extras={}, &blk)
       with_ldap do |ldap|        
-        result = ldap.search search_args(:filter => filter)
-        log.debug result
+        results = ldap.search(search_args(extras), &blk)
         log.debug ldap.get_operation_result.code
         log.debug ldap.get_operation_result.message
-        return nil if !result or result.size == 0
+        return nil unless results && !results.empty?
         answer = {}
-        result[0].attribute_names.each do |name|
-          name = name.to_s.downcase
-          answer[name] = result[0][name] unless name == path_field.to_s
+        results.each do |result|
+          result.attribute_names.each do |name|
+            name = name.to_s.downcase
+            answer[name] = result[name] unless name == path_field.to_s
+          end
         end
         answer
-      end
-      
+      end      
     end
 
     def search_args(extras={})
