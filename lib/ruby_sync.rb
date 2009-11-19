@@ -46,19 +46,19 @@ class Module
           value = values.first
         end
         
-        class_variable_set("@@meta_#{name}", value)
+        instance_variable_set("@meta_#{name}", value)
 
         class_def name do
-          class_eval("class_variable_get('@@meta_#{name}')")
+          (class_eval("instance_variable_get('@meta_#{name}')")) ? class_eval("instance_variable_get('@meta_#{name}')") : value
         end
 
         class_def "set_#{name}" do |v|
-          class_eval("class_variable_set('@@meta_#{name}', '#{v}')")
+          class_eval("instance_variable_set('@meta_#{name}', '#{v}')")
         end
         class_eval("alias :#{name}= :set_#{name}")
         
         meta_def "get_#{name}" do
-          class_variable_get("@@meta_#{name}")
+          instance_variable_get("@meta_#{name}")
         end
       end
     end
