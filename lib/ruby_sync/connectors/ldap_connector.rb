@@ -133,9 +133,12 @@ END
         ldap_attributes = perform_operations(operations)
         ldap_attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
         result = ldap.add path_field => path, :attributes => ldap_attributes
-#        log.debug path
-        log.debug ldap_attributes.inspect
-        log.debug ldap.get_operation_result.message unless ldap.get_operation_result.code == 0
+
+        unless ldap.get_operation_result.code == 0
+#          log.debug path
+          log.debug ldap_attributes.inspect
+          log.error ldap.get_operation_result.message
+        end
       end
       
       log.debug("ldap.add returned '#{result}'")      

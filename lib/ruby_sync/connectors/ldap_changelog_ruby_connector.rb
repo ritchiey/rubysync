@@ -212,22 +212,29 @@ module RubySync::Connectors
             dump_entry = ''
             entry.to_ldif {|line| dump_entry = dump_entry + line + "\n"}#TODO Not Ruby 1.9.+ compliant
             changelog_attributes[RUBYSYNC_DUMP_ENTRY_ATTRIBUTE] = [dump_entry]
-          else            
+          else
             return#Wrong type or ldif_entry is empty
           end
 
 
-          begin           
+          begin
               #Changelog entry successfully added
               changelog_dn_attribute = changelog_attributes.delete('dn').to_s
-              result = ldap.add :dn=>changelog_dn_attribute, :attributes=>changelog_attributes
+              result = ldap.add :dn => changelog_dn_attribute, :attributes => changelog_attributes
+
+              unless ldap.get_operation_result.code == 0
+#                log.debug path
+#                log.debug changelog_dn
+                log.debug changelog_attributes.inspect
+                log.warn ldap.get_operation_result.message
+              end
               log.debug("ldap.add returned '#{result}'")
               @last_change_number=change_number
               update_last_sync_state
               cle = ldap.search(:base => changelog_dn, :filter => "changenumber=#{change_number.to_s}").first
 
               yield event_for_changelog_entry(cle)
-            
+
           rescue
             raise Exception.new("Exception occurred while adding LDAP changelog entry n°#{change_number.to_s}")
           end
