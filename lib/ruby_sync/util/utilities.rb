@@ -260,12 +260,47 @@ class String
     self.strtr("_24"=>"$","_28"=> "(","_29"=>")")
   end
 
-  #remove every special French letters
-  def replace_accents
-     return self.strtr("¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ",
-"YuAAAAAAACEEEEIIIIDNOOOOOOUUUUYsaaaaaaaceeeeiiiionoooooouuuuyy");
+  INT = {'˜' => '~', '‘’' => '\'', '«»„“”˝' => '"', '‒–—―‐' => '-', '…' => '...', '¡' => '!', '‼' => '!!',
+    '¿' => '?', '‽' => '!?', '‹' => '<', '›' => '>', '♯' => '#', '⁄÷' => '/', '·' => '.',
+    '¹' => '1', '²' => '2', '³' => '3',  '¼'=> '1/4', '½' => '1/2', '¾'=> '3/4', '×' => '*', '±' => '+/-', '∓' => '-/+',
+    '№' => 'No', '™' => 'TM',
+    'ÀÁÂÃÅĀĄĂΑ' => 'A', 'Ä' => 'Ae', 'àáâãåāąăαª' => 'a', 'ä' => 'ae', 'Æ' => 'AE', 'æ' => 'ae',
+    'Β' => 'B', 'βϐ' => 'b', 'ÇĆČĈĊ©' => 'C', 'çćčĉċ' => 'c', 'ĎĐÐΔ' => 'D', 'ďđðδ' => 'd', 'ÈÉÊËĒĘĚĔĖΕΗ϶' =>'E',
+    'èéêëēęěĕėεηϵ' => 'e', 'ƒ' => 'f', 'ĜĞĠĢΓ' => 'G', 'ĝğġģγϝ' => 'g', 'ĤĦ' => 'H',
+    'ĥħ' => 'h', 'ÌÍÎÏĪĨĬĮİΙ' =>'I', 'ìíîïīĩĭįıι' =>'i', 'Ĳ' => 'IJ', 'Ĵ' => 'J',
+    'ĵ' => 'j', 'ĶΚϘ' => 'K', 'Χ'=> 'KH', 'ķĸκϰϙ' => 'k', 'ϗ'=> 'kai', 'χ'=> 'kh',
+    'ŁĽĹĻĿΛ' => 'L', 'łľĺļŀλ' => 'l', 'Μ' => 'M', 'μ'=>'m', 'ÑŃŇŅŊΝ' => 'N', 'ñńňņŉŋν' => 'n',
+    'ÒÓÔÕØŌŐŎΟΩ' => 'O', 'Ö' => 'Oe', 'òóôõøōőŏωο°' => 'o', 'ö' => 'oe',    'Œ' => 'OE', 'œ' => 'oe',
+    'Φ' => 'PH',  'Π' => 'Pi', 'Ψ' => 'PS',  'φϕ' => 'ph', 'πϖ' => 'pi', 'ψ' => 'ps', 'ŔŘŖℝ®Ρ' =>'R',
+    'ŕřŗρϱ' =>'r', 'ŚŠŞŜȘΣϹϺ' => 'S', '§' => 'SS', 'śšşŝșσςϲϻ' => 's', 'ß' => 'ss', 'ŤŢŦȚΤ' => 'T', 'Θϴ' => 'TH',
+    'ťţŧțτ' => 't', 'θϑ'=>'th', 'ÙÚÛŪŮŰŬŨŲΥϒϜ' =>'U', 'Ü' => 'Ue', 'ùúûūůűŭũųµυ' =>'u', 'ü' => 'ue',
+    'Ŵ' => 'W', 'ŵ' => 'w', 'Ξ' => 'X', 'ξ' => 'x', 'ÝŶŸ' =>'Y', 'ýÿŷ' =>'y', 'ŹŽŻΖ' =>'Z', 'žżźζ' =>'z'}
+
+  INT_CURRENCY = {'¤' => 'generic currency sign', '฿' => 'baht', '¢' => 'cent', '₡' => 'colón',
+    '₵' => 'cedi', '₫' => 'dong', '€' => 'euro', 'ƒ' => 'florin', '₲' => 'guarani',
+    '₴' => 'hryvnia', '₭' => 'kip', '₥' => 'mill', '₦' => 'naira', '₧' => 'peseta', '₱' => 'peso', '£' => 'pound',
+    '﷼' => 'riyal', 'ރ' => 'rufiyaa', '₨' => 'rupee', '௹' => 'rupee', '৲ ৳' => 'rupee', '૱' => 'rupee',
+    '₪' => 'new shekel', '₮' => 'tugrik', '₩' => 'won', '¥' => 'yen', '₳' => 'austral', '₠' => 'ECU',
+    '₢' => 'cruzeiro', '₯' => 'drachma', '₣' => 'franc', '₤' => 'lira', 'ℳ' => 'mark', '₧' => 'peseta', '₰' => 'pfennig'}
+  #'$' => 'dollar'# Skip dollar, beacause it's in ASCII table
+
+#  ASCII_PRINTABLE_CHARS = "!\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+
+  # Replace every specials characters
+  def replace_special_chars(replace_currency = false)
+    string = self
+    special_chars_table = INT.merge(replace_currency ? INT_CURRENCY : {})
+    special_chars_table.each do |key, value|
+      string = string.gsub %r([#{key}]), value
+    end
+    string
   end
-  
+
+  def to_ascii(replace_currency = false)
+    string = self.replace_special_chars(replace_currency)
+    string.gsub(/[^\x20-\x7E]/i, '')
+  end
+
 end
 
 # Generally useful methods
