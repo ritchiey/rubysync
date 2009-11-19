@@ -261,7 +261,7 @@ module RubySync
         end
       elsif blk and [:add, :modify].include? @type
         drop_changes_to left.to_s
-        uncommitted_operations << RubySync::Operation.replace(left.to_s, blk.call) 
+        uncommitted_operations << RubySync::Operation.replace(left.to_s, blk.call) if blk.call
       end
     end
 
