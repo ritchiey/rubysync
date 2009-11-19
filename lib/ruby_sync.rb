@@ -24,6 +24,7 @@ require 'ruby_sync/util/metaid'
 require 'ruby_sync/operation'
 require 'ruby_sync/event'     
 
+$KCODE = 'UTF8'
 
 module RubySync
   VERSION = '0.2.1'
@@ -102,3 +103,5 @@ if (base_path)
 end     
                                 
 ActiveSupport::Dependencies.load_paths = load_paths
+
+
