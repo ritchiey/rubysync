@@ -235,7 +235,8 @@ module RubySync::Connectors
 
               yield event_for_changelog_entry(cle)
 
-          rescue
+          rescue Exception => e
+            log.debug e.inspect
             raise Exception.new("Exception occurred while adding LDAP changelog entry n°#{change_number.to_s}")
           end
         else
