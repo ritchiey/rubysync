@@ -177,6 +177,7 @@ module RubySync
       end
       
       def started
+        client.last_sync_info = vault.extract_last_sync_info if !client.parse_all_entries
         client.started
         vault.started
       end

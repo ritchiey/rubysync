@@ -24,8 +24,9 @@ module RubySync::Connectors
     include ConnectorEventProcessing
     include CopyEntryChangeTracking
       
-    attr_accessor :once_only, :name, :is_vault, :pipeline
-      
+    attr_accessor :once_only, :name, :is_vault, :pipeline, :parse_all_entries, :last_sync_info
+    class << self; attr_accessor :parse_all_entries, :last_sync_info; end
+
     def initialize options={}
       base_path # call this once to get the working directory before anything else
       # in the connector changes the cwd
@@ -33,6 +34,7 @@ module RubySync::Connectors
       once_only = false
       self.name = options[:name]
       self.is_vault = options[:is_vault]
+      self.parse_all_entries = self.class.parse_all_entries = self.class.parse_all_entries.nil? ? true : self.class.parse_all_entries
       if is_vault && !can_act_as_vault?
         raise "#{self.class.name} can't act as an identity vault."
       end
@@ -138,6 +140,36 @@ module RubySync::Connectors
       @is_vault
     end
 
+#    def get_parse_all_entries # unused
+#      self.class.parse_all_entries
+#    end
+#
+#    def set_parse_all_entries(value) # unused
+#      @parse_all_entries = value
+#      self.class.parse_all_entries = value
+#    end
+
+    def self.set_parse_all_entries(value)
+      @parse_all_entries = value
+    end
+
+#    def get_last_sync_info # unused
+#      log.debug "get last_sync_info #{self.class.last_sync_info}"
+#      self.class.last_sync_info
+#    end
+
+    def set_last_sync_info(value)
+      log.debug "set last_sync_info with #{value}"
+      @last_sync_info = value
+      self.class.last_sync_info = value
+    end
+    alias :last_sync_info= set_last_sync_info
+
+    # Override this to return the last synchronization info of your connector
+    def extract_last_sync_info
+       return Time.now if parse_all_entries
+       log.warn "You must override this method to return the last synchronization information of your connector"
+    end
 
     # Returns the association key for the given path. Called if this connector is
     # the client.
