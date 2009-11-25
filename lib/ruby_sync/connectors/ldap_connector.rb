@@ -137,7 +137,7 @@ END
         unless ldap.get_operation_result.code == 0
 #          log.debug path
           log.debug ldap_attributes.inspect
-          log.error ldap.get_operation_result.message
+          log.warn ldap.get_operation_result.message
         end
       end
       
@@ -194,15 +194,20 @@ END
         results = ldap.search(search_args(extras), &blk)
         log.debug ldap.get_operation_result.code
         log.debug ldap.get_operation_result.message
+
         return nil unless results && !results.empty?
-        answer = {}
-        results.each do |result|
-          result.attribute_names.each do |name|
-            name = name.to_s.downcase
-            answer[name] = result[name] unless name == path_field.to_s
+        if block_given? && extras.key?(:return_result) && extras[:return_result] == false
+          answer = {}
+          results.each do |result|
+            result.attribute_names.each do |name|
+              name = name.to_s.downcase
+              answer[name] = result[name] unless name == path_field.to_s
+            end
           end
+          answer
+        else
+          results
         end
-        answer
       end      
     end
 
