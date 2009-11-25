@@ -252,7 +252,7 @@ module RubySync::Connectors
         ldap.search(:base => changelog_dn, :filter => filter) do |change|
           target_dn = change.targetdn[0]
 
-          filter_last_change = Net::LDAP::Filter.eq( "targetdn", target_dn) & Net::LDAP::Filter.ge('changeNumber',"#{change.changenumber[0].to_i}")
+          filter_last_change = Net::LDAP::Filter.eq(:targetdn, target_dn) & Net::LDAP::Filter.ge(:changenumber, change.changenumber[0])
           ldap_result = [change] if (ldap_result=ldap.search(:base => changelog_dn, :filter => filter_last_change)).empty?
 
           unless ldap_result.last.changetype[0].to_sym == :delete# Changelogs of current dn wouldn't have a delete changetype

@@ -40,7 +40,8 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogRubyConnector
     username      'cn=Directory Manager'
     password      'secret'
     changelog_dn  'ou=changelog,dc=example,dc=com'
-    search_filter 'cn=*'
+#    search_filter 'cn=*'
+    search_filter Net::LDAP::Filter.pres :cn
     search_base   'ou=People,dc=example,dc=com'
 
 #  # OpenLDAP config

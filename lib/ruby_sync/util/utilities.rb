@@ -96,7 +96,7 @@ module Net
     #  ldap.delete_value dn, :mail, "oldmailaddress@example.com"
     #
     def delete_value dn, attribute, value
-      unless result = (modify :dn => dn, :operations => [[:delete, attribute, value]])
+        unless result = (modify :dn => dn, :operations => [[:delete, attribute, value]])
          log.error "Result: #{get_operation_result.code}"
          log.error "Message: #{get_operation_result.message}"
          raise Exception.new("Unable to delete value: #{value} of attribute: #{attribute}")

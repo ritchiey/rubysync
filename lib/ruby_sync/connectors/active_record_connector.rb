@@ -88,13 +88,7 @@ module RubySync::Connectors
         meta_def :find_chaining do |*args|
           yield(self,args)
         end
-      end
-      #      ar_class.class_eval <<-END
-      #        meta_def :find_chaining do
-      #          yield(self, #{find_args})
-      #        end
-      #      END
-      
+      end      
     end
 
     def initialize options={}
