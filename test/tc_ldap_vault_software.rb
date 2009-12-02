@@ -41,7 +41,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogRubyConnector
     password      'secret'
     changelog_dn  'ou=changelog,dc=example,dc=com'
 #    search_filter 'cn=*'
-    search_filter Net::LDAP::Filter.pres :cn
+    search_filter Net::LDAP::Filter.pres(:cn)
     search_base   'ou=People,dc=example,dc=com'
 
 #  # OpenLDAP config
@@ -198,7 +198,7 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
     @pipeline.run_once
     assert_equal @last_change_number+=1, @vault.last_change_number
     with_ldap(@vault) do |ldap|
-      assert_equal(true,ldap.search(:base => @vault.search_base, :filter => "(& (cn = #{@bob_details['cn']}) (objectClass = inetOrgPerson))").empty?)
+      assert ldap.search(:base => @vault.search_base, :filter => "(& (cn = #{@bob_details['cn']}) (objectClass = inetOrgPerson))").empty?
     end    
   end
 
@@ -221,7 +221,7 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
     with_ldap(@vault) do |ldap|
       assert ldap.add(:dn => person_dn, :attributes => person)
       filter = Net::LDAP::Filter.pres("objectclass") & Net::LDAP::Filter.eq("cn", person[:cn])
-      assert_equal(false,ldap.search(:base => @vault.search_base, :filter => filter).empty?)
+      assert !ldap.search(:base => @vault.search_base, :filter => filter).empty?
     end
   end
 
@@ -244,7 +244,7 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
     with_ldap(@vault) do |ldap|
       assert ldap.delete(:dn => entry[:dn])
       filter = Net::LDAP::Filter.pres("objectclass") & Net::LDAP::Filter.eq("cn", entry[:cn])
-      assert_equal(true,ldap.search(:base => @vault.search_base, :filter => filter).empty?)
+      assert ldap.search(:base => @vault.search_base, :filter => filter).empty?
     end    
   end
 
