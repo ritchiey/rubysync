@@ -44,8 +44,7 @@ module RubySync
       
       #add_dump_options
       attr_accessor :delay    # delay in seconds between checking connectors
-      
-      
+            
       def initialize
         @delay = 5
       end
@@ -58,7 +57,7 @@ module RubySync
         options = HashWithIndifferentAccess.new(options)
         connector_class = class_called(connector_name, "connector")
         unless connector_class
-          log.error "No connector called #connector_name}"
+          log.error "No connector called #{connector_name}"
           return
         end
         options[:name] ||= "#{self.name}(client)"
@@ -269,6 +268,7 @@ module RubySync
         case event.type
         when :add
           if in_create(event)
+            #TODO disallowed creation for blank event.target_path
             perform_transform :in_place_transform, event, event.hint
       	    log.info "Create on vault allowed. Placing at #{event.target_path}"
           else
