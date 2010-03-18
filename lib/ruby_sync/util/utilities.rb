@@ -329,9 +329,50 @@ class String
     string
   end
 
+  PUNCTUATION_CHARS = " {}()[]<>«»'’\"“”,;/\\·.…:!?‽-–@&*⁂|¦❦❧#№©®°℃′″‴†‡§∴∵¶•_+±×÷=≠%‰²³µ$€£¥"
+  def replace_punctuations(replacement = ' ', options = {} )
+    string = self
+    punctuation_chars =
+      if !options[:except].blank?
+        PUNCTUATION_CHARS.gsub(/[#{Regexp.escape(options[:except])}]/, '')
+      elsif !options[:only].blank?
+        PUNCTUATION_CHARS.scan(/[#{Regexp.escape(options[:only])}]/).join
+      else
+        PUNCTUATION_CHARS
+      end
+      
+    string = string.gsub %r([#{Regexp.escape(punctuation_chars)}]), replacement
+  end
+
   def to_ascii(replace_currency = false)
     string = self.replace_special_chars(replace_currency)
     string.gsub(/[^\x20-\x7E]/i, '')
+  end
+
+  def split_words (options = {})
+    punctuation_chars =
+      if !options[:except].blank?
+      String::PUNCTUATION_CHARS.gsub(/[#{Regexp.escape(options[:except])}]/, '')
+    elsif !options[:only].blank?
+      String::PUNCTUATION_CHARS.scan(/[#{Regexp.escape(options[:only])}]/).join
+    else
+      String::PUNCTUATION_CHARS
+    end
+    self.split(/[#{Regexp.escape(punctuation_chars)}]/)
+  end
+
+  def reverse_words (options = {})
+    punctuation_chars =
+      if !options[:except].blank?
+      String::PUNCTUATION_CHARS.gsub(/[#{Regexp.escape(options[:except])}]/, '')
+    elsif !options[:only].blank?
+      String::PUNCTUATION_CHARS.scan(/[#{Regexp.escape(options[:only])}]/).join
+    else
+      String::PUNCTUATION_CHARS
+    end
+    punc = self.scan(/[#{Regexp.escape(punctuation_chars)}]/).reverse#extract punctuation characters
+    words = self.split_words(options).reverse
+    words.map_with_index { |word, i| "#{word}#{punc[i]}" }.join
   end
 
 end
