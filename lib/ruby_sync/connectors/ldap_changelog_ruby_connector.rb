@@ -100,47 +100,38 @@ module RubySync::Connectors
         last_entry = Net::LDIF.parse("dn: #{path}\nchangetype: add\n#{change.send(changes_attribute)[0]}")[0].data
         raise Exception.new("Wrong type for last_entry and/or entry") unless last_entry.respond_to?(:deep_diff) and entry.respond_to?(:deep_diff)
 
-        #TODO Moving this stuff into an Module, named HashComparator with methods like those of Helpers section in #TcHashComparator, because it'll be useful for other connectors or pipelines? (eg: #BaseConnector, #BasePipeline)
-          old_attributes = last_entry.symbolize_keys.deep_diff(entry.symbolize_keys)
-          old_attributes.delete(:dn)# attribute dn is useless
-
-          new_attributes = entry.symbolize_keys.deep_diff(last_entry.symbolize_keys)#new or modified
-          new_attributes.delete(:dn)# attribute dn is useless
-
-          replace_attributes = new_attributes.keys & old_attributes.keys# to replace
-          delete_attributes = old_attributes.keys - replace_attributes# to remove
-          add_attributes = new_attributes.keys - replace_attributes# to create
+        diff_attributes = last_entry.full_diff(entry)
        
         #Deleting or replacing attributes only if the lastest change has been done by the actual client/vault
         if change.send(RUBYSYNC_CONTEXT_ATTRIBUTE)[0]==self.association_context.ldap_encode
                  
-          delete_attributes.each do |key|
-            old_attributes[key].each do |value|
+          diff_attributes[:deleted].each do |key|
+            diff_attributes[:old][key].each do |value|
               ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
               log.debug("remove attribute #{key}: #{value}")
             end
           end
 
-          replace_attributes.each do |key|
+          diff_attributes[:replaced].each do |key|
             if entry.symbolize_keys[key].is_a?(Array) or last_entry.symbolize_keys[key].is_a?(Array)
-              old_attributes[key].each do |value|
+              diff_attributes[:old][key].each do |value|
                 ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
                 log.debug("in replace : remove attribute #{key}: #{value}")
               end
-              new_attributes[key].each do |value|
+              diff_attributes[:new][key].each do |value|
                 ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
                 log.debug("in replace : add attribute #{key}: #{value}")
               end
             else
-              value = new_attributes[key]
+              value = diff_attributes[:new][key]
               ldif_entry = ldif_entry + "replace: #{key}\n#{key}: #{value}\n-\n"
               log.debug("replace attribute #{key}: #{value}")
             end
           end
         end
 
-        add_attributes.each do |key|
-          new_attributes[key].each do |value|
+        diff_attributes[:added].each do |key|
+          diff_attributes[:new][key].each do |value|
             ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
             log.debug("add attribute #{key}: #{value}")
           end
@@ -250,6 +241,7 @@ module RubySync::Connectors
         # TODO Filtering by @last_change_number boost performance. But in downside it's drop some entries who have been deleted
         # TODO Scan changelog to find deleted entries in background or periodicaly only ?
         filter = "(& (!(changeType=delete)) (objectClass=changeLogEntry) )"# (changeNumber>=#{@last_change_number.to_i})
+#        filter =  Net::LDAP::Filter.eq(:objectclass, 'changeLogEntry') & Net::LDAP::Filter.ne(:changetype, 'delete')
         ldap.search(:base => changelog_dn, :filter => filter) do |change|
           target_dn = change.targetdn[0]
 

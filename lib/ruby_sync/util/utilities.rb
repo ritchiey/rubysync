@@ -189,6 +189,21 @@ class Hash
     h1
   end
 
+  # Returns an Hash with the old, new, added, replaced and deleted attributes
+  def full_diff(new_hash)
+    old = self.symbolize_keys.deep_diff(new_hash.symbolize_keys)
+    old.delete(:dn) # attribute dn is useless
+
+    new = new_hash.symbolize_keys.deep_diff(self.symbolize_keys) # new or modified
+    new.delete(:dn) # attribute dn is useless
+
+    replaced = new.keys & old.keys # to replace
+    deleted = old.keys - replaced # to remove
+    added = new.keys - replaced # to create
+
+    return { :added => added, :deleted => deleted, :new => new, :old => old, :replaced => replaced }
+  end
+
   #convert Hash to Ldif syntax
   def to_ldif
     hash = self.stringify_keys
