@@ -166,41 +166,26 @@ end
 class Hash
   
   # Returns a Hash that represents the difference between two Hashes who have Array values
-  def deep_diff(h2)
+  def deep_diff(hash)
     h1 = self.deep_dup
     h1.each do |k, v|
-#      if( v == h2[k])
-#        h1.delete(k)
-#      else
-        h1_values = v.to_a
-        h2_values = h2[k].to_a
-        
-      #Experimental
-        old_values =  h1_values - h2_values
-        new_values =  h2_values - h1_values
-#        delete_values = old_values.uniq! & add_values.uniq!
-#        add_values.each{|v1| h1_values << v1}
-#        delete_values.to_a.each{|v1| h1_values.delete(v1)}
-        h1_values = (old_values).uniq
-        
-          
-#        h2_values.each do |v2|
-#          h1_values.each do |v1|
-#            (v1 == v2) ? h1_values.delete(v1) :  h1_values << v2
-#          end
-#        end
+      h1_values = [*v]
+      h2_values = [*hash[k]]
 
-        #Replace array wich has only one element by element value
-        if h1_values.empty?
-          h1.delete(k)
-        elsif(h1_values.size == 1)
-          h1[k]=h1_values.at(0)
-        else
-          h1[k] = h1_values
-        end
+      old_values =  h1_values - h2_values
+      new_values =  h2_values - h1_values
+
+      h1_values = (old_values).uniq
+
+      #Replace array wich has only one element by element value
+      if h1_values.empty?
+        h1.delete(k)
+      elsif(h1_values.size == 1)
+        h1[k]=h1_values.at(0)
+      else
+        h1[k] = h1_values
       end
-     
-#    end
+    end
     h1
   end
 
@@ -220,9 +205,10 @@ class Hash
     ary
   end
 
-  #Select the keys in params and only return the hash with corresponding key=>value
-  #Eg. {:last_name => 'Robert', :first_name => 'Bob', :age => 55}.from_keys(:last_name, :age)
-  #Will return {:last_name => 'Robert', :age => 55}
+  # Replaces the hash with only the given keys.
+  # Eg. {:last_name => 'Robert', :first_name => 'Bob', :age => 55}.from_keys(:last_name, :age)
+  # Will return {:last_name => 'Robert', :age => 55}
+  # Similar to ActiveSupport::CoreExtensions::Hash::Slice.slice! but with indifferent access bundles
   def from_keys(*keys)
     self.to_options!.reject { |k,v| !keys.collect{ |v| v.to_sym}.include?(k) }
   end
@@ -292,7 +278,7 @@ class String
     self.strtr("_24"=>"$","_28"=> "(","_29"=>")")
   end
 
-  INT = {'˜' => '~', '‘’' => '\'', '«»„“”˝' => '"', '‒–—―‐' => '-', '…' => '...', '¡' => '!', '‼' => '!!',
+  SPECIALS_CHARS = {'˜' => '~', '‘’' => '\'', '«»„“”˝' => '"', '‒–—―‐' => '-', '…' => '...', '¡' => '!', '‼' => '!!',
     '¿' => '?', '‽' => '!?', '‹' => '<', '›' => '>', '♯' => '#', '⁄÷' => '/', '·' => '.',
     '¹' => '1', '²' => '2', '³' => '3',  '¼'=> '1/4', '½' => '1/2', '¾'=> '3/4', '×' => '*', '±' => '+/-', '∓' => '-/+',
     '№' => 'No', '™' => 'TM',
@@ -308,7 +294,7 @@ class String
     'ťţŧțτ' => 't', 'θϑ'=>'th', 'ÙÚÛŪŮŰŬŨŲΥϒϜ' =>'U', 'Ü' => 'Ue', 'ùúûūůűŭũųµυ' =>'u', 'ü' => 'ue',
     'Ŵ' => 'W', 'ŵ' => 'w', 'Ξ' => 'X', 'ξ' => 'x', 'ÝŶŸ' =>'Y', 'ýÿŷ' =>'y', 'ŹŽŻΖ' =>'Z', 'žżźζ' =>'z'}
 
-  INT_CURRENCY = {'¤' => 'generic currency sign', '฿' => 'baht', '¢' => 'cent', '₡' => 'colón',
+  CURRENCY_CHARS = {'¤' => 'generic currency sign', '฿' => 'baht', '¢' => 'cent', '₡' => 'colón',
     '₵' => 'cedi', '₫' => 'dong', '€' => 'euro', 'ƒ' => 'florin', '₲' => 'guarani',
     '₴' => 'hryvnia', '₭' => 'kip', '₥' => 'mill', '₦' => 'naira', '₧' => 'peseta', '₱' => 'peso', '£' => 'pound',
     '﷼' => 'riyal', 'ރ' => 'rufiyaa', '₨' => 'rupee', '௹' => 'rupee', '৲ ৳' => 'rupee', '૱' => 'rupee',
@@ -316,12 +302,12 @@ class String
     '₢' => 'cruzeiro', '₯' => 'drachma', '₣' => 'franc', '₤' => 'lira', 'ℳ' => 'mark', '₧' => 'peseta', '₰' => 'pfennig'}
   #'$' => 'dollar'# Skip dollar, beacause it's in ASCII table
 
-#  ASCII_PRINTABLE_CHARS = "!\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+#  ASCII_TABLE_CHARS = "!\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 
   # Replace every specials characters
   def replace_special_chars(replace_currency = false)
     string = self
-    special_chars_table = INT.merge(replace_currency ? INT_CURRENCY : {})
+    special_chars_table = SPECIALS_CHARS.merge(replace_currency ? CURRENCY_CHARS : {})
     special_chars_table.each do |key, value|
       string = string.gsub %r([#{key}]), value
     end
