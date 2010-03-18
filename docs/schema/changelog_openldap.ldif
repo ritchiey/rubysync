@@ -1,0 +1,33 @@
+dn: cn=changelog,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: changelog
+olcAttributeTypes: {0}( 2.16.840.1.113730.3.1.5 NAME 'changeNumber' DESC 'a nu
+ mber which uniquely identifies a change made to a directory entry' EQUALITY i
+ ntegerMatch ORDERING integerOrderingMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.2
+ 7 SINGLE-VALUE )
+olcAttributeTypes: {1}( 2.16.840.1.113730.3.1.6 NAME 'targetDN' DESC 'the DN o
+ f the entry which was modified' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.
+ 1.4.1.1466.115.121.1.12 SINGLE-VALUE )
+olcAttributeTypes: {2}( 2.16.840.1.113730.3.1.7 NAME 'changeType' DESC 'the ty
+ pe of change made to an entry' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.14
+ 66.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: {3}( 2.16.840.1.113730.3.1.8 NAME 'changes' DESC 'a set of 
+ changes to apply to an entry' SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
+olcAttributeTypes: {4}( 2.16.840.1.113730.3.1.9 NAME 'newRDN' DESC 'the new RD
+ N of an entry which is the target of a modrdn operation' EQUALITY distinguish
+ edNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 SINGLE-VALUE )
+olcAttributeTypes: {5}( 2.16.840.1.113730.3.1.10 NAME 'deleteOldRDN' DESC 'a f
+ lag which indicates if the old RDN should be retained as an attribute of the 
+ entry' EQUALITY booleanMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE
+  )
+olcAttributeTypes: {6}( 2.16.840.1.113730.3.1.11 NAME 'newSuperior' DESC 'the 
+ new parent of an entry which is the target of a moddn operation' EQUALITY dis
+ tinguishedNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 SINGLE-VALUE )
+olcAttributeTypes: {7}( 2.16.840.1.113730.3.1.35 NAME 'changeLog' DESC 'the di
+ stinguished name of the entry which contains the set of entries comprising th
+ is server s changelog' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.1.4.1.146
+ 6.115.121.1.12 )
+olcObjectClasses: {0}( 2.16.840.1.113730.3.2.1 NAME 'changeLogEntry' SUP top S
+ TRUCTURAL MUST ( changeNumber $ targetDN $ changeType ) MAY ( changes $ newRD
+ N $ deleteOldRDN $ newSuperior ) )
+
