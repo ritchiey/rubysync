@@ -107,10 +107,27 @@ module Net
   end
 end
 
+module Enumerable
+  def pluck(method, *args)
+    map { |x| x.send method, *args }
+  end
+
+  alias invoke pluck
+end
+
 class Array
   def to_ruby
     map {|f| "'#{f}'"}.join(', ')    
   end
+  
+  def map_with_index!
+    each_with_index do |e, idx| self[idx] = yield(e, idx); end
+  end
+
+  def map_with_index(&block)
+    dup.map_with_index!(&block)
+  end
+
 
   # Returns an array with his hashes merged
   # Eg.
@@ -120,6 +137,21 @@ class Array
     hash = Hash.new
     self.select{ |h| h if !h.is_a?(Hash) || !hash.merge!(h) }  + (!hash.empty? ? [hash] : [])
   end
+
+   def pluck!(method, *args)
+    each_index { |x| self[x] = self[x].send method, *args }
+  end
+
+  alias invoke! pluck!
+
+  def extract_options
+    self.last.is_a?(::Hash) ? self.last : {}
+  end
+
+  def without_options
+    self.last.is_a?(::Hash) && self.length > 1 ? self.values_at(0..-2) : self
+  end
+
 end
 
 class Object
