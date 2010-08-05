@@ -17,7 +17,7 @@
 [  File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)
 ].each {|path| $:.unshift path unless $:.include?(path) || $:.include?(File.expand_path(path))}
 
-
+require 'ruby_sync'
 require 'net/ldif'
 require 'test/unit'
 
@@ -49,6 +49,12 @@ class TcLDIF < Test::Unit::TestCase
       "  By the way, you should really get out more."], a[10]
   end
 
+  def test_tokenize_binary_data
+    a = array_for_file "example8.ldif"
+
+    assert_equal ["logonhours", "���������������������"], a[5]
+    assert_equal ["msexchmailboxguid", "F�D+\nsJO�;��_Ci�\n  ���������������������\nF�D+\nsJO�;��_Ci�\n"], a[6]
+  end
 
   def test_tokenize_hyphens
     a = array_for_file "example6.ldif"
@@ -56,6 +62,32 @@ class TcLDIF < Test::Unit::TestCase
     assert_equal ["telephonenumber","+1 408 555 1212"], a[9]
     [30,33,37,40,45,47].each {|i| assert_equal ["-","-"], a[i]}
     
+  end
+
+  def test_convert_hash_to_ldif
+    entry = { "objectclass" => ["top", "person", "organizationalPerson"],
+      :description => "A very cool\ndescription",
+      "logonhours" => "���������������������",
+      "msexchmailboxguid" => "F�D+
+sJO�;��_Ci�
+  ���������������������
+F�D+
+sJO�;��_Ci�
+" }
+
+    ldif_entry = ""
+    entry.to_ldif {|line| ldif_entry = ldif_entry + line + "\n"}
+#    log.debug ldif_entry
+    last_entry =  @ldif.parse("dn: cn=Gern Jensen, ou=Product Testing\nchangetype: add\n#{ldif_entry}")[0].data
+    
+    assert_equal entry[:description], last_entry["description"]
+    assert_equal entry["logonhours"], last_entry["logonhours"]
+    assert_equal entry["msexchmailboxguid"], last_entry["msexchmailboxguid"]
+
+    diff_entry = {}
+    assert_equal diff_entry, last_entry.symbolize_keys.deep_diff(entry.symbolize_keys)
+    assert_equal diff_entry, entry.symbolize_keys.deep_diff(last_entry.symbolize_keys)
+
   end
   
   def test_parse_simple_content
@@ -108,7 +140,7 @@ private
 
   def tokenize_file filename
     with_file(filename) do |file|
-      @ldif.tokenize(file) { |name, value| yield name,value }
+      @ldif.tokenize(file) { |name, value| yield name, value }
     end
   end
 

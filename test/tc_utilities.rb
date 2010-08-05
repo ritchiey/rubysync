@@ -85,6 +85,59 @@ class TcUtilities < Test::Unit::TestCase
     assert_equal 3, e.size
   end
 
-  
+
+  def test_deep_diff_with_binary_data
+    s1 = "���������������������"
+    assert !Net::LDIF.base64_value?(s1)
+
+    h1 = {:to => s1}
+    h2 = {:to => Base64.encode64(s1)}
+    h3 = {}
+    assert_equal h3, h1.deep_diff(h2)
+
+    h1 = {:to => s1}
+    h2 = {:to => Base64.encode64(s1)}
+    assert_equal h3, h2.deep_diff(h1)
+
+    s2 = "F�D+
+sJO�;��_Ci�
+  ���������������������
+F�D+
+sJO�;��_Ci�
+"
+    assert !Net::LDIF.base64_value?(s2)
+
+    h1 = {:to => s2}
+    h2 = {:to => Base64.encode64(s2)}
+    h3 = {}
+    
+    assert_equal h3, h1.deep_diff(h2)
+    assert_equal h3, h2.deep_diff(h1)
+
+    h1 = {:to => [s2]}
+    h2 = {:to => [Base64.encode64(s2)]}
+    h3 = {}
+    assert_equal h3, h1.deep_diff(h2)
+    assert_equal h3, h2.deep_diff(h1)
+
+    h1 = {:to => [s2]}
+    h2 = {:to => Base64.encode64(s2)}
+    h3 = {}
+    assert_equal h3, h1.deep_diff(h2)
+    assert_equal h3, h2.deep_diff(h1)
+
+    h1 = {:to => [s2]}
+    h2 = {:to => [Base64.encode64(s2)]}
+    h3 = {}
+    assert_equal h3, h1.deep_diff(h2)
+    assert_equal h3, h2.deep_diff(h1)
+
+    s3 = "coco"
+    h1 = {:ki => s3}.merge(h1)
+    h2 = {:ki => [s3]}.merge(h2)
+    h3 = {}
+    assert_equal h3, h1.deep_diff(h2)
+  end
+
   
 end

@@ -3,13 +3,13 @@
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
 # This file is part of RubySync.
-# 
+#
 # RubySync is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
-# 
+#
 # RubySync is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
@@ -18,9 +18,9 @@ require 'base64'
 module Net
 
   class ParsingError < StandardError; end
-    
 
-  
+
+
   # Represents a mod-spec structure from RFC2849
   class LDIFModSpec # :nodoc:
     attr_accessor :type, :attribute, :values
@@ -54,20 +54,20 @@ module Net
   # 'add'.
   class ChangeRecord
     attr_accessor :dn, :changetype, :data
-    
+
     def initialize(dn, changetype='add')
       self.dn = dn
       self.changetype = changetype
       @mod_spec = nil
       @data = nil
     end
-    
+
     def to_s
       "#{@dn}\n#{@changetype}\n" +
       @data.inspect
     end
-      
-    
+
+
     def add_value(name, value) # :nodoc:
       # Changetype specified before any other fields
       if name == 'changetype' and !@data
@@ -78,11 +78,11 @@ module Net
       if name == '-' and @changetype != 'modify'
           raise ParsingError.new("'-' is only valid in LDIF change records when changetype is modify")
       end
-      
+
       # Just an ordinary name value pair
       case changetype
       when 'add': add_content(name, value)
-      when 'delete':  
+      when 'delete':
         raise ParsingError.new("Didn't expect content when changetype was 'delete', (#{name}:#{value})")
       when 'modify': add_modification(name, value)
       when 'modrdn': add_moddn_value(name,value)
@@ -92,7 +92,7 @@ module Net
       end
     end
 
-    
+
     def add_modification(name, value)
       @data ||= []
       if name == '-'
@@ -102,14 +102,14 @@ module Net
         @mod_spec = nil
         return
       end
-      
+
       if @mod_spec
         @mod_spec.add_change name,value
       elsif %w{add delete replace}.include? name
         @mod_spec = LDIFModSpec.new(name, value)
       end
     end
-    
+
     def add_moddn_value(name, value)
       #TODO: implement
       #raise Exception.new("Sorry, not yet implemented")
@@ -152,7 +152,46 @@ module Net
     SAFE_CHAR = '[\x01-\x09\x0b-\x0c\x0e-\x7f\'\-\.ķĸκϰϙÜĴŁĽĹĻĿΛŔŘŖℝ®Ρĵ‘’ϗ‹ĥħßΘϴ›₠ΦĶΚϘ₡Χ‼βϐ₢₣Ψ‽₤ÙÚÛŪŮŰŬŨŲΥϒϜ₥±ä₦²ÇĆČĈĊ©³òóôõøōőŏωο°æ‒–—―‐πϖ₧ÝŶŸℳ₨ñńňņŉŋνÄĎĐÐΔ₩₪ŴÑŃŇŅŊΝÆ₫ŵ·θϑŹŽŻΖ€Œèéêëēęěĕėεηϵ⁄÷₭œ«»„“”˝¹₮௹﷼₯φϕ№ŤŢŦȚΤĤĦ₰ĜĞĠĢΓ¼₱♯…½₲ĝğġģγϝΒÀÁÂÃÅĀĄĂΑłľĺļŀλ¾ŚŠŞŜȘΣϹϺχ¿ÒÓÔÕØŌŐŎΟΩ₳ψ₴ťţŧțτ₵žżźζÈÉÊËĒĘĚĔĖΕΗ϶öçćčĉċÌÍÎÏĪĨĬĮİΙμރƒ¡àáâãåāąăαª˜ξ฿¢Ö∓૱×Μ™£¤ýÿŷüďđðδ¥Ξ৲ ৳ŕřŗρϱĲśšşŝșσςϲϻΠìíîïīĩĭįıιùúûūůűŭũųµυ§]'
     SAFE_STRING = "#{SAFE_INIT_CHAR}#{SAFE_CHAR}*"
     BASE64_STRING = '[\x2b\x2f\x30-\x39\x3d\x41-\x5a\x61-\x7a]*'
+    BASE64_REGEX = '^\s*(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048]=|[A-Za-z0-9+/][AQgw]==)?[\n\r]?\z'
 
+    def self.base64_value?(value)
+      if !value.blank? && value.respond_to?(:match)
+        !value.match(/#{BASE64_REGEX}/oi).nil?
+      else
+        false
+      end
+    end
+
+    def base64_value?
+      self.class.base64_value?(self)
+    end
+
+    def self.base64_safe?(value)
+      if value.respond_to?(:match)
+        !value.match(/^\s*(#{BASE64_STRING})[\n\r]?$/oi).nil?
+      else
+        false
+      end
+    end
+
+    def base64_safe?
+      self.class.base64_safe?(self)
+    end
+
+    def self.binary_value?(value)
+      if value.respond_to?(:encoding)
+        return true if value.encoding == Encoding.find("ascii-8bit")
+      end
+      if /\A#{SAFE_STRING}\z/ =~ value.to_s
+        false
+      else
+        true
+      end
+    end
+
+    def binary_value?
+      self.class.binary_value?(self)
+    end
 
     # Yields Net::ChangeRecord for each LDIF record in the file.
     # If the file contains attr-val (content) records, they are
@@ -171,14 +210,14 @@ module Net
           value == '1' or raise ParsingError.new("Don't know how to parse LDIF version '#{value}'")
           next
         end
-        
+
         # Blank line
         # Unless I'm reading the spec wrong, blank lines don't seem to mean much
         # Yet in all the examples, the records seem to be separated by blank lines.
         # TODO: Check whether blank lines mean anything
         next if (name == nil)
 
-        name.downcase!        
+        name.downcase!
         # DN - start a new record
         if name == 'dn'
           # Process existing record
@@ -186,8 +225,8 @@ module Net
           record = ChangeRecord.new(value)
           next
         end
-        
-        record or raise ParsingException.new("Expecting a dn, got #{name}: #{value}")        
+
+        record or raise ParsingException.new("Expecting a dn, got #{name}: #{value}")
         record.add_value name, value
       end # of tokens
       yield(record) if record
@@ -208,7 +247,7 @@ module Net
     # Lines containing only a hyphen are yielded as a name="-",
     # value="-" pair.
     # Values specified as file:// urls as described in RFC2849 are
-    # replaced with the contents of the specified file. 
+    # replaced with the contents of the specified file.
     def self.tokenize(stream)
 
       foldable = false
@@ -218,7 +257,7 @@ module Net
       line_number = 0
       stream.each_line do |line|
         line_number += 1
-        
+
         # Blank line
         if line.strip.length == 0
           yield(name, value.to_s) if name;name = nil;value = ""
@@ -227,13 +266,13 @@ module Net
           comment = false
           next
         end
-        
+
         # Line extension
         if foldable and line[0,1] == ' '
           value << line.chop[1..-1] unless comment
           next
         end
-                    
+
         # Comment
         if line[0,1] == '#'
           yield(name, value.to_s) if name;name = nil;value = ""
@@ -243,15 +282,24 @@ module Net
         end
 
         # Base64 Encoded name:value pair
-        if line =~ /^(#{ATTRIBUTE_DESCRIPTION})::\s*(#{BASE64_STRING})/oi
-          yield(name, value.to_s) if name
-          name  = $1
-          value = Base64EncodedString.new($2)
-          comment = false
-          foldable = false # It is but we've got a separate rule for it
-          next
+        if line =~ /^(#{ATTRIBUTE_DESCRIPTION})::\s*(.+)/oi
+            yield(name, value.to_s) if name
+            name  = $1
+            binary_data = $2
+            binary_data.gsub!(/(\n) (.+)/,'\1\2')
+            value = if binary_value?(binary_data) && !base64_value?(binary_data)
+                Base64.encode64(binary_data).gsub(/(.+)\n$/,'\1')
+              elsif base64_value?(binary_data) || base64_safe?(binary_data)
+                binary_data
+              else
+                raise ParsingError.new("This value isn't encoding in Base64 : #{binary_data}")
+              end
+            value =  Base64EncodedString.new(value.to_s)#.gsub(/\n/, '')
+            comment = false
+            foldable = false # It is but we've got a separate rule for it
+            next
         end
-        
+
         # URL value
         if line =~ /^(#{ATTRIBUTE_DESCRIPTION}):<\s*(#{SAFE_STRING})/oi
             yield(name, value.to_s) if name
@@ -261,7 +309,7 @@ module Net
             foldable = true
             next
           end
-        
+
         # Name:Value pair
         if line =~ /^(#{ATTRIBUTE_DESCRIPTION}):\s*(#{SAFE_STRING})/oi
           yield(name, value.to_s) if name
@@ -270,7 +318,7 @@ module Net
           comment = false
           next
         end
-        
+
         # Hyphen
         if line =~ /^-/o
           yield(name, value.to_s) if name;name = nil;value = ""
@@ -281,8 +329,25 @@ module Net
         end
 
         # Continuation of Base64 Encoded value?
-        if value.kind_of?(Base64EncodedString) and line =~ /^ (#{BASE64_STRING})/oi
-          value << $1
+        if ( value.kind_of?(Base64EncodedString) and line =~ /^ (#{Net::LDIF::BASE64_STRING})[\n\r]?$/oi ) or
+            binary_value?(line)
+
+            if $1
+              value << $1
+            elsif binary_value?(line)
+              if binary_value?(value) && !base64_value?(value)
+                value << Base64.encode64(line).gsub(/(.+)\n$/,'\1')
+              else
+                value << "\n#{Base64.encode64(line).gsub(/(.+)\n$/,'\1')}"
+              end
+            end
+            next
+        end
+
+        if line !=~ /^ (#{SAFE_STRING})/oi and ( value[-1, 1] == ' ' or binary_value?(value) )
+          yield(name, value.to_s) if name
+          log.debug value # debug
+          value << Base64EncodedString.new(value)#[value].pack("m").gsub(/\n/, '')
           next
         end
 
@@ -291,13 +356,14 @@ module Net
       yield(name, value.to_s) if name
       line_number
     end
-    
+
     private
-    
-    
+
+
     def process(record, type) # :nodoc:
-      
+
     end
-    
+
   end
+
 end

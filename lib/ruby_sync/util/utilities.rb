@@ -21,8 +21,7 @@ require 'rubygems'
 require 'active_support'
 require 'irb'
 require 'net/ldap'
-
-
+require 'net/ldif'
 
 module Kernel    
   # Make the log method globally available
@@ -169,12 +168,27 @@ class Hash
   def deep_diff(hash)
     h1 = self.deep_dup
     h1.each do |k, v|
-      h1_values = [*v]
-      h2_values = [*hash[k]]
+      if v.is_a?(::Array)
+        v.map! do |v1|
+         ( Net::LDIF.binary_value?(v1) && !Net::LDIF.base64_value?(v1) )? Base64.encode64(v1).gsub(/(.+)\n$/,'\1') : v1.gsub(/(.+)\n$/,'\1')
+        end
+      elsif v && v.respond_to?(:to_s)
+        v = Base64.encode64(v.to_s) if Net::LDIF.binary_value?(v.to_s) && !Net::LDIF.base64_value?(v.to_s)
+        v.gsub!(/(.+)\n$/,'\1')
+      end
+      h1_values = [v].flatten
+
+      if hash[k].is_a?(::Array)
+        hash[k].map! do |v2|
+          ( Net::LDIF.binary_value?(v2) && !Net::LDIF.base64_value?(v2) )? Base64.encode64(v2).gsub(/(.+)\n$/,'\1') : v2.gsub(/(.+)\n$/,'\1')
+        end
+      elsif hash[k] && hash[k].respond_to?(:to_s)
+        hash[k] = Base64.encode64(hash[k].to_s) if Net::LDIF.binary_value?(hash[k].to_s) && !Net::LDIF.base64_value?(hash[k].to_s)
+        hash[k].gsub!(/(.+)\n$/,'\1')
+      end
+      h2_values = [hash[k]].flatten
 
       old_values =  h1_values - h2_values
-      new_values =  h2_values - h1_values
-
       h1_values = (old_values).uniq
 
       #Replace array wich has only one element by element value
@@ -186,6 +200,7 @@ class Hash
         h1[k] = h1_values
       end
     end
+
     h1
   end
 
@@ -204,15 +219,58 @@ class Hash
     return { :added => added, :deleted => deleted, :new => new, :old => old, :replaced => replaced }
   end
 
-  #convert Hash to Ldif syntax
+  # Convert Hash to Ldif syntax
   def to_ldif
-    hash = self.stringify_keys
+    self.delete_if {|key, value| value.blank? }
+    hash = self.stringify_keys.dasherize_keys
+
     ary = []
     hash.keys.sort.each {|attr|
-      hash[attr].each {|val|
-        #TODO Not Ruby 1.9 compliant
-        ary << "#{attr}: #{val}" unless attr.to_sym == :dn
-      }
+      if hash[attr]
+        if hash[attr].is_a?(::Array)#respond_to? :each
+          hash[attr].each do |val|
+            #TODO Not Ruby 1.9 compliant
+            unless attr.to_sym == :dn
+              #TODO Support URL see Net::LDIF#tokenize
+              b64_value = false
+              binary_value = false
+              if val.match(/[\n\r]/) || val.match(/^ .+$/) || val.match(/^:.+$/) ||
+                  ( Net::LDIF.binary_value?(val) && !Net::LDIF.base64_value?(val) )
+                binary_value =  Net::LDIF.binary_value?(val)
+                val = Base64.encode64(val).gsub(/(.+)\n$/,'\1')
+                b64_value = true
+              end
+
+              if ( Net::LDIF.base64_value?(val) && binary_value) || b64_value
+                val.gsub!(/([\n\r])([^\s]+)/,'\1 \2')
+                ary << "#{attr}:: #{val}"
+              else
+                ary << "#{attr}: #{val}"
+              end
+            end
+          end
+        else
+          unless attr.to_sym == :dn
+            val = hash[attr]
+            #TODO DRY
+            b64_value = false
+            binary_value = false
+            if val.match(/[\n\r]/) || val.match(/^ .+$/) || val.match(/^:.+$/) ||
+                ( Net::LDIF.binary_value?(val) && !Net::LDIF.base64_value?(val) )
+              binary_value =  Net::LDIF.binary_value?(val)
+              val = Base64.encode64(val).gsub(/(.+)\n$/,'\1')
+              b64_value = true
+            end
+
+            if ( Net::LDIF.base64_value?(val) && binary_value) || b64_value
+              val.gsub!(/([\n\r])([^\s]+)/,'\1 \2')
+              ary << "#{attr}:: #{val}"
+            else
+              ary << "#{attr}: #{val}"
+            end
+          end  
+        end
+      end
     }
 
     block_given? and ary.each {|line| yield line}
@@ -227,6 +285,35 @@ class Hash
   def from_keys(*keys)
     self.to_options!.reject { |k,v| !keys.collect{ |v| v.to_sym}.include?(k) }
   end
+
+  def camelize_keys(first_letter_in_uppercase = true)
+    inject({}) do |options, (key, value)|
+      options[key.camelize(first_letter_in_uppercase)] = value
+      options
+    end
+  end
+
+  def camelize_keys!(first_letter_in_uppercase = true)
+    keys.each do |key|
+      self[key.camelize(first_letter_in_uppercase)] = delete(key)
+    end
+    self
+  end
+  
+  def dasherize_keys
+    inject({}) do |options, (key, value)|
+      options[key.to_s.dasherize] = value
+      options
+    end
+  end
+
+  def dasherize_keys!
+    keys.each do |key|
+      self[key.to_s.dasherize] = delete(key)
+    end
+    self
+  end
+
 end
 
 #class Symbol
