@@ -29,8 +29,6 @@ RUBYSYNC_ASSOCIATION_ATTRIBUTE = "rubySyncAssociation"
 module RubySync::Connectors
   module LdapAssociationTracking
 
-    attr_accessor :last_change_number
-
     def associate association, path
       # TODO: check and warn if path is outside of search_base
 

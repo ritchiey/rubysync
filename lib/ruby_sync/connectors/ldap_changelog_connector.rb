@@ -28,12 +28,14 @@ require 'net/ldap'
 module RubySync::Connectors
   class LdapChangelogConnector < RubySync::Connectors::LdapConnector
     include LdapChangelogNumberTracking
+    include LdapChangelogEventProcessing
 
-    option             :changelog_dn
-    changelog_dn          "cn=changelog"
+    option :changelog_dn, :path_cookie
+    changelog_dn "cn=changelog"
 
     def initialize options={}
       super options
+      self.class.path_cookie = search_base if(!respond_to?(:path_cookie) && respond_to?(:search_base) && search_base)
       @last_change_number = 1
       # TODO: Persist the current CSN, for now we'll just skip to the end of the changelog
       skip_existing_changelog_entries
@@ -55,7 +57,7 @@ module RubySync::Connectors
         filter = Net::LDAP::Filter.ge('changenumber', @last_change_number)
         first = true
         @full_refresh_required = false
-        ldap.search :base => changelog_dn, :filter =>filter do |change|
+        ldap.search :base => changelog_dn, :filter => filter do |change|
           change_number = change.changenumber[0].to_i
           if first
             first = false
@@ -98,33 +100,7 @@ module RubySync::Connectors
     def test_add id, details
       details << RubySync::Operation.new(:add, "objectclass", ['inetOrgPerson', 'organizationalPerson', 'person', 'top', 'rubySyncSynchable'])
       add id, details
-    end
-
-
-    private
-
-
-    def event_for_changelog_entry cle
-      payload = nil
-      dn = cle.targetdn[0]
-      changetype = cle.changetype[0]
-      if cle.attribute_names.include? :changes
-        payload = []
-        cr = Net::LDIF.parse("dn: #{dn}\nchangetype: #{changetype}\n#{cle.changes[0]}")[0]
-        if changetype.to_sym == :add
-          # cr.data will be a hash of arrays or strings (attr-name=>[value1, value2, ...])
-          cr.data.each do |name, values|
-            payload << RubySync::Operation.add(name, values)
-          end
-        else
-          # cr.data will be an array of arrays of form [:action, :subject, [values]]
-          cr.data.each do |record|
-            payload << RubySync::Operation.new(record[0], record[1], record[2])
-          end
-        end
-      end
-      RubySync::Event.new(changetype, self, dn, nil, payload)
-    end
+    end  
 
   end
 end

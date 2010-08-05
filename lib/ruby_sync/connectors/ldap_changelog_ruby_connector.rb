@@ -19,6 +19,7 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'ruby_sync'
 require 'ruby_sync/connectors/ldap_connector'
+
 require 'net/ldif'
 $VERBOSE = false
 require 'net/ldap'
@@ -27,19 +28,13 @@ require 'net/ldap'
 RUBYSYNC_CHANGELOG_CLASS = "rubySyncChangeLogEntry"
 RUBYSYNC_DUMP_ENTRY_ATTRIBUTE = "rubySyncDumpEntry"
 RUBYSYNC_CONTEXT_ATTRIBUTE = "rubySyncContext"
+RUBYSYNC_SOURCE_INFO_ATTRIBUTE = "rubySyncSourceInfo"
 
 module RubySync::Connectors
 
-  class LdapChangelogRubyConnector < LdapChangelogConnector
-
-    option             :changelog_dn
-    changelog_dn       'ou=changelog,dc=example,dc=com'#"cn=changelog,ou=system"
-
-    def initialize options={}
-      super(options)
-      restore_last_sync_state
-    end
-
+  module LdapChangelogRubyChange
+    #option :username, :search_filter, :host, :search_base, :port, :changelog_dn, :password, :bind_method
+      
     def each_change(&blk)
       #      unless @last_sync == nil and @last_sync.split(",")[0] == self.association_context
       #        restore_last_sync_state
@@ -57,16 +52,19 @@ module RubySync::Connectors
 
           if change_number > @last_change_number.to_i
             log.info("change_number > @last_change_number")
+#            context = change.send(RUBYSYNC_CONTEXT_ATTRIBUTE.downcase)[0]
+#            if context == self.association_context
             # TODO: A proper DN object would be nice instead of string manipulation
-            target_dn = change.targetdn[0].gsub(/\s*,\s*/,',')
-            if target_dn =~ /#{search_base}$/oi
-              change_type = change.changetype[0]
-              #              if change_type.to_sym == :delete
-              #                 event = RubySync::Event.delete(self, target_dn)
-              #              elsif change_type.to_sym == :modify
-              #                change[RUBYSYNC_DUMP_ENTRY_ATTRIBUTE] = change['changes']
-              #                event = event_for_changelog_entry(change)
-              #              else
+            target_search_path = self.class.path_cookie.gsub(/\s*,\s*/,',')
+            if target_search_path =~ /#{search_base}$/oi
+              log.info("Read the new changeLogEntry")
+#              change_type = change.changetype[0]
+#              if change_type.to_sym == :delete
+#                 event = RubySync::Event.delete(self, change.send(RUBYSYNC_SOURCE_INFO_ATTRIBUTE)[0] )
+#              elsif change_type.to_sym == :modify
+#                change[RUBYSYNC_DUMP_ENTRY_ATTRIBUTE] = change['changes']
+#                event = event_for_changelog_entry(change)
+#              else
               event = event_for_changelog_entry(change)
 #              end
 
@@ -84,8 +82,6 @@ module RubySync::Connectors
 
       # scan changelog entries to find deleted
       delete_changelog_entries(&blk)
-   
-    end
 
     end
 
@@ -129,6 +125,12 @@ module RubySync::Connectors
                   ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
                 end
                 log.debug("in replace : remove attribute #{key}: #{value}")
+              end
+              if diff_attributes[:new][key].blank? # debug
+               log.debug last_entry.inspect
+               log.debug "***#{key}***"
+               log.debug entry.inspect
+               log.debug diff_attributes.inspect # debug
               end
               diff_attributes[:new][key].each do |value|
                 if Net::LDIF.binary_value?(value)
@@ -175,7 +177,9 @@ module RubySync::Connectors
 #        yield RubySync::Event.add(self, entry['dn'].to_s, nil, operations)
 #        perform_operations(operations)
 
-        if path != search_base
+        if path #!= search_base
+          entry.delete_if {|key, value| value.blank? }
+          entry.dasherize_keys!.stringify_values!
           with_ldap do |ldap|
             ldif_entry = ''
 
@@ -268,34 +272,56 @@ module RubySync::Connectors
 #        filter = "(& (!(changeType=delete)) (objectClass=#{RUBYSYNC_CHANGELOG_CLASS}) )"# (changeNumber>=#{@last_change_number.to_i})
         filter =  Net::LDAP::Filter.eq(:objectclass, RUBYSYNC_CHANGELOG_CLASS) & Net::LDAP::Filter.ne(:changetype, 'delete') # Net::LDAP DSL version
         ldap.search(:base => changelog_dn, :filter => filter) do |change|
-          target_dn = change.targetdn[0]
+          target_dn = change.send(RUBYSYNC_SOURCE_INFO_ATTRIBUTE)[0]
 
-          filter_last_change = Net::LDAP::Filter.eq(:targetdn, target_dn) & Net::LDAP::Filter.ge(:changenumber, change.changenumber[0])
+          filter_last_change = Net::LDAP::Filter.eq(RUBYSYNC_SOURCE_INFO_ATTRIBUTE, target_dn) & Net::LDAP::Filter.ge(:changenumber, change.changenumber[0])
           ldap_result = [change] if (ldap_result=ldap.search(:base => changelog_dn, :filter => filter_last_change)).empty?
 
-          unless ldap_result.last.changetype[0].to_sym == :delete# Changelogs of current dn wouldn't have a delete changetype
-            filter_attribute = target_dn.scan(/^\s*(\w+)\s*=\s*(\w+).*$/)[0]
-            filter_dn = Net::LDAP::Filter.eq(filter_attribute[0], filter_attribute[1])
-            if ldap.search(:base => search_base, :filter => filter_dn).empty?
-              yield RubySync::Event.delete(self, target_dn)
-
+          unless ldap_result.last.changetype[0].to_sym == :delete # Changelogs of current dn wouldn't have a delete changetype
+            #filter_attribute = target_dn.scan(/^\s*(\w+)\s*=\s*([\w-]+).*$/)[0]
+#            association_key = RubySync::Association.new(self.association_context, target_dn).to_s
+#
+#            filter_dn = Net::LDAP::Filter.eq(RUBYSYNC_ASSOCIATION_ATTRIBUTE, association_key)
+#            if ldap.search(:base => search_base, :filter => filter_dn).empty?
+            if !self[target_dn]
+              log.debug "#{name}: Deleting unfound entry with path_field = #{target_dn}"
+              log.debug target_dn.inspect # debug
+              log.debug self.association_context # debug
               change_number = @last_change_number +=1
-              changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, 'targetdn' => target_dn, 'changenumber' => change_number.to_s,'objectclass'=>'changeLogEntry' , 'changetype'=>'delete'}
+              changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn,
+                RUBYSYNC_SOURCE_INFO_ATTRIBUTE => target_dn, 'changenumber' => change_number.to_s,
+                'objectclass' => RUBYSYNC_CHANGELOG_CLASS, 'changetype' => 'delete',
+                RUBYSYNC_CONTEXT_ATTRIBUTE => self.association_context }
               changelog_dn_attribute = changelog_attributes.delete('dn').to_s
-              ldap.add :dn=>changelog_dn_attribute, :attributes=>changelog_attributes
+              ldap.add :dn => changelog_dn_attribute, :attributes => changelog_attributes
               update_last_sync_state
+              
+              yield RubySync::Event.delete(self, target_dn)
             end
           end
         end
       end
     end
 
+  end
+
+  class LdapChangelogRubyConnector < LdapChangelogConnector
+    include LdapChangelogRubyChange
+
+    option             :changelog_dn
+    changelog_dn       'ou=changelog,dc=example,dc=com'#"cn=changelog,ou=system"
+
+    def initialize options={}
+      super(options)
+      restore_last_sync_state
+    end
+    
     #  def update_mirror path
     #    with_ldap do |ldap|
-    #      filter = "(targetdn>=#{path})"
+    #      filter = "(#{RUBYSYNC_SOURCE_INFO_ATTRIBUTE}>=#{path})"
     #      ldap.search(:base => changelog_dn, :filter =>filter, :return_result => false) ? type='add' : type='modify';
     #      change_number += 1 if (change_number=@last_change_number)
-    #      changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, 'targetdn' => path.to_s, 'changenumber' => change_number.to_s,'objectclass'=>'changeLogEntry' , 'changetype'=>type}
+    #      changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, RUBYSYNC_SOURCE_INFO_ATTRIBUTE => path.to_s, 'changenumber' => change_number.to_s, 'objectclass' => RUBYSYNC_CHANGELOG_CLASS, 'changetype'=>type}
     #      ldap.add :dn=>changelog_attributes['dn'].to_s, :attributes=>changelog_attributes
     #    end
     #  end
@@ -304,7 +330,7 @@ module RubySync::Connectors
     ##    if @last_change_number > 0
     #      with_ldap do |ldap|
     #        change_number += 1 if (change_number=@last_change_number)
-    #        changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, 'targetdn' => path.to_s, 'changenumber' => change_number.to_s,'objectclass'=>'changeLogEntry' , 'changetype'=>'delete'}
+    #        changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, RUBYSYNC_SOURCE_INFO_ATTRIBUTE' => path.to_s, 'changenumber' => change_number.to_s, 'objectclass' => RUBYSYNC_CHANGELOG_CLASS, 'changetype'=>'delete'}
     #        ldap.add :dn=>changelog_attributes['dn'].to_s, :attributes=>changelog_attributes
     #      end
     ##    end

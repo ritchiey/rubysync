@@ -107,6 +107,7 @@ module Net
 end
 
 module Enumerable
+
   def pluck(method, *args)
     map { |x| x.send method, *args }
   end
@@ -151,14 +152,21 @@ class Array
     self.last.is_a?(::Hash) && self.length > 1 ? self.values_at(0..-2) : self
   end
 
+  # Array#flatten has problems with recursive arrays. Going one level deeper solves the majority of the problems. 
+  def flatten_deeper
+    self.collect { |element| (element.respond_to?(:flatten) && !element.is_a?(Hash)) ? element.flatten : element }.flatten
+  end
+  
 end
 
 class Object
+
   #deep copy for a data structure, eg. Hash or Array
   #Authors GOTO Kentaro and Robert Feldt
   def deep_dup
     Marshal::load(Marshal.dump(self))
   end
+
 end
 
 
@@ -191,7 +199,7 @@ class Hash
       old_values =  h1_values - h2_values
       h1_values = (old_values).uniq
 
-      #Replace array wich has only one element by element value
+      # Replace array wich has only one element by element value
       if h1_values.empty?
         h1.delete(k)
       elsif(h1_values.size == 1)
@@ -274,7 +282,6 @@ class Hash
     }
 
     block_given? and ary.each {|line| yield line}
-
     ary
   end
 
@@ -314,6 +321,46 @@ class Hash
     self
   end
 
+  def stringify_values
+    inject({}) do |options, (key, value)|
+      options[key] =
+        if value.respond_to?(:to_s)
+          if value.is_a?(::Array) || value.is_a?(::Hash)
+            value = value.values.flatten if value.is_a?(::Hash)
+            value.flatten! if value.is_a?(::Array)
+            value.map do |nested_value|
+              nested_value.respond_to?(:to_s) ? nested_value.to_s : nested_value
+            end
+          else
+            value.to_s
+          end
+        else
+          value
+        end
+      options
+    end
+  end
+
+  def stringify_values!
+    each do |key, value|
+      self[key] = 
+        if value.respond_to?(:to_s)
+          if value.is_a?(::Array) || value.is_a?(::Hash)
+            value = value.values.flatten if value.is_a?(::Hash)
+            value.flatten! if value.is_a?(::Array)
+            value.map! do |nested_value|
+              nested_value.respond_to?(:to_s) ? nested_value.to_s : nested_value
+            end
+          else
+            value.to_s
+          end
+        else
+          value
+        end
+    end
+    self
+  end
+  
 end
 
 #class Symbol
