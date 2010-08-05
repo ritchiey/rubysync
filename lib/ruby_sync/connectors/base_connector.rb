@@ -23,9 +23,16 @@ module RubySync::Connectors
     meta_eval { include RubySync::Utilities }
     include ConnectorEventProcessing
     include CopyEntryChangeTracking
-      
-    attr_accessor :once_only, :name, :is_vault, :pipeline, :parse_all_entries, :last_sync_info
-    class << self; attr_accessor :parse_all_entries, :last_sync_info; end
+  
+    attr_accessor :once_only, :name, :is_vault, :pipeline, :parse_all_entries,
+      :last_sync_info, :track_associations_module, :track_associations_options,
+      :track_changes_module, :track_changes_options
+    
+    class << self
+      attr_accessor :parse_all_entries, :last_sync_info,
+        :track_associations_module, :track_associations_options,
+        :track_changes_module, :track_changes_options
+    end
 
     def initialize options={}
       base_path # call this once to get the working directory before anything else
@@ -170,6 +177,7 @@ module RubySync::Connectors
     def extract_last_sync_info
        return Time.now if parse_all_entries
        log.warn "You must override this method to return the last synchronization information of your connector"
+       return nil
     end
 
     # Returns the association key for the given path. Called if this connector is
@@ -235,7 +243,7 @@ module RubySync::Connectors
     # The context to be used to for all associations created where this
     # connector is the client.
     def association_context
-      self.name
+      return (self.name)? self.name : self.class.name
     end
 
     def clean
@@ -397,12 +405,47 @@ module RubySync::Connectors
       END
     end
 
-    def self.track_changes_with method
-      include_something_called method, "change_tracking"
+    def self.track_changes_with(*args)
+      include_something_called( (@track_changes_module = args.first), 'change_tracking' ) if args.first && !@track_changes_module
+      acts_as_change_tracking if respond_to? :acts_as_change_tracking
+
+      @track_changes_options ||= {}
+      @track_changes_options.merge!(args.extract_options!.symbolize_keys) if args && args.size > 0
+      if @track_changes_options
+        track_option *@track_changes_options.keys
+        @track_changes_options.each do |key, value|
+          if self.respond_to?("#{key}=")
+            self.send("#{key}=", value)
+          else
+            log.debug "#{name}: doesn't respond to #{key}="
+          end
+        end
+      end
     end
-		  
-    def self.track_associations_with method
-      include_something_called method, "association_tracking"
+
+    def reload_track_changes
+      self.class.track_changes_with(@track_changes_module, @track_changes_options) if self.class.respond_to? :acts_as_change_tracking
+    end
+
+
+   def self.track_associations_with(*args)
+      include_something_called( (@track_associations_module = args.first), 'association_tracking' ) unless @track_associations_module
+      @track_associations_options ||= {}
+      @track_associations_options.merge!(args.extract_options!.symbolize_keys) if args && args.size > 0
+      if @track_associations_options
+        track_option *@track_associations_options.keys
+        @track_associations_options.each do |key, value|
+          if self.respond_to?("#{key}=")
+            self.send("#{key}=", value)
+          else
+            log.debug "#{name}: doesn't respond to #{key}="
+          end
+        end
+      end
+    end
+
+    def reload_track_associations
+      self.class.track_associations_with(@track_associations_module, @track_associations_options)
     end
 
     def self.track_with(tracking_name, options={})
@@ -429,9 +472,20 @@ module RubySync::Connectors
       ::File.join(p,name)
     end
 
-    def self.include_something_called name, extension, message=nil
+    def self.extend_something_called name, extension, message = nil
       module_name = class_name_for(name, extension)
       m = eval(module_name)
+
+      unless extend(m)
+        message ||= "Couldn't find a module called #{module_name}"
+        log.error message
+      end
+    end
+
+    def self.include_something_called name, extension, message = nil
+      module_name = class_name_for(name, extension)
+      m = eval(module_name)
+
       unless include(m)
         message ||= "Couldn't find a module called #{module_name}"
         log.error message

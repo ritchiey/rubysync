@@ -181,8 +181,7 @@ END
     end
 
     def [](path)
-      with_ldap do |ldap|
-        
+      with_ldap(true) do |ldap|
         return nil if path.blank?
         if path_field == :dn or path.gsub(/\s*,\s*/,',') =~ /#{search_base}$/oi
           base_path = path
@@ -193,7 +192,9 @@ END
           filter = Net::LDAP::Filter.eq(path_field, path)
           scope = Net::LDAP::SearchScope_WholeSubtree
         end
+
 	      result = ldap.search search_args(:base => base_path, :scope => scope, :filter => filter)
+
         return nil if !result or result.size == 0
         answer = {}
         result[0].attribute_names.each do |name|
@@ -204,8 +205,10 @@ END
       end
     end
 
-    def search(extras={}, &blk)
-      with_ldap do |ldap|        
+    def search(extras = {} , &blk)
+      connector = extras.delete(:connector)
+      with_ldap(connector) do |ldap|
+        #TODO rename arg extras[:search_base] to extras[:base]
         results = ldap.search(search_args(extras), &blk)
 #        log.debug ldap.get_operation_result.code
 #        log.debug ldap.get_operation_result.message
@@ -271,7 +274,7 @@ END
     end
 
 
-    def with_ldap
+    def with_ldap(connector = nil)
       result = nil
       
       connection_options = {:host => host, :port => port, :auth => auth}

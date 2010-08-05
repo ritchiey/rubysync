@@ -60,11 +60,44 @@ class Module
         class_eval("alias :#{name}= :set_#{name}")
 
         meta_def "get_#{name}" do
-          instance_variable_get("@meta_#{name}")
+          instance_variable_get("@meta_#{name}") || (respond_to?(:superclass) && superclass && superclass.instance_variable_get("@meta_#{name}"))
         end
       end
     end
   end
+
+#  # TODO merge this method with #option method
+  def track_option *names
+    names.each do |name|
+      meta_def "set_#{name}" do |*values|
+        if values.is_a?(Enumerable) && values.length > 1
+          value = values
+        elsif values
+          value = values.first
+        end
+
+        instance_variable_set("@meta_#{name}", value)
+        class_def "get_#{name}" do
+          (class_eval("instance_variable_get('@meta_#{name}')")) ? class_eval("instance_variable_get('@meta_#{name}')") : value
+        end
+        class_eval("alias :#{name} :get_#{name}")
+
+        class_def "set_#{name}" do |v|
+          class_eval("instance_variable_set('@meta_#{name}', '#{v}')")
+        end
+        class_eval("alias :#{name}= :set_#{name}")
+      end
+      instance_eval("alias :#{name}= :set_#{name}")
+
+      meta_def "get_#{name}" do
+        instance_variable_get("@meta_#{name}")
+      end
+      instance_eval("alias :#{name} :get_#{name}")
+    end
+  end
+
+#  alias :track_option :option
+
 end
 
 

@@ -126,9 +126,11 @@ module RubySync
         log.debug "Default matching rule - vault[in_place] exists?"
         if vault.respond_to?('[]')
           path = in_place(event) 
-          if path
+          if !path.blank?
             log.debug "Checking for object at '#{path}' on vault."
             vault[path] and path
+          else
+            false
           end
         else
           log.debug "Vault doesn't support random access - no match"
@@ -139,7 +141,11 @@ module RubySync
       def out_match(event)
         log.debug "Default matching rule - client[out_place] exists?"
         path = out_place(event)
-        client.respond_to?('[]') and client[path] and path
+        if !path.blank?
+          client.respond_to?('[]') and client[path] and path
+        else
+          false
+        end
       end
       
       # Override to restrict creation on the client
@@ -176,7 +182,12 @@ module RubySync
       end
       
       def started
-        client.last_sync_info = vault.extract_last_sync_info if !client.parse_all_entries
+        self.client.reload_track_changes
+        self.vault.reload_track_changes
+        self.client.restore_last_sync_state if self.client.respond_to?(:restore_last_sync_state) # TODO move that into a block ?
+        self.vault.restore_last_sync_state if self.vault.respond_to?(:restore_last_sync_state) # TODO move that into a block ?
+
+        client.last_sync_info = client.extract_last_sync_info if !client.parse_all_entries && client.sync_info.blank?
         client.started
         vault.started
       end
