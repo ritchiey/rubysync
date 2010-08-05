@@ -36,28 +36,29 @@ end
 
 
 class Module
+  
   # Add an option that will be defined by a class method, stored in a class variable
   # and accessible as an instance method
   def option *names
     names.each do |name|
       meta_def name do |*values|
         if values.is_a?(Enumerable) && values.length > 1
-          value= values
+          value = values
         elsif values
           value = values.first
         end
-        
+
         instance_variable_set("@meta_#{name}", value)
 
         class_def name do
-          (class_eval("instance_variable_get('@meta_#{name}')")) ? class_eval("instance_variable_get('@meta_#{name}')") : value
+          ( class_eval("instance_variable_get('@meta_#{name}')") )? class_eval("instance_variable_get('@meta_#{name}')") : value
         end
 
         class_def "set_#{name}" do |v|
           class_eval("instance_variable_set('@meta_#{name}', '#{v}')")
         end
         class_eval("alias :#{name}= :set_#{name}")
-        
+
         meta_def "get_#{name}" do
           instance_variable_get("@meta_#{name}")
         end

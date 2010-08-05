@@ -19,8 +19,8 @@ require 'ruby_sync'
 
 module RubySync::Connectors::CopyEntryChangeTracking
 
-  #Default behaviour copy all entries of the current connector to the other connector
-  #You should override this method
+  # Default behaviour copy all entries of the current connector to the other connector
+  # You can override this method
   def each_change(&blk)
      each_entry do |path, entry|
       operations = create_operations_for(entry)

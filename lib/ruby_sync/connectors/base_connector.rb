@@ -20,7 +20,7 @@ module RubySync::Connectors
   class BaseConnector
       
     include RubySync::Utilities
-    meta_eval {include RubySync::Utilities}
+    meta_eval { include RubySync::Utilities }
     include ConnectorEventProcessing
     include CopyEntryChangeTracking
       
@@ -34,7 +34,7 @@ module RubySync::Connectors
       once_only = false
       self.name = options[:name]
       self.is_vault = options[:is_vault]
-      self.parse_all_entries = self.class.parse_all_entries = self.class.parse_all_entries.nil? ? true : self.class.parse_all_entries
+      self.parse_all_entries = self.class.parse_all_entries = (self.class.parse_all_entries.nil?) ? true : self.class.parse_all_entries
       if is_vault && !can_act_as_vault?
         raise "#{self.class.name} can't act as an identity vault."
       end
@@ -45,6 +45,7 @@ module RubySync::Connectors
           log.debug "#{name}: doesn't respond to #{key}="
         end
       end
+
     end      
       
 
@@ -159,7 +160,7 @@ module RubySync::Connectors
 #    end
 
     def set_last_sync_info(value)
-      log.debug "set last_sync_info with #{value}"
+      log.debug "#{name}: set last_sync_info with #{value}"
       @last_sync_info = value
       self.class.last_sync_info = value
     end
@@ -236,7 +237,7 @@ module RubySync::Connectors
     def association_context
       self.name
     end
-      
+
     def clean
     end
       

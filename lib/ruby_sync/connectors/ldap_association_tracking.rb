@@ -54,6 +54,7 @@ module RubySync::Connectors
         filter = Net::LDAP::Filter.eq(RUBYSYNC_ASSOCIATION_ATTRIBUTE,
           association.to_s)
         log.debug "Searching with filter: #{filter}"
+   
         results = ldap.search :base => search_base, :filter => filter
         results or return nil
         case results.length
@@ -67,9 +68,8 @@ module RubySync::Connectors
     
     def associations_for path
       with_ldap do |ldap|
-        results = ldap.search :base => path,
-	  :scope=>Net::LDAP::SearchScope_BaseObject,
-	  :attributes=>[RUBYSYNC_ASSOCIATION_ATTRIBUTE]
+        results = ldap.search :base => path, :scope => Net::LDAP::SearchScope_BaseObject,
+          :attributes => [RUBYSYNC_ASSOCIATION_ATTRIBUTE]
         unless results and results.length > 0
           log.warn "Attempted association lookup on non-existent LDAP entry '#{path}'"
           return []

@@ -110,11 +110,12 @@ module Enumerable
   def pluck(method, *args)
     map { |x| x.send method, *args }
   end
-
   alias invoke pluck
+
 end
 
 class Array
+
   def to_ruby
     map {|f| "'#{f}'"}.join(', ')    
   end
@@ -137,10 +138,9 @@ class Array
     self.select{ |h| h if !h.is_a?(Hash) || !hash.merge!(h) }  + (!hash.empty? ? [hash] : [])
   end
 
-   def pluck!(method, *args)
+  def pluck!(method, *args)
     each_index { |x| self[x] = self[x].send method, *args }
   end
-
   alias invoke! pluck!
 
   def extract_options
@@ -460,7 +460,7 @@ module RubySync
 
     # If not already an array, slip into one
     def as_array o
-      (o.instance_of? Array)? o : [o]
+      (o.instance_of?(::Array))? o : [o]
     end
     
     # Perform an action and rescue any exceptions thrown, display the exception with the specified text

@@ -77,12 +77,12 @@ module RubySync::Connectors
 
 
     def each_entry
-      Net::LDAP.open(:host=>host, :port=>port, :auth=>auth) do |ldap|
+      Net::LDAP.open(:host => host, :port => port, :auth => auth) do |ldap|
 	      ldap.search search_args(:return_result => false) do |ldap_entry|
           if ldap_entry[path_field] && ldap_entry[path_field][0]
             yield ldap_entry[path_field][0], to_entry(ldap_entry)
           else
-            log.debug "Skip this entry, it should have a path"
+            log.warn "#{name}: Skip this entry, it should have a path, check if the 'path_field' option is correctly set"
           end
 	      end
       end
@@ -132,10 +132,9 @@ END
         operations << RubySync::Operation.add('objectclass', RUBYSYNC_ASSOCIATION_CLASS)
         ldap_attributes = perform_operations(operations)
         ldap_attributes['objectclass'] || log.warn("Add without objectclass attribute is unlikely to work.")
-        result = ldap.add path_field => path, :attributes => ldap_attributes
+        result = ldap.add :dn => path, :attributes => ldap_attributes
 
         unless ldap.get_operation_result.code == 0
-#          log.debug path
           log.debug ldap_attributes.inspect
           log.warn ldap.get_operation_result.message
         end
@@ -155,35 +154,51 @@ END
         operations.each do |op|          
           if op.subject == 'objectclass' and op.type == :replace
             found=false
+            op.values.flatten!
             op.values.each { |value| found=true if value == RUBYSYNC_ASSOCIATION_CLASS}
             op.values << RUBYSYNC_ASSOCIATION_CLASS unless found
           end
         end
-        
-        unless ldap.modify path_field=>path, :operations=>to_ldap_operations(operations)
-          log.warn "Ldap Modification fails:  #{ldap.get_operation_result.message}"#debug
+#        dn = (path_field == :dn)? path : "#{path_field}=#{path},#{search_base}"
+        unless ldap.modify :dn => path, :operations => to_ldap_operations(operations)
+          log.warn "Ldap Modification fails:  #{ldap.get_operation_result.message}"
         end
-        log.debug ldap.get_operation_result.message unless ldap.get_operation_result.code == 0
+        if ldap.get_operation_result.code == 0
+          return true
+        else
+          log.debug ldap.get_operation_result.message
+          return false
+        end
       end
     end
 
     def delete(path)
-      with_ldap {|ldap| ldap.delete path_field => path }
+      if path
+        with_ldap {|ldap| ldap.delete :dn => path }
+      else
+        log.warn "Unable to delete empty path"
+      end
     end
 
     def [](path)
       with_ldap do |ldap|
         
-        base_path = path
-        scope = Net::LDAP::SearchScope_BaseObject
-        
+        return nil if path.blank?
+        if path_field == :dn or path.gsub(/\s*,\s*/,',') =~ /#{search_base}$/oi
+          base_path = path
           filter = Net::LDAP::Filter.pres(:objectclass)
+          scope = Net::LDAP::SearchScope_BaseObject
+        else
+          base_path = search_base
+          filter = Net::LDAP::Filter.eq(path_field, path)
+          scope = Net::LDAP::SearchScope_WholeSubtree
+        end
 	      result = ldap.search search_args(:base => base_path, :scope => scope, :filter => filter)
         return nil if !result or result.size == 0
         answer = {}
         result[0].attribute_names.each do |name|
 	        name = name.to_s.downcase
-	        answer[name] = result[0][name] unless name == path_field.to_s
+	        answer[name] = result[0][name] unless name == 'dn'
         end
         answer
       end
@@ -192,16 +207,16 @@ END
     def search(extras={}, &blk)
       with_ldap do |ldap|        
         results = ldap.search(search_args(extras), &blk)
-        log.debug ldap.get_operation_result.code
-        log.debug ldap.get_operation_result.message
-
-        return nil unless results && !results.empty?
+#        log.debug ldap.get_operation_result.code
+#        log.debug ldap.get_operation_result.message
+   
+        return nil if results.blank?
         if block_given? && extras.key?(:return_result) && extras[:return_result] == false
           answer = {}
           results.each do |result|
             result.attribute_names.each do |name|
               name = name.to_s.downcase
-              answer[name] = result[name] unless name == path_field.to_s
+              answer[name] = result[name] unless name == 'dn'
             end
           end
           answer
@@ -213,7 +228,7 @@ END
 
     def search_args(extras={})
       args = {:base => search_base, :filter => search_filter}
-      args[:attributes] = get_attributes if respond_to?(:get_attributes)
+      args[:attributes] = attributes if respond_to?(:attributes)
       args.merge(extras)
     end
 
@@ -258,9 +273,12 @@ END
 
     def with_ldap
       result = nil
-      connection_options = {:host=>host, :port=>port, :auth=>auth}
+      
+      connection_options = {:host => host, :port => port, :auth => auth}
       connection_options[:encryption] = encryption if encryption
+      
       started unless @connection_index
+      
       @connections[@connection_index] = Net::LDAP.new(connection_options) unless @connections[@connection_index]
       if @connections[@connection_index]
         ldap = @connections[@connection_index]
@@ -273,7 +291,7 @@ END
 
 
     def auth
-      {:method=>bind_method, :username=>username, :password=>password}
+      {:method => bind_method, :username => username, :password => password}
     end
 
     # Produce an array of operation arrays suitable for the LDAP library

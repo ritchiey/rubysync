@@ -23,7 +23,6 @@ module RubySync::Connectors
     include MemoryAssociationTracking
     include MemoryChangeTracking
 
-
     def each_entry
       @data.each do |key, entry|
         yield key, entry

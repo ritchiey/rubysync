@@ -41,17 +41,20 @@ module RubySync::Connectors
     end
 
     def each_change(&blk)
-      #      unless @last_sync == nil and @last_sync.split(",")[0] == self.association_context.ldap_encode
+      #      unless @last_sync == nil and @last_sync.split(",")[0] == self.association_context
       #        restore_last_sync_state
       #      end
       #      first = true
       with_ldap do |ldap|
         log.debug "@last_change_number = #{@last_change_number}"
+
         filter = Net::LDAP::Filter.ge("changenumber", @last_change_number.to_i.to_s)
 
         @full_refresh_required = false
         ldap.search :base => changelog_dn, :filter => filter do |change|
-          change_number = change.changenumber[0].to_i 
+          change_number = change.changenumber[0].to_i
+
+
           if change_number > @last_change_number.to_i
             log.info("change_number > @last_change_number")
             # TODO: A proper DN object would be nice instead of string manipulation
@@ -65,9 +68,8 @@ module RubySync::Connectors
               #                event = event_for_changelog_entry(change)
               #              else
               event = event_for_changelog_entry(change)
-                 
-              #              end
-             
+#              end
+
               yield event
               @last_change_number = change_number
               update_last_sync_state
@@ -76,7 +78,7 @@ module RubySync::Connectors
           #          end
         end
       end
-             
+
       # scan existing entries to see if any are new or modified
       save_changelog_entries(&blk)
 
@@ -85,29 +87,35 @@ module RubySync::Connectors
    
     end
 
-    #dummy method, because we don't have to skip changelog entries with software LDAP changelog
-    def skip_existing_changelog_entries    
     end
 
-    #Compare current entry with last entry store in changeLogEntry and return a ldif_entry
+    # Dummy method, because we don't have to skip changelog entries with software LDAP changelog
+    def skip_existing_changelog_entries; end
+
+    # Compare current entry with last entry store in changeLogEntry and return a ldif_entry
     def compare_changes(path, entry, change)
+      
       ldif_entry = ''
-      if change.attribute_names.include? :changes or change.attribute_names.include? RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym
+      if change.attribute_names.include?(:changes) or change.attribute_names.include?(RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym)
 
         # using RUBYSYNC_DUMP_ENTRY_ATTRIBUTE only for change_type :modify
-        change.changetype[0].to_sym == :add ? changes_attribute = 'changes' : changes_attribute = RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym
+        changes_attribute = ( change.changetype[0].to_sym == :add )?  :changes : RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym
 
         last_entry = Net::LDIF.parse("dn: #{path}\nchangetype: add\n#{change.send(changes_attribute)[0]}")[0].data
-        raise Exception.new("Wrong type for last_entry and/or entry") unless last_entry.respond_to?(:deep_diff) and entry.respond_to?(:deep_diff)
-
+        raise Exception.new("Wrong type for last_entry and/or entry") if !last_entry.respond_to?(:deep_diff) && !entry.respond_to?(:deep_diff)
+        
         diff_attributes = last_entry.full_diff(entry)
-       
-        #Deleting or replacing attributes only if the lastest change has been done by the actual client/vault
-        if change.send(RUBYSYNC_CONTEXT_ATTRIBUTE)[0]==self.association_context.ldap_encode
-                 
+
+        # Deleting or replacing attributes only if the lastest change has been done by the actual client/vault
+        if change.send(RUBYSYNC_CONTEXT_ATTRIBUTE.downcase)[0] == self.association_context
+
           diff_attributes[:deleted].each do |key|
             diff_attributes[:old][key].each do |value|
-              ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
+              if Net::LDIF.binary_value?(value)
+                ldif_entry = ldif_entry + "delete: #{key}\n#{key}:: #{value}\n-\n"
+              else
+                ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
+              end
               log.debug("remove attribute #{key}: #{value}")
             end
           end
@@ -115,16 +123,28 @@ module RubySync::Connectors
           diff_attributes[:replaced].each do |key|
             if entry.symbolize_keys[key].is_a?(Array) or last_entry.symbolize_keys[key].is_a?(Array)
               diff_attributes[:old][key].each do |value|
-                ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
+                if Net::LDIF.binary_value?(value)
+                   ldif_entry = ldif_entry + "delete: #{key}\n#{key}:: #{value}\n-\n"
+                else
+                  ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
+                end
                 log.debug("in replace : remove attribute #{key}: #{value}")
               end
               diff_attributes[:new][key].each do |value|
-                ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
+                if Net::LDIF.binary_value?(value)
+                  ldif_entry = ldif_entry + "add: #{key}\n#{key}:: #{value}\n-\n"
+                else
+                  ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
+                end
                 log.debug("in replace : add attribute #{key}: #{value}")
               end
             else
               value = diff_attributes[:new][key]
-              ldif_entry = ldif_entry + "replace: #{key}\n#{key}: #{value}\n-\n"
+              if Net::LDIF.binary_value?(value)
+                ldif_entry = ldif_entry + "replace: #{key}\n#{key}:: #{value}\n-\n"
+              else
+                ldif_entry = ldif_entry + "replace: #{key}\n#{key}: #{value}\n-\n"
+              end
               log.debug("replace attribute #{key}: #{value}")
             end
           end
@@ -132,24 +152,28 @@ module RubySync::Connectors
 
         diff_attributes[:added].each do |key|
           diff_attributes[:new][key].each do |value|
-            ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
+            if Net::LDIF.binary_value?(value)
+              ldif_entry = ldif_entry + "add: #{key}\n#{key}:: #{value}\n-\n"
+            else
+              ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
+            end
             log.debug("add attribute #{key}: #{value}")
           end
         end
-        
+
         log.debug("ldif changelog entry is empty") if ldif_entry.empty?
         ldif_entry
       else
         raise Exception.new("Invalid changelog entry, 'changes' or '#{RUBYSYNC_DUMP_ENTRY_ATTRIBUTE}' attributes are empty")#No changes found
       end
-      
+
     end
-    
+
     def save_changelog_entries(&blk)
       each_entry do |path, entry|
-  #          operations = operations_for_entry(entry)
-        #          yield RubySync::Event.add(self, entry['dn'].to_s, nil, operations)
-        #          perform_operations(operations
+#        operations = operations_for_entry(entry)
+#        yield RubySync::Event.add(self, entry['dn'].to_s, nil, operations)
+#        perform_operations(operations)
 
         if path != search_base
           with_ldap do |ldap|
@@ -169,7 +193,7 @@ module RubySync::Connectors
                   type='add'# Recreate entry
                 when :add, :modify
                   type = 'modify'# Update existing entry
-                  ldif_entry = compare_changes(path, entry,change)
+                  ldif_entry = compare_changes(path, entry, change)
                 else
                   raise Exception.new("Invalid changelog type")
                 end
@@ -181,7 +205,7 @@ module RubySync::Connectors
             save_changelog_entry(type, path, entry, ldif_entry, &blk)
           end
         else
-          log.debug "Skip this entry, it should have a path"
+          log.warn "#{name}: Skip this entry, it should have a path, #{entry.inspect}"
         end
       end
     end
@@ -194,37 +218,38 @@ module RubySync::Connectors
             'changenumber' => change_number.to_s, 'objectclass' => RUBYSYNC_CHANGELOG_CLASS,
             RUBYSYNC_CONTEXT_ATTRIBUTE => association_context, 'changetype' => type}
 
-          if type.to_sym==:add
-            entry.to_ldif {|line| ldif_entry = ldif_entry + line + "\n"}#TODO Not Ruby 1.9.+ compliant
+          if type.to_sym == :add
+            entry.to_ldif {|line| ldif_entry = ldif_entry + line + "\n"} # TODO Not Ruby 1.9.+ compliant
             changelog_attributes['changes'] = [ldif_entry]
-          elsif type.to_sym==:modify and !ldif_entry.empty?
-
+          elsif type.to_sym == :modify and !ldif_entry.empty?
             changelog_attributes['changes'] = [ldif_entry]
             dump_entry = ''
-            entry.to_ldif {|line| dump_entry = dump_entry + line + "\n"}#TODO Not Ruby 1.9.+ compliant
+            entry.to_ldif {|line| dump_entry = dump_entry + line + "\n"} # TODO Not Ruby 1.9.+ compliant
             changelog_attributes[RUBYSYNC_DUMP_ENTRY_ATTRIBUTE] = [dump_entry]
           else
-            return#Wrong type or ldif_entry is empty
+            return # Wrong type or ldif_entry is empty
           end
-
+         
 
           begin
-              #Changelog entry successfully added
               changelog_dn_attribute = changelog_attributes.delete('dn').to_s
               result = ldap.add :dn => changelog_dn_attribute, :attributes => changelog_attributes
 
-              unless ldap.get_operation_result.code == 0
-#                log.debug path
-#                log.debug changelog_dn
+              if ldap.get_operation_result.code == 0
+                # Changelog entry successfully added
+                log.debug("ldap.add returned '#{result}'")
+                @last_change_number = change_number
+                update_last_sync_state
                 cle = ldap.search(:base => changelog_dn, :filter => Net::LDAP::Filter.eq(:changenumber, change_number.to_s)).first
+
+                yield event_for_changelog_entry(cle)
+              else
+#                log.debug path # debug
+#                log.debug changelog_dn # debug
                 log.debug changelog_attributes.inspect
                 log.warn ldap.get_operation_result.message
+                raise Exception.new("Exception occurred while adding LDAP changelog entry n°#{change_number.to_s}")
               end
-              log.debug("ldap.add returned '#{result}'")
-              @last_change_number=change_number
-              update_last_sync_state
-
-              yield event_for_changelog_entry(cle)
 
           rescue Exception => e
             log.debug e.inspect
