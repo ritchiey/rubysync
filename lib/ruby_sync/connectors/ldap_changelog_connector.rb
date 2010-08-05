@@ -52,7 +52,7 @@ module RubySync::Connectors
     def each_change
       with_ldap do |ldap|
         log.debug "@last_change_number = #{@last_change_number}"
-        filter = "(changenumber>=#{@last_change_number})"
+        filter = Net::LDAP::Filter.ge('changenumber', @last_change_number)
         first = true
         @full_refresh_required = false
         ldap.search :base => changelog_dn, :filter =>filter do |change|
@@ -84,7 +84,7 @@ module RubySync::Connectors
 
     def skip_existing_changelog_entries
       with_ldap do |ldap|
-        filter = "(changenumber>=#{@last_change_number})"
+        filter = Net::LDAP::Filter.ge('changenumber', @last_change_number)
         @full_refresh_required = false
         ldap.search :base => changelog_dn, :filter =>filter do |change|
           change_number = change.changenumber[0].to_i

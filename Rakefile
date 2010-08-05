@@ -37,9 +37,10 @@ spec = Gem::Specification.new do |s|
   s.files = %w(COPYING README.txt Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
   s.require_path = "lib"
   s.bindir = "bin"
-  s.add_dependency('ruby-net-ldap', '>=0.0.4')
-  s.add_dependency('activesupport', '>=1.4.0')
-  s.add_dependency('activerecord', '>=1.15.3')
+  s.add_dependency('my-ruby-net-ldap', '>=0.5.0')
+  s.add_dependency('activesupport', '<3.0.0')
+  s.add_dependency('activerecord', '<3.0.0')
+  s.add_dependency('sqlite3-ruby', '<1.3.0')
   s.add_dependency('simpleconsole', '>=0.1.1')
   s.add_dependency('contacts', '>=1.0.7')
 

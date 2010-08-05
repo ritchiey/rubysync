@@ -31,7 +31,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogRubyConnector
 #    username      'uid=admin,ou=system'
 #    password      'secret'
 #    changelog_dn  'cn=changelog,ou=system'
-#    search_filter 'cn=*'
+#    search_filter Net::LDAP::Filter.pres(:cn)
 #    search_base   'ou=users,ou=system'
 
   # OpenDS config
@@ -39,8 +39,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogRubyConnector
     port          1389
     username      'cn=Directory Manager'
     password      'secret'
-    changelog_dn  'ou=changelog,dc=example,dc=com'
-#    search_filter 'cn=*'
+#    changelog_dn  'ou=changelog,dc=example,dc=com'
     search_filter Net::LDAP::Filter.pres(:cn)
     search_base   'ou=People,dc=example,dc=com'
 
@@ -50,7 +49,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogRubyConnector
 #  username      'cn=admin,dc=localhost'
 #  password      'secret'
 #  changelog_dn 'cn=changelog'
-#  search_filter 'cn=*'
+#  search_filter Net::LDAP::Filter.pres(:cn)
 #  search_base   'dc=localhost'
 
   # Default config
@@ -265,8 +264,8 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
 
         end
 
-        ldap.search(:base => vault.changelog_dn, :filter => "objectClass = changeLogEntry") { |entry| ldap.delete(:dn => entry.dn)}
-        ldap.search(:base => vault.search_base, :filter => "objectClass = inetOrgPerson") { |entry| ldap.delete(:dn => entry.dn)}
+        ldap.search(:base => 'ou=Memory,ou=changelogs,dc=example,dc=com', :filter => Net::LDAP::Filter.eq("objectClass","rubySyncChangeLogEntry") ) { |entry| ldap.delete(:dn => entry.dn)}
+        ldap.search(:base => 'ou=People,ou=changelogs,dc=example,dc=com', :filter => Net::LDAP::Filter.eq("objectClass","rubySyncChangeLogEntry") ) { |entry| ldap.delete(:dn => entry.dn)}
       end
   end
 

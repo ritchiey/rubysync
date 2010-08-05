@@ -60,7 +60,7 @@ module RubySync::Connectors
     host                  'localhost'
     port                  10389
     #port                  389
-    search_filter         "cn=*"
+    search_filter         Net::LDAP::Filter.pres(:cn)
     encryption            nil
     path_field            :dn
     
@@ -112,7 +112,7 @@ module RubySync::Connectors
   port            389
   username       'cn=Manager,dc=my-domain,dc=com'
   password       'secret'
-  search_filter  "cn=*"
+  search_filter  Net::LDAP::Filter.pres(:cn)
   #attributes     :cn, :sn, :objectclass
   search_base    "ou=users,o=my-organization,dc=my-domain,dc=com"
   #bind_method  :simple
@@ -175,9 +175,9 @@ END
       with_ldap do |ldap|
         
         base_path = path
-        filter = 'objectclass=*'
         scope = Net::LDAP::SearchScope_BaseObject
         
+          filter = Net::LDAP::Filter.pres(:objectclass)
 	      result = ldap.search search_args(:base => base_path, :scope => scope, :filter => filter)
         return nil if !result or result.size == 0
         answer = {}

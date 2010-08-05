@@ -32,7 +32,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogConnector
   username      'cn=admin,dc=localhost'
   password      'secret'
   changelog_dn 'cn=changelog'
-  search_filter "cn=*"
+  search_filter Net::LDAP::Filter.pres(:cn)
   search_base   "dc=localhost"
 
   # Default config
@@ -41,7 +41,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogConnector
 #  username    'cn=directory manager'
 #  password    'password'
 #  changelog_dn 'cn=changelog'
-#  search_filter "cn=*"
+#  search_filter Net::LDAP::Filter.pres(:cn)
 #  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
   
   def initialize options={}

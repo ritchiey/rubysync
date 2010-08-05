@@ -369,17 +369,6 @@ class String
     ) { |match| values[keys.index(match)] }
   end
 
-  #Convert specials chars to be compliant with Ldap filter
-  def ldap_encode
-    #self.strtr("*"=>"\\2a","\\"=>"\5c","NUL"=>"\\00","("=> "\\28",")"=>"\\29")
-    self.strtr("$"=>"_24","("=> "_28",")"=>"_29")
-  end
-
-  #Restore specials chars from Ldap entry
-  def ldap_decode
-    self.strtr("_24"=>"$","_28"=> "(","_29"=>")")
-  end
-
   SPECIALS_CHARS = {'˜' => '~', '‘’' => '\'', '«»„“”˝' => '"', '‒–—―‐' => '-', '…' => '...', '¡' => '!', '‼' => '!!',
     '¿' => '?', '‽' => '!?', '‹' => '<', '›' => '>', '♯' => '#', '⁄÷' => '/', '·' => '.',
     '¹' => '1', '²' => '2', '³' => '3',  '¼'=> '1/4', '½' => '1/2', '¾'=> '3/4', '×' => '*', '±' => '+/-', '∓' => '-/+',

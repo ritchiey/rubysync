@@ -28,27 +28,29 @@ RUBYSYNC_LAST_SYNC_ATTRIBUTE = 'rubySyncLastSync'
 module RubySync::Connectors
   module LdapChangelogNumberTracking
 
-    attr_accessor :sync_info
+    attr_accessor :sync_info, :last_change_number
 
     def restore_last_sync_state
       with_ldap do |ldap|
-        filter = Net::LDAP::Filter.eq(RUBYSYNC_LAST_SYNC_ATTRIBUTE, "#{self.association_context.ldap_encode},*")
-        if (ldap_result = ldap.search(:base => search_base, :filter => filter, :scope => Net::LDAP::SearchScope_BaseObject)).empty?
+        filter = Net::LDAP::Filter.eq(RUBYSYNC_LAST_SYNC_ATTRIBUTE, "#{association_context},*")
+        if (ldap_result = ldap.search(:base => path_cookie, :filter => filter, :scope => Net::LDAP::SearchScope_BaseObject)).empty?
           @full_refresh_required = true
           @last_change_number = 0
           sync_info = @sync_info ? @sync_info : Time.now.strftime("%Y%m%d%H%M%S%z")
-          ldap.add_attribute(search_base, RUBYSYNC_LAST_SYNC_ATTRIBUTE,
-            @last_sync="#{self.association_context.ldap_encode},#{@last_change_number.to_s},#{sync_info}")
+          ldap.add_attribute(path_cookie, RUBYSYNC_LAST_SYNC_ATTRIBUTE,
+            @last_sync="#{self.association_context},#{@last_change_number.to_s},#{sync_info}")
         else
           @full_refresh_required = false
-          ldap_result[0][RUBYSYNC_LAST_SYNC_ATTRIBUTE].each do |last_sync|
-            unless last_sync.match(/^#{self.association_context.ldap_encode},.*$/).nil?
+          ldap_result[0][RUBYSYNC_LAST_SYNC_ATTRIBUTE.downcase].each do |last_sync|
+            if last_sync.match(/^#{Regexp.escape(association_context)},.+$/)
               @last_sync = last_sync
               #Extract change_number from RUBYSYNC_LAST_SYNC_ATTRIBUTE value
               @last_change_number = @last_sync.split(",")[1].to_i
               break
             end
           end
+   
+          log.warn 'Unable to restore the last synchronization state' unless @last_change_number
         end
       end
     end
@@ -56,18 +58,18 @@ module RubySync::Connectors
     def update_last_sync_state
       with_ldap do |ldap|
         sync_info = @sync_info ? @sync_info : Time.now.strftime("%Y%m%d%H%M%S%z")
-        if(@last_sync != (last_sync = "#{self.association_context.ldap_encode},#{@last_change_number.to_s},#{sync_info}"))
+        if(@last_sync != (last_sync = "#{self.association_context},#{@last_change_number.to_s},#{sync_info}"))
           @full_refresh_required = false
-          ldap.update_attribute(search_base, RUBYSYNC_LAST_SYNC_ATTRIBUTE.downcase.to_sym, @last_sync, @last_sync=last_sync)
+          ldap.update_attribute(path_cookie, RUBYSYNC_LAST_SYNC_ATTRIBUTE, @last_sync, @last_sync=last_sync)
         end
       end
     end
 
     def extract_last_sync_info
       if @last_change_number && @last_change_number > 0 && @last_sync
-        sync_info = @last_sync.match(/^#{self.association_context.ldap_encode},[0-9]+,(.*)$/)
+        sync_info = @last_sync.match(/^#{Regexp.escape(association_context)},[0-9]+,(.+)$/)
         if sync_info && sync_info[1]
-          sync_info = @sync_info ? sync_info[1] : Time.parse(sync_info[1])
+          sync_info = (@sync_info)? sync_info[1] : Time.parse(sync_info[1])
           return sync_info
         end
         log.warn 'Unable to extract information of the last synchronization'

@@ -155,7 +155,7 @@ module RubySync::Connectors
           with_ldap do |ldap|
             ldif_entry = ''
 
-            filter = Net::LDAP::Filter.eq("targetdn", path) & Net::LDAP::Filter.eq("objectclass", "changeLogEntry")
+            filter = Net::LDAP::Filter.eq(RUBYSYNC_SOURCE_INFO_ATTRIBUTE, path) & Net::LDAP::Filter.eq(:objectclass, RUBYSYNC_CHANGELOG_CLASS)
             #filter = filter & Net::LDAP::Filter.ge("changenumber", @last_change_number.to_i.to_s) unless @full_refresh_required
             if !(ldap_result=ldap.search(:base => changelog_dn, :filter => filter)) || ldap_result.empty?
               type='add'# Create entry
@@ -190,9 +190,9 @@ module RubySync::Connectors
       with_ldap do |ldap|
         if type
           change_number = @last_change_number + 1
-          changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, 'targetdn' => path.to_s,
-            'changenumber' => change_number.to_s,'objectclass'=>['changeLogEntry', RUBYSYNC_CHANGELOG_CLASS],
-            RUBYSYNC_CONTEXT_ATTRIBUTE => self.association_context.ldap_encode, 'changetype'=>type}
+          changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, RUBYSYNC_SOURCE_INFO_ATTRIBUTE => path.to_s,
+            'changenumber' => change_number.to_s, 'objectclass' => RUBYSYNC_CHANGELOG_CLASS,
+            RUBYSYNC_CONTEXT_ATTRIBUTE => association_context, 'changetype' => type}
 
           if type.to_sym==:add
             entry.to_ldif {|line| ldif_entry = ldif_entry + line + "\n"}#TODO Not Ruby 1.9.+ compliant
@@ -216,13 +216,13 @@ module RubySync::Connectors
               unless ldap.get_operation_result.code == 0
 #                log.debug path
 #                log.debug changelog_dn
+                cle = ldap.search(:base => changelog_dn, :filter => Net::LDAP::Filter.eq(:changenumber, change_number.to_s)).first
                 log.debug changelog_attributes.inspect
                 log.warn ldap.get_operation_result.message
               end
               log.debug("ldap.add returned '#{result}'")
               @last_change_number=change_number
               update_last_sync_state
-              cle = ldap.search(:base => changelog_dn, :filter => "changenumber=#{change_number.to_s}").first
 
               yield event_for_changelog_entry(cle)
 
@@ -240,8 +240,8 @@ module RubySync::Connectors
       with_ldap do |ldap|
         # TODO Filtering by @last_change_number boost performance. But in downside it's drop some entries who have been deleted
         # TODO Scan changelog to find deleted entries in background or periodicaly only ?
-        filter = "(& (!(changeType=delete)) (objectClass=changeLogEntry) )"# (changeNumber>=#{@last_change_number.to_i})
-#        filter =  Net::LDAP::Filter.eq(:objectclass, 'changeLogEntry') & Net::LDAP::Filter.ne(:changetype, 'delete')
+#        filter = "(& (!(changeType=delete)) (objectClass=#{RUBYSYNC_CHANGELOG_CLASS}) )"# (changeNumber>=#{@last_change_number.to_i})
+        filter =  Net::LDAP::Filter.eq(:objectclass, RUBYSYNC_CHANGELOG_CLASS) & Net::LDAP::Filter.ne(:changetype, 'delete') # Net::LDAP DSL version
         ldap.search(:base => changelog_dn, :filter => filter) do |change|
           target_dn = change.targetdn[0]
 

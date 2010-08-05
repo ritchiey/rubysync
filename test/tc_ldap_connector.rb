@@ -31,7 +31,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogConnector
   username      'uid=admin,ou=system'
   password      'secret'
   changelog_dn 'cn=changelog,ou=system'
-  search_filter "cn=*"
+  search_filter Net::LDAP::Filter.pres(:cn)
   search_base   "ou=system"
 
   # Default config
@@ -39,7 +39,7 @@ class MyLdapConnector < RubySync::Connectors::LdapChangelogConnector
 #  port          389
 #  username      'cn=admin,dc=9to5magic,dc=com,dc=au'
 #  password      'secret'
-#  search_filter "cn=*"
+#  search_filter Net::LDAP::Filter.pres(:cn)
 #  search_base   "dc=9to5magic,dc=com,dc=au"
 end
 
