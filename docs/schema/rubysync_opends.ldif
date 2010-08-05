@@ -46,11 +46,15 @@ attributeTypes: ( 1.3.6.1.4.1.33635.1.1.7
 attributeTypes: ( 1.3.6.1.4.1.33635.1.1.8 
   NAME 'rubySyncSourceInfo'
   DESC 'a DN or a human identifier of the source entry'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
  )
 attributeTypes: ( 1.3.6.1.4.1.33635.1.1.9 
   NAME 'rubySyncTargetInfo'
   DESC 'a DN or a human identifier of the target entry'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
  )
 objectClasses: ( 1.3.6.1.4.1.33635.1.2.1 
@@ -68,9 +72,10 @@ objectClasses: ( 1.3.6.1.4.1.33635.1.2.2
 objectClasses: ( 1.3.6.1.4.1.33635.1.2.3 
   NAME 'rubySyncChangeLogEntry'
   DESC 'Useful for LDAP server without native public changelog support (see https://opends.dev.java.net/public/standards/draft-good-ldap-changelog.txt)'
-  AUXILIARY
-  MUST ( changeNumber $ changeType )
-  MAY ( rubySyncContext $ rubySyncDumpEntry )
+  SUP top
+  STRUCTURAL
+  MUST ( changeNumber $ changeType $ rubySyncSourceInfo )
+  MAY ( rubySyncContext $ rubySyncDumpEntry $ changes $ newRDN $ deleteOldRDN $ newSuperior )
  )
 objectClasses: ( 1.3.6.1.4.1.33635.1.2.4 
   NAME 'rubySyncIssueEntry'

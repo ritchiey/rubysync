@@ -74,6 +74,8 @@
       <description>a DN or a human identifier of the source entry</description>
       <usage>USER_APPLICATIONS</usage>
       <syntax>1.3.6.1.4.1.1466.115.121.1.15</syntax>
+      <equality>caseIgnoreMatch</equality>
+      <substring>caseIgnoreSubstringsMatch</substring>
     </attributetype>
     <attributetype oid="1.3.6.1.4.1.33635.1.1.9" obsolete="false" singlevalue="false" collective="false" nousermodification="false">
       <aliases>
@@ -82,6 +84,8 @@
       <description>a DN or a human identifier of the target entry</description>
       <usage>USER_APPLICATIONS</usage>
       <syntax>1.3.6.1.4.1.1466.115.121.1.15</syntax>
+      <equality>caseIgnoreMatch</equality>
+      <substring>caseIgnoreSubstringsMatch</substring>
     </attributetype>
   </attributetypes>
   <objectclasses>
@@ -110,14 +114,22 @@
         <alias>rubySyncChangeLogEntry</alias>
       </aliases>
       <description>Useful for LDAP server without native public changelog support (see https://opends.dev.java.net/public/standards/draft-good-ldap-changelog.txt)</description>
-      <type>AUXILIARY</type>
+      <superiors>
+        <superior>top</superior>
+      </superiors>
+      <type>STRUCTURAL</type>
       <mandatory>
         <attributetype>changeNumber</attributetype>
         <attributetype>changeType</attributetype>
+        <attributetype>rubySyncSourceInfo</attributetype>
       </mandatory>
       <optional>
         <attributetype>rubySyncContext</attributetype>
         <attributetype>rubySyncDumpEntry</attributetype>
+        <attributetype>changes</attributetype>
+        <attributetype>newRDN</attributetype>
+        <attributetype>deleteOldRDN</attributetype>
+        <attributetype>newSuperior</attributetype>
       </optional>
     </objectclass>
     <objectclass oid="1.3.6.1.4.1.33635.1.2.4" obsolete="false">
