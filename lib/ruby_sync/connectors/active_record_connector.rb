@@ -16,6 +16,7 @@
 
 $VERBOSE=false
 require "active_record"
+gem 'sqlite3-ruby', '<1.3.0' # Version 1.3.x isn't compatible with Ruby 1.8.6
 #$VERBOSE=true
 require "ruby_sync/connectors/base_connector"
 
@@ -44,13 +45,13 @@ module RubySync::Connectors
     db_pool 5
     # Default db_config in case we're not sucking the config out of a rails app
     db_config(
-      :adapter=>get_db_type,
-      :host=>get_db_host,
-      :database=>get_db_name,
-      :username=>get_db_username,
-      :password=>get_db_password,
-      :encoding=>get_db_encoding,
-      :pool=>get_db_pool
+      :adapter => get_db_type,
+      :host => get_db_host,
+      :database => get_db_name,
+      :username => get_db_username,
+      :password => get_db_password,
+      :encoding=> get_db_encoding,
+      :pool => get_db_pool
     )
 
     def method_missing(name)
@@ -68,7 +69,7 @@ module RubySync::Connectors
         if track.respond_to?(:ar_class) && track.ar_class.respond_to?(:descends_from_active_record?) && track.ar_class.descends_from_active_record?
           return track.ar_class
         else
-          log.warn "No tracking class"
+          log.warn "No ActiveRecord tracking class"
           return
         end
         #    elsif is_vault? and @pipeline
@@ -118,7 +119,7 @@ module RubySync::Connectors
         @models||=[]
         Dir[File.join(rails_app_path, 'app','models', '*.rb')].each do |filepath|
           require_dependency filepath
-          filepath = filepath.gsub("\\","/")#For Windows
+          filepath = filepath.gsub("\\","/") # For Windows
           filename = File.basename(filepath,File.extname(filepath))
           class_name = filename.camelize
           class_model = class_name.constantize
@@ -137,8 +138,8 @@ module RubySync::Connectors
     end
 
     def self.fields
-      c = self.new
       return get_columns if respond_to? :get_columns
+      c = self.new
       c.ar_class.column_names
     end
 
@@ -209,9 +210,14 @@ END
 
 
     def modify(path, operations)
-      ar_class.find(path) do |record|
-        populate(record, perform_operations(operations))
-        record.save
+      if (record = ar_class.first( :conditions => { path_column => path } ) )
+        if !(ar_operations = perform_operations(operations)).blank?
+          log.info "Modifying '#{path}' with '#{ar_operations.inspect}'"
+          populate(record, ar_operations)
+          record.save!
+        end
+      else
+        nil
       end
     end
 
@@ -224,25 +230,18 @@ END
     end
 
     def [](path)
-      to_entry(ar_class.find(path))
-    rescue ActiveRecord::RecordNotFound
+      record = ar_class.send(:"find_by_#{path_column}", path)
+      (record.blank?)? nil : to_entry(record)
+    rescue ActiveRecord::StatementInvalid, ActiveRecord::RecordNotFound
       return nil
     end
-
-    #    def Object.const_missing(name)
-    #      if name == :RAILS_ROOT
-    #        File.expand_path(application)
-    #      else
-    #        super
-    #      end
-    #    end
 
     private
 
     def populate record, content
-      ar_class.content_columns.each do |c|
-        if !respond_to?(:columns) || self.class.fields.include?(c.name.to_sym)
-          record[c.name] = content[c.name][0] if content[c.name]
+      content.keys.each do |key|
+        if !respond_to?(:columns) || self.class.fields.include?(key.to_sym)
+          record[key] = content[key][0] if record.respond_to?(key)
         end
       end
     end
@@ -253,10 +252,6 @@ END
 
       entry
     end
-
-    #    def RAILS_ROOT(value)
-    #       Object.const_set(:RAILS_ROOT, value) unless Object.const_defined? :RAILS_ROOT
-    #    end
 
   end
 

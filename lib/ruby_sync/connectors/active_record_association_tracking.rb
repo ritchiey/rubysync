@@ -57,7 +57,7 @@ module RubySync::Connectors::ActiveRecordAssociationTracking
 
   def ruby_sync_association
     unless @ruby_sync_association
-      if Object.const_defined?(:RubySyncAssociation) and @models.include?('RubySyncAssociation')
+      if Object.const_defined?('RubySyncAssociation') and @models.include?('RubySyncAssociation')
         @ruby_sync_association = ::RubySyncAssociation
         @ruby_sync_association.establish_connection(db_config)
       elsif track.respond_to? :associations_model

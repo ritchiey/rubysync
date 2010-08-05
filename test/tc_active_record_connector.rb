@@ -22,6 +22,7 @@ require 'ruby_sync_test'
 
 class ArActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
   #option :dbm_path
+#  path_column :first_name
   model :person
   application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
   #dbm_path "/tmp/rubysync_ar_test"
@@ -50,8 +51,6 @@ class ArTestPipeline < RubySync::Pipelines::BasePipeline
   end
 
 end
-
-
 
 class TcActiveRecordConnector < Test::Unit::TestCase
 
@@ -103,11 +102,11 @@ class TcActiveRecordConnector < Test::Unit::TestCase
   
 #  def test_vault_to_client
 #    # Turn on the RubySyncObserver to track the changes to people
-#    ActiveRecord::Base.observers = ::RubySyncObserver
-#     ::RubySyncObserver.observe ::Person
-#     ::RubySyncObserver.instance
+#      ActiveRecord::Base.observers = ::RubySyncObserver
+#      ActiveRecord::Base.instantiate_observers
+#
 #     assert_nil ::RubySyncEvent.find(:first), "Pre-existing events in queue"
-#     person = Person.create :first_name=>"Ritchie", :last_name=>"Young"
+#     person = Person.create :first_name => "Ritchie", :last_name => "Young"
 #     assert_not_nil ::RubySyncEvent.find_by_event_type('add'), "No add event generated"
 #     @pipeline.run_once
 #    # Find the association and use the key to look up the record on the client
@@ -125,7 +124,7 @@ class TcActiveRecordConnector < Test::Unit::TestCase
   end
   
   def test_fields
-    assert_equal(%w{first_name last_name}.sort, ::ArActiveRecordConnector.fields.sort)
+    assert_equal(%w{id first_name last_name}.sort, ::ArActiveRecordConnector.fields.sort)
   end
   
 end

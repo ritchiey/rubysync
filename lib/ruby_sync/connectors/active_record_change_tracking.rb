@@ -28,12 +28,12 @@ module RubySync::Connectors::ActiveRecordChangeTracking
 
   def each_change(&blk)
     # Process each RubySyncEvent and then delete it from the db.
-    if Object.const_defined?(:RubySyncEvent) and @models.include?('RubySyncEvent')#TODO used a constant instead of a hard coded model name
+    if Object.const_defined?('RubySyncEvent') and @models.include?('RubySyncEvent')#TODO Used a constant instead of a hard coded model name
       ::RubySyncEvent.find(:all).each do |rse|
         event = RubySync::Event.new(rse.event_type, self, rse.trackable_id, nil, to_payload(rse))
         yield event
 
-        #useful ?
+        # Useful ?
         if is_vault? and @pipeline and rse.event_type==:delete
           association = association_for @pipeline.association_context, rse.trackable_id
           remove_association association
@@ -42,10 +42,10 @@ module RubySync::Connectors::ActiveRecordChangeTracking
         ::RubySyncEvent.delete rse
       end
     elsif respond_to? :track
-      if !track_class.nil?
-        # scan existing entries to see if any new or modified
+      if !track_class.blank?
+        # Scan existing entries to see if any new or modified
         each_entry do |path, entry|
-          digest = digest(entry)#TODO used entry.hash instead of digest ?
+          digest = digest(entry) #TODO Used entry.hash instead of digest ?
           unless stored_digest = track_class.find_by_key(path) and digest == stored_digest
             operations = create_operations_for(entry)
             yield RubySync::Event.add(self, path, nil, operations)
@@ -53,7 +53,7 @@ module RubySync::Connectors::ActiveRecordChangeTracking
           end
         end
         
-        # scan track to find deleted entries
+        # Scan track to find deleted entries
         track_class.find(:all).each do |record|
           key=record.key
           unless self[key]
@@ -65,9 +65,9 @@ module RubySync::Connectors::ActiveRecordChangeTracking
             end
           end
         end
-      elsif track.is_a?(RubySync::Connectors::LdapChangelogRubyConnector)
-        log.debug 'Delegate #each_change to LDAP Changelog system'
-        track.each_change(&blk)# delegate the change tracking to LDAP Changelog system
+      elsif track.is_a?(RubySync::Connectors::LdapChangelogConnector)
+        log.debug "Delegate #each_change to #{track.class}"
+        track.each_change(&blk) # Delegate the change tracking another RubySync Connector      
       end
     else
       super
