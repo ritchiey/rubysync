@@ -187,8 +187,9 @@ module RubySync
         self.client.restore_last_sync_state if self.client.respond_to?(:restore_last_sync_state) # TODO move that into a block ?
         self.vault.restore_last_sync_state if self.vault.respond_to?(:restore_last_sync_state) # TODO move that into a block ?
 
-        client.last_sync_info = client.extract_last_sync_info if !client.parse_all_entries && client.sync_info.blank?
+        client.last_sync_info = client.extract_last_sync_info if !client.parse_all_entries && client.respond_to?(:sync_info) && client.sync_info.blank?
         client.started
+        vault.last_sync_info = vault.extract_last_sync_info if !vault.parse_all_entries && vault.respond_to?(:sync_info) && vault.sync_info.blank?
         vault.started
       end
       
