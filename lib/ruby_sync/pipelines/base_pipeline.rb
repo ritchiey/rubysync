@@ -195,6 +195,9 @@ module RubySync
       def stopped
         client.stopped
         vault.stopped
+
+        # In case of entries allowed out for the vault to the client and used of a tracker in the client, we parse the changes of the client
+        run_in_once if allowed_out && out_changes? && client.tracker?
       end
       
       # execute the in pipe once and then return
