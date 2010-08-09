@@ -249,7 +249,7 @@ module RubySync
         perform_transform :in_filter, event, event.hint
 
         perform_transform :in_event_transform, event, event.hint
-            
+        @in_changes = true
         associated_entry = nil
         unless event.type == :disassociate
           associated_entry = vault.find_associated(event.association) if event.associated?
@@ -332,7 +332,7 @@ module RubySync
         log.info "Processing outgoing #{event.type} event "+ event.hint
         perform_transform :out_filter, event, event.hint
         perform_transform :out_event_transform, event, event.hint
-
+        @out_changes = true
         associated_entry = nil
         unless event.type == :disassociate
           associated_entry = client.entry_for_own_association_key(event.association.key) if event.associated?
@@ -381,8 +381,17 @@ module RubySync
         log.info "---\n"
         
       end
-      
-      
+
+      # Check if there are new entries in the client
+      def in_changes?
+        @in_changes||=false
+      end
+
+      # Check if there are new entries in the vault
+      def out_changes?
+        @out_changes||=false
+      end
+
       # Called by the identity-vault connector in the 'out' thread to process events generated
       # by the identity vault.
       #       def out_handler(event)
