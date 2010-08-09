@@ -421,6 +421,7 @@ module RubySync::Connectors
           end
         end
       end
+      @tracker = true
     end
 
     def reload_track_changes
@@ -442,6 +443,7 @@ module RubySync::Connectors
           end
         end
       end
+      @tracker = true
     end
 
     def reload_track_associations
@@ -459,7 +461,17 @@ module RubySync::Connectors
       options[:is_vault] = false
       class_def 'track' do
         @track ||= tracking_class.new(options)
-      end      
+      end
+      @tracker = true
+    end
+
+    # Return true if the current connector has a tracker
+    def self.tracker?
+      @tracker||=false
+    end
+
+    def tracker?
+      self.class.tracker?
     end
 
     private
