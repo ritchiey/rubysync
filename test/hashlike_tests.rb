@@ -60,7 +60,6 @@ module HashlikeTests
     @pipeline.run_once
     assert_not_nil @client[client_path], "#{client_path} wasn't created on the client"
     assert_equal normalise(@bob_details), normalise(@client[client_path])
-    @pipeline.run_once # Vault to client
     @vault.delete vault_path
     assert_equal normalise(@bob_details), normalise(@client[client_path])
     assert_nil @vault[vault_path], "Bob wasn't deleted from the vault"

@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-
-[  File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)
-].each {|path| $:.unshift path unless $:.include?(path) || $:.include?(File.expand_path(path))}
-
+[ File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)
+].each { |path| $:.unshift(path) unless $:.include?(path) || $:.include?(File.expand_path(path)) }
 
 require 'ruby_sync_test'
 require 'hashlike_tests'
@@ -24,9 +22,8 @@ require 'ruby_sync/connectors/ldap_connector'
 require 'ruby_sync/connectors/ldap_changelog_ruby_connector'
 require 'ruby_sync/connectors/memory_connector'
 
-
 class MyLdapConnector < RubySync::Connectors::LdapConnector
-   # ApacheDS config
+  # ApacheDS config
 #    host          'localhost'
 #    port          10389
 #    username      'uid=admin,ou=system'
@@ -44,7 +41,7 @@ class MyLdapConnector < RubySync::Connectors::LdapConnector
     search_filter Net::LDAP::Filter.pres(:cn)
     search_base   'ou=People,dc=example,dc=com'
 
-#  # OpenLDAP config
+  # OpenLDAP config
 #  host          'localhost'
 #  port          389
 #  username      'cn=admin,dc=localhost'
@@ -61,10 +58,6 @@ class MyLdapConnector < RubySync::Connectors::LdapConnector
 #  changelog_dn 'cn=changelog'
 #  search_filter "cn=*"
 #  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
-  
-#  def initialize options={}
-#    super(options)
-#  end
 
   track_changes_with :ldap_changelog_ruby, :changelog_dn => 'ou=People,ou=changelogs,dc=example,dc=com',
     :path_cookie => get_search_base
@@ -168,7 +161,6 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
 
     add_ldap_entry(@joe_details)
     @pipeline.run_once # vault to client entries
-    @pipeline.run_once # client track changes
     assert_equal @last_change_number+=1, last_change_number # Adding joe
 
     @bob_details['sn']=['robertos']
@@ -203,12 +195,10 @@ class TcLdapVaultSoftware < Test::Unit::TestCase
 #    op1 = [:add, :objectclass, person[:objectclass].first]
     modify_ldap_entry(person)
     @pipeline.run_once # vault to client entries
-    @pipeline.run_once # client track changes
     assert_equal @last_change_number+=1, last_change_number # Updating joe
 
     delete_ldap_entry(@joe_details)
     @pipeline.run_once # vault to client entries
-    @pipeline.run_once # client track changes
     assert_equal @last_change_number+=1, last_change_number # Deleting joe
     with_ldap(@vault) do |ldap|
       assert ldap.search(:base => @vault.search_base, :filter => "(& (cn = #{@bob_details['cn']}) (objectClass = inetOrgPerson))").empty?
