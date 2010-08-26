@@ -195,10 +195,7 @@ module RubySync
       
       def stopped
         client.stopped
-        vault.stopped
-
-        # In case of entries allowed out for the vault to the client and used of a tracker in the client, we parse the changes of the client
-        run_in_once if allowed_out && out_changes? && client.tracker?
+        vault.stopped       
       end
       
       # execute the in pipe once and then return
@@ -215,6 +212,12 @@ module RubySync
         log.debug "running #{name} 'out' pipeline once"
         vault.once_only = true
         vault.start {|event| out_handler(event)}
+        
+        # In case of entries allowed out for the vault to the client and used of a tracker in the client, we parse the changes of the client
+        if allowed_out && out_changes? && client.tracker?
+          log.debug "Re running #{name} 'in' pipeline once because vault has changes and client has a tracker"
+          run_in_once
+        end
       end
       
       def start
@@ -283,10 +286,12 @@ module RubySync
         case event.type
         when :add
           if in_create(event)
+            @in_changes = true
             #TODO disallowed creation for blank event.target_path
             perform_transform :in_place_transform, event, event.hint
       	    log.info "Create on vault allowed. Placing at #{event.target_path}"
           else
+            @in_changes = false
       	    log.info "Create rule disallowed creation"
             log.info "---\n"; return
           end
@@ -364,9 +369,11 @@ module RubySync
         case event.type
         when :add
           if out_create(event)
+            @out_changes = true
             perform_transform :out_place_transform, event, event.hint
       	    log.info "Create on client allowed. Placing at #{event.target_path}"
           else
+            @out_changes = false
       	    log.info "Create rule disallowed creation"
             log.info "---\n"; return
           end
@@ -388,12 +395,12 @@ module RubySync
 
       # Check if there are new entries in the client
       def in_changes?
-        @in_changes||=false
+        @in_changes
       end
 
       # Check if there are new entries in the vault
       def out_changes?
-        @out_changes||=false
+        @out_changes
       end
 
       # Called by the identity-vault connector in the 'out' thread to process events generated
