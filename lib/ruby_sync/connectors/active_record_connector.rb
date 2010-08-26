@@ -29,6 +29,8 @@ module RubySync::Connectors
     include ActiveRecordAssociationTracking
     include ActiveRecordChangeTracking
 
+    attr_accessor :rails_app_path
+
     option :ar_class, :model, :changes_model, :associations_model,
       :application, :rails_env, :columns, :path_column, :find_method, :find_filter, :find_block,
       :db_type, :db_host, :db_username, :db_password, :db_name, :db_encoding, :db_pool, :db_config
@@ -97,19 +99,18 @@ module RubySync::Connectors
 
     def initialize options={}
       super options
-
       # Rails app specified, use it to configure
       if application
 
         # Load the database configuration
-        rails_app_path = File.expand_path(application)
-        ::Module.rails_app_path = rails_app_path
-        db_config_filename = File.join(rails_app_path, 'config', 'database.yml')
+        @rails_app_path = File.expand_path(application)
+        ::Module.rails_app_path = @rails_app_path
+        db_config_filename = File.join(@rails_app_path, 'config', 'database.yml')
         new_db_config = YAML.load(File.read(db_config_filename)).with_indifferent_access[rails_env]
 
         #Add rails application relative path for sqlite databases
         if new_db_config['adapter'].match('^(jdbc)?sqlite(2|3)?$')
-          new_db_config['database'] = rails_app_path + '/' + new_db_config['database'] if Pathname.new(new_db_config['database']).relative?
+          new_db_config['database'] = @rails_app_path + '/' + new_db_config['database'] if Pathname.new(new_db_config['database']).relative?
         end
 
         # Load db config
@@ -117,24 +118,37 @@ module RubySync::Connectors
 
         # Require the models
         @models||=[]
-        Dir[File.join(rails_app_path, 'app','models', '*.rb')].each do |filepath|
-          require_dependency filepath
+        Dir[File.join(@rails_app_path, 'app','models', '*.rb')].each do |filepath|
           filepath = filepath.gsub("\\","/") # For Windows
-          filename = File.basename(filepath,File.extname(filepath))
-          class_name = filename.camelize
-          class_model = class_name.constantize
-
-          if(class_model.respond_to?(:descends_from_active_record?) && class_model.descends_from_active_record?)
-            @models << class_name
-            # Establish connection
-            class_model.establish_connection db_config# if defined? class_model.establish_connection
-            # Setup logger for activerecord
-            class_model.logger = Logger.new(File.open(File.join(rails_app_path, 'log', "#{rails_env}.log"), 'a'))
+          if filepath.match(/.+\_observer\.rb$/)# || filepath.match(/.+\/ruby\_sync.+\.rb$/)
+            # do something ?
+          else
+            require_model(filepath)
           end
         end
       end
       self.class.ar_class model.to_s.camelize.constantize
       self.class.path_column ar_class.primary_key unless respond_to?(:path_column)
+    end
+
+    def require_model(filepath)
+      begin       
+        require_dependency filepath
+      rescue Exception => ex
+        log.error ex.message
+      end
+      filename = File.basename(filepath,File.extname(filepath))
+      class_name = filename.camelize
+
+      class_model = class_name.constantize
+      # Establish connection only if the model has a corresponding table in the database
+      if class_model.respond_to?(:table_name) #&& class_name.underscore.pluralize == class_model.table_name
+        @models << class_name
+        # Establish connection
+        class_model.establish_connection db_config# if defined? class_model.establish_connection                  
+        # Setup logger for activerecord
+        class_model.logger = Logger.new(File.open(File.join(@rails_app_path, 'log', "#{rails_env}.log"), 'a'))                    
+      end
     end
 
     def self.fields
