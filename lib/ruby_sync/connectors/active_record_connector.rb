@@ -132,7 +132,7 @@ module RubySync::Connectors
     end
 
     def require_model(filepath)
-      begin       
+      begin
         require_dependency filepath
       rescue Exception => ex
         log.error ex.message
@@ -140,14 +140,17 @@ module RubySync::Connectors
       filename = File.basename(filepath,File.extname(filepath))
       class_name = filename.camelize
 
-      class_model = class_name.constantize
+      class_model = "::#{class_name}".constantize
       # Establish connection only if the model has a corresponding table in the database
       if class_model.respond_to?(:table_name) #&& class_name.underscore.pluralize == class_model.table_name
         @models << class_name
         # Establish connection
-        class_model.establish_connection db_config# if defined? class_model.establish_connection                  
+        unless class_model.connected?
+          log.debug "Database connection etablished"
+          ::ActiveRecord::Base.establish_connection db_config# if defined? class_model.establish_connection
+        end
         # Setup logger for activerecord
-        class_model.logger = Logger.new(File.open(File.join(@rails_app_path, 'log', "#{rails_env}.log"), 'a'))                    
+        class_model.logger = Logger.new(File.open(File.join(@rails_app_path, 'log', "#{rails_env}.log"), 'a'))
       end
     end
 
