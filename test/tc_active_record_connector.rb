@@ -15,7 +15,7 @@
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 
-[  File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)
+[ File.dirname(__FILE__) + '/../lib', File.dirname(__FILE__)
 ].each {|path| $:.unshift path unless $:.include?(path) || $:.include?(File.expand_path(path))}
 
 require 'ruby_sync_test'

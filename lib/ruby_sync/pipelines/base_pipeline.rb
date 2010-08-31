@@ -195,7 +195,7 @@ module RubySync
       
       def stopped
         client.stopped
-        vault.stopped       
+        vault.stopped
       end
       
       # execute the in pipe once and then return

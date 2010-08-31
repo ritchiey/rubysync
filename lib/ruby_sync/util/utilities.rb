@@ -3,13 +3,13 @@
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
 #
 # This file is part of RubySync.
-# 
+#
 # RubySync is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
-# 
+#
 # RubySync is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
@@ -23,7 +23,7 @@ require 'irb'
 require 'net/ldap'
 require 'net/ldif'
 
-module Kernel    
+module Kernel
   # Make the log method globally available
   def log
     unless defined? @@log
@@ -51,7 +51,7 @@ module Kernel
 
     if loaded
       method_id
-    else      
+    else
       method_missing_without_dependency method_id, *args
     end
   end
@@ -59,7 +59,7 @@ end
 
 module Net
   class LDAP
-    
+
     # Update the value of an attribute.
     # #update_attribute can be thought of as equivalent to calling #add_attribute
     # followed by #delete_value. It takes the full DN of the entry to modify,
@@ -103,7 +103,7 @@ module Net
          log.error "Message: #{get_operation_result.message}"
          raise Exception.new("Unable to delete value: #{value} of attribute: #{attribute}")
       end
-      
+
       result
     end
   end
@@ -121,9 +121,9 @@ end
 class Array
 
   def to_ruby
-    map {|f| "'#{f}'"}.join(', ')    
+    map {|f| "'#{f}'"}.join(', ')
   end
-  
+
   def map_with_index!
     each_with_index do |e, idx| self[idx] = yield(e, idx); end
   end
@@ -155,11 +155,11 @@ class Array
     self.last.is_a?(::Hash) && self.length > 1 ? self.values_at(0..-2) : self
   end
 
-  # Array#flatten has problems with recursive arrays. Going one level deeper solves the majority of the problems. 
+  # Array#flatten has problems with recursive arrays. Going one level deeper solves the majority of the problems.
   def flatten_deeper
     self.collect { |element| (element.respond_to?(:flatten) && !element.is_a?(Hash)) ? element.flatten : element }.flatten
   end
-  
+
 end
 
 class Object
@@ -174,7 +174,7 @@ end
 
 
 class Hash
-  
+
   # Returns a Hash that represents the difference between two Hashes who have Array values
   def deep_diff(hash)
     h1 = self.deep_dup
@@ -279,7 +279,7 @@ class Hash
             else
               ary << "#{attr}: #{val}"
             end
-          end  
+          end
         end
       end
     }
@@ -309,7 +309,7 @@ class Hash
     end
     self
   end
-  
+
   def dasherize_keys
     inject({}) do |options, (key, value)|
       options[key.to_s.dasherize] = value
@@ -346,7 +346,7 @@ class Hash
 
   def stringify_values!
     each do |key, value|
-      self[key] = 
+      self[key] =
         if value.respond_to?(:to_s)
           if value.is_a?(::Array) || value.is_a?(::Hash)
             value = value.values.flatten if value.is_a?(::Hash)
@@ -363,7 +363,7 @@ class Hash
     end
     self
   end
-  
+
 end
 
 #class Symbol
@@ -381,7 +381,7 @@ class Module
   alias_method(:const_missing_without_rails_app_path, :const_missing)
 #  attr_accessor :rails_app_path
   @@rails_app_path = nil
-  
+
   def self.rails_app_path=(value)
     @@rails_app_path = value
   end
@@ -390,7 +390,7 @@ class Module
     @@rails_app_path
   end
 
-  def const_missing(const_id)  
+  def const_missing(const_id)
     return const_missing_without_rails_app_path(const_id) if @@rails_app_path.nil?
 
     begin
@@ -466,7 +466,7 @@ class String
       else
         PUNCTUATION_CHARS
       end
-      
+
     string = string.gsub %r([#{Regexp.escape(punctuation_chars)}]), replacement
   end
 
@@ -512,7 +512,7 @@ module RubySync
     def as_array o
       (o.instance_of?(::Array))? o : [o]
     end
-    
+
     # Perform an action and rescue any exceptions thrown, display the exception with the specified text
     def with_rescue text
       begin
@@ -521,7 +521,7 @@ module RubySync
         log.warn "#{text}: #{exception.message}"
         log.debug exception.backtrace.join("\n")
       end
-    end       
+    end
 
     def dump_before
       []
@@ -535,7 +535,7 @@ module RubySync
       event.commit_changes
       log.info event.to_yaml if dump_after.include?(name.to_sym)
     end
-    
+
     def call_if_exists(method, event, hint="")
       result = nil
       if respond_to? method
@@ -549,8 +549,8 @@ module RubySync
     def log_progress last_action, event, hint=""
       log.info "Result of #{last_action}: #{hint}\n" + YAML.dump(event)
     end
-    
-    
+
+
     # Ensure that a given path exists as a directory
     def ensure_dir_exists paths
       as_array(paths).each do |path|
@@ -565,7 +565,7 @@ module RubySync
         end
       end
     end
-    
+
     def pipeline_called name
       begin
         something_called name, "pipeline"
@@ -574,8 +574,8 @@ module RubySync
         nil
       end
     end
-    
-    
+
+
     def connector_called name, message=nil
       begin
         something_called name, "connector"
@@ -595,27 +595,27 @@ module RubySync
     def class_called name, extension, message=nil
       class_for_name(class_name_for(name, extension), message)
     end
-      
+
     def class_for_name(name, message=nil)
       eval(name)
     rescue Exception => e
       message ||= "Unable to find class called '#{name}'"
       log.error message
-      log.error e.message#debug
+      log.error e.message # debug
       nil
     end
 
     def class_name_for name, extension
       "#{name.to_s}_#{extension}".camelize
     end
-    
+
     # Ensure that path is in the search path
     # prepends it if it's not
     def include_in_search_path path
       path = File.expand_path(path)
       $:.unshift path unless $:.include?(path)
     end
-    
+
     # Return the base_path
     ::Kernel.send :define_method, :base_path do
       @@base_path = find_base_path unless @@base_path
@@ -638,22 +638,22 @@ module RubySync
       end
       return false
     end
-       
-    
+
+
     def get_preference(name, file_name=nil)
       class_name ||= get_preference_file
     end
-    
+
     def set_preference(name)
-      
+
     end
-    
+
     def get_preference_file_path name
       dir = "#{ENV[HOME]}/.rubysync"
       Dir.mkdir(dir)
       "#{dir}#{file}"
     end
-    
+
     # Performs the given operations on the given record. The record is a
     # Hash in which each key is a field name and each value is an array of
     # values for that field.
@@ -695,7 +695,7 @@ module RubySync
       return record
     end
 
-      
+
     # Filter operations to eliminate those that would have
     # no effect on the record. Returns the resulting array
     # of operations.
@@ -731,6 +731,6 @@ module RubySync
       end
       effective
     end
- 
+
   end
 end
