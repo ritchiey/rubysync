@@ -41,8 +41,11 @@ module Kernel
       begin
         loaded = true
         require_dependency "#{Module.rails_app_path}/app/models/#{method_id.to_s}"
-      rescue MissingSourceFile
+      rescue MissingSourceFile => ex
         loaded = false
+#        log.debug "#{ex.message}" # debug
+        raise NameError, "NameError: undefined local variable or method '#{method_id}' in #{name}", caller
+        exit
       end
     end
 
