@@ -212,7 +212,7 @@ END
       log.info "Adding '#{event.target_path}' to '#{name}'"
       ar_class.new() do |record|
         populate(record, perform_operations(event.payload))
-        #log.info(record.inspect)
+        log.debug record.attributes.inspect # debug
         record.save!
         update_mirror record.send(:"#{path_column}")
         if is_vault?
@@ -258,7 +258,7 @@ END
     def populate record, content
       content.keys.each do |key|
         if !respond_to?(:columns) || self.class.fields.include?(key.to_sym)
-          record[key] = content[key][0] if record.respond_to?(key)
+          record.send("#{key}=", content[key][0]) if record.respond_to?("#{key}=")
         end
       end
     end
