@@ -16,7 +16,9 @@
 
 $VERBOSE=false
 require "active_record"
-gem 'sqlite3-ruby', '<1.3.0' # Version 1.3.x isn't compatible with Ruby 1.8.6
+require "active_record/observer"
+
+gem 'sqlite3-ruby', '<1.3.0' if RUBY_VERSION <= "1.8.6" # Version 1.3.x isn't compatible with Ruby 1.8.6
 #$VERBOSE=true
 require "ruby_sync/connectors/base_connector"
 
@@ -74,8 +76,6 @@ module RubySync::Connectors
           log.warn "No ActiveRecord tracking class"
           return
         end
-        #    elsif is_vault? and @pipeline
-        #      @pipeline.client.track_class
       else
          log.error "No track method"
          return
@@ -116,12 +116,35 @@ module RubySync::Connectors
         # Load db config
         self.class.db_config new_db_config
 
-        # Require the models
+        # Setup logger for ActiveRecord models
+        ActiveRecord::Base.logger = Logger.new(File.open(File.join(@rails_app_path, 'log', "#{rails_env}.log"), 'a'))
+        ActiveRecord::Base.logger.level = Logger::INFO if rails_env.to_sym == :production
+
+        ActiveRecord::Base.establish_connection db_config if !ActiveRecord::Base.connected?
+        # Require Non-ActiveRecord models before all the models
+        Dir[File.join(@rails_app_path, 'app','models', '*_observer.rb')].each do |filepath|
+          begin
+            require_dependency filepath
+            filename = File.basename(filepath,File.extname(filepath))
+            class_name = filename.camelize
+            class_model = "::#{class_name}".constantize
+            if class_model.respond_to? :observe
+              ActiveRecord::Base.observers << class_model
+            end
+            log.debug "Require Non-ActiveRecord model: '#{class_name}' in #{name}"
+          rescue Exception => ex
+            log.error ex.message
+          end
+        end
+
+        ActiveRecord::Base.instantiate_observers if !ActiveRecord::Base.observers.blank?
+
+        # Require the ActiveRecord models
         @models||=[]
         Dir[File.join(@rails_app_path, 'app','models', '*.rb')].each do |filepath|
           filepath = filepath.gsub("\\","/") # For Windows
-          if filepath.match(/.+\_observer\.rb$/)# || filepath.match(/.+\/ruby\_sync.+\.rb$/)
-            # do something ?
+          if filepath.match(/.+\_observer\.rb$/)
+            # Do nothing because Observers are already loaded
           else
             require_model(filepath)
           end
@@ -142,15 +165,18 @@ module RubySync::Connectors
 
       class_model = "::#{class_name}".constantize
       # Establish connection only if the model has a corresponding table in the database
-      if class_model.respond_to?(:table_name) #&& class_name.underscore.pluralize == class_model.table_name
+      if !@models.include?(class_name) && class_model.respond_to?(:table_name) #&& class_name.underscore.pluralize == class_model.table_name
         @models << class_name
         # Establish connection
-        unless class_model.connected?
-          log.debug "Database connection etablished"
-          ::ActiveRecord::Base.establish_connection db_config# if defined? class_model.establish_connection
+        if !class_model.connected?
+          if filepath.match(/.+[\\\/]ruby\_sync\_.+\.rb$/)
+            class_model.establish_connection db_config
+          else
+            class_model.establish_connection db_config# if class_model.respond_to? :establish_connection
+          end
+          log.debug "Database connection etablished for '#{class_name}' in #{name}"
         end
-        # Setup logger for activerecord
-        class_model.logger = Logger.new(File.open(File.join(@rails_app_path, 'log', "#{rails_env}.log"), 'a'))
+
       end
     end
 
@@ -212,7 +238,6 @@ END
       log.info "Adding '#{event.target_path}' to '#{name}'"
       ar_class.new() do |record|
         populate(record, perform_operations(event.payload))
-        log.debug record.attributes.inspect # debug
         record.save!
         update_mirror record.send(:"#{path_column}")
         if is_vault?
