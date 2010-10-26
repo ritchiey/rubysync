@@ -1,3 +1,4 @@
 class User < ActiveRecord::Base
-  named_scope :username_begin_by, lambda{ |char| {:conditions => "username LIKE '#{char}%'"}}
+  validates_uniqueness_of :username
+  named_scope :username_begin_by, lambda { |char| {:conditions => "username LIKE '#{char}%'"} }
 end

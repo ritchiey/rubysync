@@ -10,11 +10,10 @@ class RubySyncOperation < ActiveRecord::Base
           
           
   def self.create_for record, type
-    record.class.content_columns.map do |column|
-      values = [ RubySyncValue.new(:value=>record[column.name].to_s) ]
-      RubySyncOperation.new :operation=>type, :field_name=>column.name, :values=>values
+    record.changed.map do |column|
+      values = [ RubySyncValue.new(:value => record.send(column).to_s) ]
+      RubySyncOperation.new :operation => type, :field_name => column, :values => values
     end
   end
-
   
 end

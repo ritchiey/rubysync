@@ -30,6 +30,7 @@ module RubySync::Connectors
 
     include ActiveRecordAssociationTracking
     include ActiveRecordChangeTracking
+    include ActiveRecordEventTracking
 
     attr_accessor :rails_app_path
 

@@ -4,13 +4,13 @@
 #  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
-# 
+#
 # RubySync is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
-# 
+#
 # RubySync is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
@@ -18,18 +18,18 @@
 
 module RubySync::Connectors
   class BaseConnector
-      
+
     include RubySync::Utilities
     meta_eval { include RubySync::Utilities }
     include ConnectorEventProcessing
     include CopyEntryChangeTracking
-  
+
     attr_accessor :once_only, :name, :is_vault, :pipeline, :parse_all_entries,
-      :last_sync_info, :track_associations_module, :track_associations_options,
+      :last_sync, :last_sync_info, :track_associations_module, :track_associations_options,
       :track_changes_module, :track_changes_options
-    
+
     class << self
-      attr_accessor :parse_all_entries, :last_sync_info,
+      attr_accessor :parse_all_entries, :last_sync, :last_sync_info,
         :track_associations_module, :track_associations_options,
         :track_changes_module, :track_changes_options
     end
@@ -53,8 +53,8 @@ module RubySync::Connectors
         end
       end
 
-    end      
-      
+    end
+
 
     # Subclasses must override this. Called by perform_add to actually
     # store the new record in the datastore. Returned value will be used
@@ -62,8 +62,8 @@ module RubySync::Connectors
     def add id, operations
       raise "add method not implemented"
     end
-      
-      
+
+
     # Override this to return a string that will be included within the class definition of
     # of configurations based on your connector.
     def self.sample_config
@@ -75,9 +75,9 @@ module RubySync::Connectors
       end
     end
 
-     
+
     def self.target_transform(&blk) event_method :target_transform,&blk; end
-    
+
     # Subclasses must override this to
     # interface with the external system and generate entries for every
     # entry in the scope passing the entry path (id) and its data (as a hash of arrays).
@@ -94,7 +94,7 @@ module RubySync::Connectors
     def start &blk
       log.debug "#{name}: Started"
       @running = true
-      sync_started()
+      sync_started(&blk)
       while @running
         each_change do |event|
           if event.type == :force_resync
@@ -117,33 +117,33 @@ module RubySync::Connectors
           sleep 1
         end
       end
-      sync_stopped
+      sync_stopped(&blk)
     end
 
-      
+
     # Called by start() after last call to each_change or each_entry
-    def sync_stopped; end
-      
+    def sync_stopped(&blk); end
+
     # Called by start() before first call to each_change or each_entry
-    def sync_started; end
+    def sync_started(&blk); end
 
     # Override this to perform actions that must be performed the
     # when the connector starts running. (Eg, opening network connections)
     def started
     end
-      
+
     # Override this to perform actions that must be performed when
     # the connector exits (eg closing network conections).
     def stopped; end
 
-      
+
     # Politely stop the connector.
     def stop
       log.info "#{name}: Attempting to stop"
       @running = false
     end
 
-      
+
     def is_vault?
       @is_vault
     end
@@ -161,10 +161,12 @@ module RubySync::Connectors
       @parse_all_entries = value
     end
 
-#    def get_last_sync_info # unused
-#      log.debug "get last_sync_info #{self.class.last_sync_info}"
-#      self.class.last_sync_info
-#    end
+    def set_last_sync(value)
+      log.debug "#{name}: set last_sync with #{value}"
+      @last_sync = value
+      self.class.last_sync = value
+    end
+    alias :last_sync= set_last_sync
 
     def set_last_sync_info(value)
       log.debug "#{name}: set last_sync_info with #{value}"
@@ -175,7 +177,7 @@ module RubySync::Connectors
 
     # Override this to return the last synchronization info of your connector
     def extract_last_sync_info
-       return Time.now if parse_all_entries
+       return Time.zone.now if parse_all_entries
        log.warn "You must override this method to return the last synchronization information of your connector"
        return nil
     end
@@ -188,8 +190,8 @@ module RubySync::Connectors
     def own_association_key_for(path)
       path
     end
-      
-      
+
+
     # Returns the appropriate entry for the association key. This key will have been provided
     # by a previous call to the association_key method.
     # This will only be called on the client connector. It is not expected that the client will
@@ -197,12 +199,12 @@ module RubySync::Connectors
     def path_for_own_association_key(key)
       key
     end
-      
+
     # Returns the entry matching the association key. This is only called on the client.
     def entry_for_own_association_key(key)
       self[path_for_own_association_key(key)]
     end
-      
+
     # True if there is an entry matching the association key. Only called on the client.
     # Override if you have a quicker way of determining whether an entry exists for
     # given key than retrieving the entry.
@@ -222,7 +224,7 @@ module RubySync::Connectors
     end
 
 
-     
+
     # Return the association object given the association context and path.
     # This should only be called on the vault.
     def association_for(context, path)
@@ -239,16 +241,23 @@ module RubySync::Connectors
       path = path_for_association association
       path and self[path]
     end
-      
+
     # The context to be used to for all associations created where this
     # connector is the client.
     def association_context
-      return (self.name)? self.name : self.class.name
+      if self.name
+        return self.name
+      elsif is_vault? && pipeline && pipeline.association_context
+        return pipeline.association_context
+      else
+        return self.class.name
+      end
+
     end
 
     def clean
     end
-      
+
     # Attempts to delete non-existent items may occur due to echoing. Many systems won't be able to record
     # the fact that an entry has been deleted by rubysync because after the delete, there is no entry left to
     # record the information in. Therefore, they may issue a notification that the item has been deleted. This
@@ -267,24 +276,24 @@ module RubySync::Connectors
     def is_delete_echo? event
       false #TODO implement delete event caching
     end
-      
+
     def is_echo? event; false end
-      
+
     # Called by unit tests to inject data
     def test_add id, details
       add id, details
     end
-      
+
     # Called by unit tests to modify data
     def test_modify id, details
       modify id, details
     end
-      
+
     # Called by unit tests to delete a record
     def test_delete id
       delete id
     end
-  
+
     # Return an array of operations that would create the given record
     # if applied to an empty hash.
     def create_operations_for record
@@ -318,8 +327,8 @@ module RubySync::Connectors
           #
           # Edit the comments as you go to describe the specifics of your connector.
           # If you need more information, consult http://rubysync.org/docs/developer/connectors
-          
-          
+
+
           # Call the option class method to declare the options used to configure
           # your connector.
           # eg.
@@ -333,17 +342,17 @@ module RubySync::Connectors
           #
           # And, of course, the same could be done in child classes (aka configuration files)
           # The value set becomes available as a readable method of the same name in instances
-          # of the class.                   
-          
-          
+          # of the class.
+
+
           ####### Configuration methods
-          
+
           # Return the list of the fields available for this connector. Feel free to print an
           # informative message if you can't determine the available fields for the datastore.
           def self.fields
             puts "The author of #{__FILE__} hasn't got around to implementing the working out the default fields yet :>"
           end
-          
+
           # Return the string that will be inserted as the contents of the subclass created
           # when "rubysync connnector blah -t your_connector" is run.
           def self.sample_config
@@ -357,7 +366,7 @@ module RubySync::Connectors
     end
 
     ####### Reading methods
-          
+
     # If your datasource supports random access (as would, for example, a database) then
     # implement the following:
     #
@@ -365,8 +374,8 @@ module RubySync::Connectors
     #  #return the entry at location indicated by 'path'
     #  #An 'entry' is a hash where the key is the attribute name and the value is an
     #  #array containing the value or values for the the attribute
-    #end               
-          
+    #end
+
     # Subclasses must override this to
     # interface with the external system and generate entries for every
     # entry in the scope passing the entry path (id) and its data (as a hash of arrays).
@@ -388,13 +397,13 @@ module RubySync::Connectors
     # stopped.
     #def each_change
     #end
-          
+
     ######## Writing methods
-          
+
     # Apply operations to create database a entry at path
     def add(path, operations)
     end
-          
+
     # Apply operations to alter database entry at path
     def modify(path, operations)
     end
@@ -460,8 +469,12 @@ module RubySync::Connectors
       options[:name] ||= "#{self.name}(track)"
       options[:is_vault] = false
       class_def 'track' do
-        @track ||= tracking_class.new(options)
+        @track = tracking_class.new(options)
       end
+      meta_def 'track' do
+        @track = tracking_class.new(options)
+      end
+      track # initialize the tracker
       @tracker = true
     end
 
@@ -507,11 +520,11 @@ module RubySync::Connectors
     def self.options options
       @options = options
     end
-        
+
     def self.default_options
       @options ||= {}
     end
-  
+
   end
 end
 

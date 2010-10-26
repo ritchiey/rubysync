@@ -21,14 +21,15 @@ require 'ruby_sync_test'
 
 class ActiveRecordTrackingConnector < RubySync::Connectors::ActiveRecordConnector
   #  model :change_track
-  changes_model :change_track#Alias of model's method
-  associations_model :association_track#Only usefull for vault connector
-  application "#{File.dirname(__FILE__)}/../examples/ar_track"
+  changes_model :change_track # Alias of model's method
+  associations_model :association_track # Only usefull for vault connector
+  application "#{File.dirname(__FILE__)}/../examples/ar_track"  
 end
 
 class ArClientConnector < RubySync::Connectors::ActiveRecordConnector
   application "#{File.dirname(__FILE__)}/../examples/ar_client_webapp"
   model :user
+  path_column :username
   columns :username, :name, :email
 
 #  find_method :all
@@ -44,12 +45,30 @@ class ArClientConnector < RubySync::Connectors::ActiveRecordConnector
 
   track_with :active_record_tracking
   #  track_changes_with :active_record
-  #  track_associations_with :active_record
+  #  track_associations_with :active_record  
 end
 
 class ArVaultConnector < RubySync::Connectors::ActiveRecordConnector
   application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
   model :person
+  path_column :first_name
+  find_method :find_chaining
+  set_parse_all_entries false
+
+  find_chaining do |model, args|
+    if !parse_all_entries && last_sync_info
+      formatted_last_sync = last_sync_info.strftime("%Y-%m-%d %H:%M:%S")
+      only_new_and_modified_entries =
+       "ruby_sync_events.timestamp >
+          '#{formatted_last_sync}'"
+    end
+
+    model.
+      all(
+        :conditions => "#{only_new_and_modified_entries||=nil}",
+        :order => "ruby_sync_events.id"
+      )
+  end
 end
 
 class ArToArTestPipeline < RubySync::Pipelines::BasePipeline
@@ -63,6 +82,11 @@ class ArToArTestPipeline < RubySync::Pipelines::BasePipeline
   in_event_transform do
     map :first_name, :username
     map :last_name, :name
+  end
+
+  out_event_transform do
+    map :username, :first_name
+    map :name, :last_name
   end
 
   # Should evaluate to the path for placing a new record on the vault
@@ -97,7 +121,13 @@ class TcArToArConnector < Test::Unit::TestCase
     @bob_details = {:username=>'bob', :name=>'Robert',:email=>'bob.robert@localhost'}
     # Wipe existing database content
     # TODO: Find out how rails does this.
+    ::ChangeTrack.delete_all
+    ::AssociationTrack.delete_all
     ::RubySyncAssociation.delete_all
+#    ::RubySyncValue.delete_all
+#    ::RubySyncOperation.delete_all
+#    ::RubySyncEvent.delete_all
+#    ::RubySyncState.delete_all
     ::Person.delete_all
     ::User.delete_all
   end
@@ -124,24 +154,22 @@ class TcArToArConnector < Test::Unit::TestCase
     end
   end
   
-  #  def test_vault_to_client
-  #    # Turn on the RubySyncObserver to track the changes to people
-  #    ActiveRecord::Base.observers = ::RubySyncObserver
-  #     ::RubySyncObserver.observe ::Person
-  #     ::RubySyncObserver.instance
-  #     assert_nil ::RubySyncEvent.find(:first), "Pre-existing events in queue"
-  #     person = Person.create :first_name=>"Ritchie", :last_name=>"Young"
-  #     assert_not_nil ::RubySyncEvent.find_by_event_type('add'), "No add event generated"
-  #     @pipeline.run_once
-  #    # Find the association and use the key to look up the record on the client
-  #    key = @vault.association_key_for @pipeline.association_context, person.id
-  #    assert_not_nil key, "No association seems to have been created"
-  #    c_person = @client.entry_for_own_association_key key
-  #    assert_not_nil c_person, "Person wasn't created on client from vault; key='#{key}'\nClient contains:\n#{@client.inspect}"
-  #    assert_equal "Ritchie", c_person['username']
-  #    assert_equal "Young", c_person['name']
-  #     ActiveRecord::Base.observers = [] # Stop tracking changes to people
-  #  end
+  def test_vault_to_client
+    assert_equal 0, ::RubySyncEvent.all(:conditions => "id > #{@vault.last_event_id}").length, "Pre-existing events in queue"
+    person = ::Person.create :first_name => "Ritchie", :last_name => "Youn"
+    assert_not_nil ::RubySyncEvent.first(:conditions => "id > #{@vault.last_event_id} AND event_type='add'"), "No add event generated"
+    @pipeline.run_once
+    person.update_attributes :last_name => "Young"
+    assert_not_nil ::RubySyncEvent.first(:conditions => "id > #{@vault.last_event_id} AND event_type='modify'"), "No modify event generated"
+    @pipeline.run_once
+    # Find the association and use the key to look up the record on the client
+    key = @vault.association_key_for @pipeline.association_context, person.first_name
+    assert_not_nil key, "No association seems to have been created"
+    c_person = @client.entry_for_own_association_key key
+    assert_not_nil c_person, "Person wasn't created on client from vault; key='#{key}'\nClient contains:\n#{@client.inspect}"
+    assert_equal "Ritchie", c_person[:username]
+    assert_equal "Young", c_person[:name]
+  end
 
   def find_bob
     ::Person.find_by_first_name "bob"

@@ -1,6 +1,6 @@
 # Add your own tasks in files placed in lib/tasks ending in .rake,
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
-gem 'sqlite3-ruby', '<1.3.0' unless Rails.env.production?
+gem 'sqlite3-ruby', '<1.3.0' if RUBY_VERSION <= "1.8.6" && (!ENV['RAILS_ENV'] == 'production' || !defined?(JRUBY_VERSION))
 require(File.join(File.dirname(__FILE__), 'config', 'boot'))
 
 require 'rake'

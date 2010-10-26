@@ -3,10 +3,10 @@ class CreateRubySyncAssociations < ActiveRecord::Migration
     create_table "ruby_sync_associations" do |t|
       t.column "context",  :string
       t.column "key",     :string
-      t.column "synchronizable_id", :integer
+      t.column "synchronizable_id", :string
       t.column "synchronizable_type", :string
     end
-    add_index "ruby_sync_associations", [:context, :key], :unique=>true
+    add_index "ruby_sync_associations", [:context, :key], :unique => true
     add_index "ruby_sync_associations", [:synchronizable_id]
   end
 

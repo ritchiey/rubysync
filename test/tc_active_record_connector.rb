@@ -25,6 +25,8 @@ class ArActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
 #  path_column :first_name
   model :person
   application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
+  path_column :first_name
+  delete_event true
   #dbm_path "/tmp/rubysync_ar_test"
 end
 
@@ -77,6 +79,9 @@ class TcActiveRecordConnector < Test::Unit::TestCase
       # Wipe existing database content
       # TODO: Find out how rails does this.
       ::RubySyncAssociation.delete_all
+      ::RubySyncValue.delete_all
+      ::RubySyncEvent.delete_all
+      ::RubySyncOperation.delete_all
       ::Person.delete_all
     end
   
@@ -100,24 +105,22 @@ class TcActiveRecordConnector < Test::Unit::TestCase
     end
   end
   
-#  def test_vault_to_client
-#    # Turn on the RubySyncObserver to track the changes to people
-#      ActiveRecord::Base.observers = ::RubySyncObserver
-#      ActiveRecord::Base.instantiate_observers
-#
-#     assert_nil ::RubySyncEvent.find(:first), "Pre-existing events in queue"
-#     person = Person.create :first_name => "Ritchie", :last_name => "Young"
-#     assert_not_nil ::RubySyncEvent.find_by_event_type('add'), "No add event generated"
-#     @pipeline.run_once
-#    # Find the association and use the key to look up the record on the client
-#    key = @vault.association_key_for @pipeline.association_context, person.id
-#    assert_not_nil key, "No association seems to have been created"
-#    c_person = @client.entry_for_own_association_key key
-#    assert_not_nil c_person, "Person wasn't created on client from vault; key='#{key}'\nClient contains:\n#{@client.inspect}"
-#    assert_equal "Ritchie", c_person['givenName'][0]
-#    assert_equal "Young", c_person['sn'][0]
-#     ActiveRecord::Base.observers = [] # Stop tracking changes to people
-#  end
+  def test_vault_to_client
+    assert_nil ::RubySyncEvent.find(:first), "Pre-existing events in queue"
+    person = ::Person.create :first_name => "Ritchie", :last_name => "Youn"
+    assert_not_nil ::RubySyncEvent.find_by_event_type('add'), "No add event generated"
+    @pipeline.run_once
+    person.update_attributes :last_name => "Young"
+    assert_not_nil ::RubySyncEvent.find_by_event_type('modify'), "No modify event generated"
+    @pipeline.run_once
+    # Find the association and use the key to look up the record on the client
+    key = @vault.association_key_for @pipeline.association_context, person.first_name
+    assert_not_nil key, "No association seems to have been created"
+    c_person = @client.entry_for_own_association_key key
+    assert_not_nil c_person, "Person wasn't created on client from vault; key='#{key}'\nClient contains:\n#{@client.inspect}"
+    assert_equal "Ritchie", c_person['givenName'][0]
+    assert_equal "Young", c_person['sn'][0]
+  end
   
   def find_bob
     Person.find_by_first_name "bob"
