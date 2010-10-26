@@ -44,7 +44,7 @@ module Kernel
       rescue MissingSourceFile => ex
         loaded = false
 #        log.debug "#{ex.message}" # debug
-        raise NameError, "NameError: undefined local variable or method '#{method_id}' in #{name}", caller
+        raise NameError, "NameError: undefined local variable or method '#{method_id}'" + ( respond_to?(:name)? " in #{name}" : "" ), caller
         exit
       end
     end
@@ -54,7 +54,7 @@ module Kernel
     else
       method_missing_without_dependency method_id, *args
     end
-  end
+  end  
 end
 
 module Net
