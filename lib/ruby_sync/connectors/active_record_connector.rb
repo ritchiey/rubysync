@@ -280,7 +280,7 @@ END
       if path.is_a?(Hash)
         ar_class.destroy_all path[:conditions] if path.key?(:conditions)
       else
-        ar_class.destroy path
+        ar_class.destroy_all( path_column => path )
       end
     end
 
