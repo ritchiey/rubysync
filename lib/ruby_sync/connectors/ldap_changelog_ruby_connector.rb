@@ -3,13 +3,13 @@
 #  Copyright (c) 2009 Nowhere Man
 #
 # This file is part of RubySync.
-# 
+#
 # RubySync is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
-# 
+#
 # RubySync is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
@@ -34,7 +34,7 @@ module RubySync::Connectors
 
   module LdapChangelogRubyChange
     #option :username, :search_filter, :host, :search_base, :port, :changelog_dn, :password, :bind_method
-      
+
     def each_change(&blk)
       #      unless @last_sync == nil and @last_sync.split(",")[0] == self.association_context
       #        restore_last_sync_state
@@ -233,7 +233,7 @@ module RubySync::Connectors
           else
             return # Wrong type or ldif_entry is empty
           end
-         
+
 
           begin
               changelog_dn_attribute = changelog_attributes.delete('dn').to_s
@@ -315,7 +315,7 @@ module RubySync::Connectors
       super(options)
       restore_last_sync_state
     end
-    
+
     #  def update_mirror path
     #    with_ldap do |ldap|
     #      filter = "(#{RUBYSYNC_SOURCE_INFO_ATTRIBUTE}>=#{path})"

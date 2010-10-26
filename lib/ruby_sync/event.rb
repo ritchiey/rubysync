@@ -124,7 +124,6 @@ module RubySync
     
     def convert_to_modify(other, filter)
       log.info "Converting '#{type}' event to modify"
-
       # The add event contained an operation for each attribute of the source record.
       # Therefore, we should delete any attributes in the target record that don't appear
       # in the event.

@@ -31,7 +31,7 @@ module RubySync::Connectors
         path = dn = cle.targetdn[0]
       elsif RUBYSYNC_SOURCE_INFO_ATTRIBUTE && !cle.send(RUBYSYNC_SOURCE_INFO_ATTRIBUTE).blank? && !cle.dn.blank?
         path = cle.send(RUBYSYNC_SOURCE_INFO_ATTRIBUTE)[0]
-        dn = cle.dn       
+        dn = cle.dn
       else
         raise Exception.new("No DN in this ChangeLog Entry")
       end

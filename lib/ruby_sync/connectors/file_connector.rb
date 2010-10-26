@@ -67,7 +67,7 @@ module RubySync
       
       # Generate a unique and appropriate filename within the given path 
       def output_file_name
-       File.join(out_path, Time.now.strftime('%Y%m%d%H%M%S') + out_extension)
+       File.join(out_path, Time.zone.now.strftime('%Y%m%d%H%M%S') + out_extension)
       end
             
     end

@@ -170,6 +170,12 @@ class Object
     Marshal::load(Marshal.dump(self))
   end
 
+  # Convert Time or String in a TimeZone object with a UTC time zone
+  def to_utc(time=nil)
+    time = self if !time
+    Time.zone.local_to_utc(Time.zone.parse(time.to_s))
+  end
+
 end
 
 
