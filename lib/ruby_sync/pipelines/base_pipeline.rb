@@ -191,6 +191,16 @@ module RubySync
         client.started
         vault.last_sync_info = vault.extract_last_sync_info if !vault.parse_all_entries && vault.respond_to?(:sync_info) && vault.sync_info.blank?
         vault.started
+
+        if !vault.parse_all_entries && vault.last_sync_info  && vault.last_sync_info.is_a?(Time)
+          # Only new and modified entries for an LDAP vault
+          # TODO Move this stuff in an ldap connector ?
+          if vault.respond_to?(:last_change_number) && vault.last_change_number > 0 && vault.respond_to?(:search_filter)
+            ldap_last_sync_timestamp = vault.last_sync_info.strftime("%Y%m%d%H%M%S%z")
+
+            vault.search_filter = Net::LDAP::Filter.construct(vault.search_filter.to_s) & ( Net::LDAP::Filter.ge(:createtimestamp, ldap_last_sync_timestamp) | Net::LDAP::Filter.ge(:modifytimestamp, ldap_last_sync_timestamp) )
+          end
+        end
       end
       
       def stopped

@@ -80,6 +80,10 @@ module RubySync::Connectors
       # scan existing entries to see if any are new or modified
       save_changelog_entries(&blk)
 
+    end
+
+    # Called by start() before first call to each_change or each_entry
+    def sync_started(&blk)
       # scan changelog entries to find deleted
       delete_changelog_entries(&blk)
 
