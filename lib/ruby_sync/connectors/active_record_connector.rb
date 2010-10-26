@@ -34,12 +34,13 @@ module RubySync::Connectors
     attr_accessor :rails_app_path
 
     option :ar_class, :model, :changes_model, :associations_model,
-      :application, :rails_env, :columns, :path_column, :find_method, :find_filter, :find_block,
+      :application, :rails_env, :columns, :path_column, :find_method, :find_filter, :find_block, :delete_event,
       :db_type, :db_host, :db_username, :db_password, :db_name, :db_encoding, :db_pool, :db_config
 
     rails_env 'development'
     find_method :all
     find_filter nil
+    delete_event false
     db_type 'postgresql'
     db_username 'rails_user'
     db_password 'your_password'
@@ -47,6 +48,7 @@ module RubySync::Connectors
     db_name "rubysync_#{get_rails_env}"
     db_encoding "utf8"
     db_pool 5
+
     # Default db_config in case we're not sucking the config out of a rails app
     db_config(
       :adapter => get_db_type,
@@ -90,7 +92,13 @@ module RubySync::Connectors
     end
 
     def find_chaining
-      ar_class.class_eval do
+      if Object.const_defined?('RubySyncEvent') and @models.include?('RubySyncEvent')
+       target_class = RubySyncEvent
+      else
+        target_class = ar_class
+      end
+
+      target_class.class_eval do
         meta_def :find_chaining do |*args|
           yield(self,args)
         end
@@ -99,6 +107,7 @@ module RubySync::Connectors
 
     def initialize options={}
       super options
+
       # Rails app specified, use it to configure
       if application
 
@@ -152,6 +161,10 @@ module RubySync::Connectors
       end
       self.class.ar_class model.to_s.camelize.constantize
       self.class.path_column ar_class.primary_key unless respond_to?(:path_column)
+
+      if Object.const_defined?('RubySyncEvent') and @models.include?('RubySyncEvent')
+        restore_last_sync_state
+      end
     end
 
     def require_model(filepath)
@@ -183,7 +196,7 @@ module RubySync::Connectors
     def self.fields
       return get_columns if respond_to? :get_columns
       c = self.new
-      c.ar_class.column_names
+      c.ar_class.column_names.sort
     end
 
     def self.sample_config
@@ -213,8 +226,7 @@ END
 
 
     def each_entry
-      #      puts find_args.inspect#debug
-      find_chaining(&find_block) unless ar_class.respond_to?(find_method)
+      find_chaining(&find_block) if !ar_class.respond_to?(find_method)
 
       ar_class.send(:"#{find_method}", *find_args).each do |record|
         yield record.send(:"#{path_column}"), to_entry(record)
@@ -291,7 +303,6 @@ END
     def to_entry active_record
       entry = active_record.attributes
       entry.from_keys(*columns) if respond_to?(:columns) && !columns.empty?
-
       entry
     end
 
