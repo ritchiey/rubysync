@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema name="changeLog">
+  <attributetypes>
+    <attributetype oid="2.16.840.1.113730.3.1.5" obsolete="false" singlevalue="true" collective="false" nousermodification="false">
+      <aliases>
+        <alias>changeNumber</alias>
+      </aliases>
+      <description>a number which uniquely identifies a change made to a directory entry</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.27</syntax>
+      <equality>integerMatch</equality>
+      <ordering>integerOrderingMatch</ordering>
+    </attributetype>
+    <attributetype oid="2.16.840.1.113730.3.1.6" obsolete="false" singlevalue="true" collective="false" nousermodification="false">
+      <aliases>
+        <alias>targetDN</alias>
+      </aliases>
+      <description>the DN of the entry which was modified</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.12</syntax>
+      <equality>distinguishedNameMatch</equality>
+    </attributetype>
+    <attributetype oid="2.16.840.1.113730.3.1.7" obsolete="false" singlevalue="true" collective="false" nousermodification="false">
+      <aliases>
+        <alias>changeType</alias>
+      </aliases>
+      <description>the type of change made to an entry</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.15</syntax>
+      <equality>caseIgnoreMatch</equality>
+    </attributetype>
+    <attributetype oid="2.16.840.1.113730.3.1.8" obsolete="false" singlevalue="false" collective="false" nousermodification="false">
+      <aliases>
+        <alias>changes</alias>
+      </aliases>
+      <description>a set of changes to apply to an entry</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.40</syntax>
+    </attributetype>
+    <attributetype oid="2.16.840.1.113730.3.1.9" obsolete="false" singlevalue="true" collective="false" nousermodification="false">
+      <aliases>
+        <alias>newRDN</alias>
+      </aliases>
+      <description>the new RDN of an entry which is the target of a modrdn operation</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.12</syntax>
+      <equality>distinguishedNameMatch</equality>
+    </attributetype>
+    <attributetype oid="2.16.840.1.113730.3.1.10" obsolete="false" singlevalue="true" collective="false" nousermodification="false">
+      <aliases>
+        <alias>deleteOldRDN</alias>
+      </aliases>
+      <description>a flag which indicates if the old RDN should be retained as an attribute of the entry</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.7</syntax>
+      <equality>booleanMatch</equality>
+    </attributetype>
+    <attributetype oid="2.16.840.1.113730.3.1.11" obsolete="false" singlevalue="true" collective="false" nousermodification="false">
+      <aliases>
+        <alias>newSuperior</alias>
+      </aliases>
+      <description>the new parent of an entry which is the target of a moddn operation</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.12</syntax>
+      <equality>distinguishedNameMatch</equality>
+    </attributetype>
+    <attributetype oid="2.16.840.1.113730.3.1.35" obsolete="false" singlevalue="false" collective="false" nousermodification="false">
+      <aliases>
+        <alias>changeLog</alias>
+      </aliases>
+      <description>the distinguished name of the entry which contains the set of entries comprising this server s changelog</description>
+      <usage>USER_APPLICATIONS</usage>
+      <syntax>1.3.6.1.4.1.1466.115.121.1.12</syntax>
+      <equality>distinguishedNameMatch</equality>
+    </attributetype>
+  </attributetypes>
+  <objectclasses>
+    <objectclass oid="2.16.840.1.113730.3.2.1" obsolete="false">
+      <aliases>
+        <alias>changeLogEntry</alias>
+      </aliases>
+      <superiors>
+        <superior>top</superior>
+      </superiors>
+      <type>STRUCTURAL</type>
+      <mandatory>
+        <attributetype>changeNumber</attributetype>
+        <attributetype>targetDN</attributetype>
+        <attributetype>changeType</attributetype>
+      </mandatory>
+      <optional>
+        <attributetype>changes</attributetype>
+        <attributetype>newRDN</attributetype>
+        <attributetype>deleteOldRDN</attributetype>
+        <attributetype>newSuperior</attributetype>
+      </optional>
+    </objectclass>
+  </objectclasses>
+</schema>
