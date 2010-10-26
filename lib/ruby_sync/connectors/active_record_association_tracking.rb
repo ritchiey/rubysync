@@ -23,31 +23,36 @@ module RubySync::Connectors::ActiveRecordAssociationTracking
   
   def associate association, path
     log.debug "Associating '#{association}' with '#{path}'"
-    ruby_sync_association.create :synchronizable_id => path, :synchronizable_type => ar_class.name,
+    ruby_sync_association.create :synchronizable_id => path.to_s, :synchronizable_type => ar_class.name,
       :context => association.context, :key => association.key.to_s
   end
-  
-  def find_associated association
-    ruby_sync_association.find_by_context_and_key association.context, association.key.to_s
-  end
+
+# Wrong query
+#  def find_associated association
+#    ruby_sync_association.find_by_context_and_key association.context, association.key.to_s
+#  end
   
   def path_for_association association
+    log.debug "Path for Association with '#{association.context}' and '#{association.key}'"
     assoc = ruby_sync_association.find_by_context_and_key association.context, association.key.to_s
     (assoc)? assoc.synchronizable_id : nil
   end
   
   def association_key_for context, path
-    record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context path, ar_class.name, context
+    log.debug "Association key for '#{context}' and '#{path}'"
+    record = ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type_and_context(path.to_s, ar_class.name, context)
     record and record.key
   end
   
   def associations_for(path)
-    ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path, ar_class.name)
+    log.debug "Associations for '#{path}'"
+    ruby_sync_association.find_by_synchronizable_id_and_synchronizable_type(path.to_s, ar_class.name)
   rescue ActiveRecord::RecordNotFound
     return nil
   end
   
   def remove_association association
+    log.debug "Remove Association for '#{association.context}' and '#{association.key}'"
     ruby_sync_association.find_by_context_and_key(association.context, association.key.to_s).destroy
   rescue ActiveRecord::RecordNotFound
     return nil
@@ -57,12 +62,13 @@ module RubySync::Connectors::ActiveRecordAssociationTracking
 
   def ruby_sync_association
     unless @ruby_sync_association
-      if Object.const_defined?('RubySyncAssociation') and @models.include?('RubySyncAssociation')
-        @ruby_sync_association = ::RubySyncAssociation
-        @ruby_sync_association.establish_connection(db_config)
-      elsif track.respond_to? :associations_model
+      if respond_to?(:track) && track.respond_to?(:associations_model)
         @ruby_sync_association = track.associations_model.to_s.camelize.constantize
-        @ruby_sync_association.establish_connection(track.db_config)
+        @ruby_sync_association.establish_connection(track.db_config) if !@ruby_sync_association.connected?
+      elsif Object.const_defined?('RubySyncAssociation') and @models.include?('RubySyncAssociation')
+        log.debug 'Used RubySyncAssociation model'
+        @ruby_sync_association = RubySyncAssociation
+        @ruby_sync_association.establish_connection(db_config) if !@ruby_sync_association.connected?
       end
     end
     @ruby_sync_association
