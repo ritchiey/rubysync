@@ -85,8 +85,13 @@ module RubySync::Connectors
 
     # Called by start() before first call to each_change or each_entry
     def sync_started(&blk)
-      # scan changelog entries to find deleted
-      delete_changelog_entries(&blk)
+      # scan changelog entries to find deleted only if track_deleted option is true
+      #  or a number who manage probability that the delete_changelog_entries method is called
+      if @last_change_number > 0 && track_deleted && 
+       (!track_deleted.is_a?(Numeric) || rand(100) < track_deleted.to_i.abs )
+        log.warn "#{name}: #delete_changelog_entries called"
+        delete_changelog_entries(&blk)
+      end
     end
 
     # Dummy method, because we don't have to skip changelog entries with software LDAP changelog
@@ -314,10 +319,9 @@ module RubySync::Connectors
 
   class LdapChangelogRubyConnector < LdapChangelogConnector
     include LdapChangelogRubyChange
-
-    option             :changelog_dn
-    changelog_dn       'ou=changelog,dc=example,dc=com'#"cn=changelog,ou=system"
-
+    
+    changelog_dn 'ou=changelog,dc=example,dc=com'#"cn=changelog,ou=system"
+    
     def initialize options={}
       super(options)
       restore_last_sync_state

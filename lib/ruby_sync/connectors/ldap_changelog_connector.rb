@@ -30,8 +30,10 @@ module RubySync::Connectors
     include LdapChangelogNumberTracking
     include LdapChangelogEventProcessing
 
-    option :changelog_dn, :path_cookie
+    option :changelog_dn, :path_cookie, :track_deleted
+
     changelog_dn "cn=changelog"
+    track_deleted true # Possible values: true, false, percentage probability(e.g. 75). By default to true (safe but slow).
 
     def initialize options={}
       super options
