@@ -60,7 +60,7 @@ class MyLdapConnector < RubySync::Connectors::LdapConnector
 #  search_base   "ou=people,dc=9to5magic,dc=com,dc=au"
 
   track_changes_with :ldap_changelog_ruby, :changelog_dn => 'ou=People,ou=changelogs,dc=example,dc=com',
-    :path_cookie => get_search_base
+    :path_cookie => get_search_base, :track_deleted => true
 
 end
 
@@ -72,7 +72,9 @@ class MyMemoryConnector < RubySync::Connectors::MemoryConnector
     :username => MyLdapConnector.get_username, :password => MyLdapConnector.get_password,
     :search_filter => Net::LDAP::Filter.eq(:objectclass, 'inetOrgPerson'),
     :path_cookie => MyLdapConnector.get_search_base,
-    :changelog_dn => 'ou=Memory,ou=changelogs,dc=example,dc=com'
+    :changelog_dn => 'ou=Memory,ou=changelogs,dc=example,dc=com',
+    :track_deleted => true
+
 
 end
 

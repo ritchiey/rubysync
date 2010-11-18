@@ -62,13 +62,12 @@ module RubySync::Connectors
               track_changes_attributes[attribute] = send(connector_attribute)
             end
           end
-          
-          self.class.track_option *attributes
+          self.class.track_option(*attributes)
           track_changes_attributes.each do |key, value|
             if self.class.respond_to?("#{key}=")
               self.class.send("#{key}=", value)
             else
-              log.debug "#{name}: doesn't respond to #{key}="
+              log.warn "#{name}: doesn't respond to #{key}="
             end
           end
 

@@ -87,7 +87,7 @@ module RubySync::Connectors
     def sync_started(&blk)
       # scan changelog entries to find deleted only if track_deleted option is true
       #  or a number who manage probability that the delete_changelog_entries method is called
-      if @last_change_number > 0 && track_deleted && 
+      if @last_change_number > 0 && respond_to?(:track_deleted) && track_deleted &&
        (!track_deleted.is_a?(Numeric) || rand(100) < track_deleted.to_i.abs )
         log.warn "#{name}: #delete_changelog_entries called"
         delete_changelog_entries(&blk)
@@ -304,8 +304,8 @@ module RubySync::Connectors
         ldap_changelogs_queue.each do |target, operation|
           ldap.add(operation)
         end
-        update_last_sync_state
 
+        update_last_sync_state
       end
     end
 

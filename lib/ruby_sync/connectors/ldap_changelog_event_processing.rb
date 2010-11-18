@@ -27,7 +27,7 @@ module RubySync::Connectors
 
     def event_for_changelog_entry cle
       payload = nil
-      if !cle.targetdn.blank?
+      if cle.respond_to?(:targetdn) && !cle.targetdn.blank?
         path = dn = cle.targetdn[0]
       elsif RUBYSYNC_SOURCE_INFO_ATTRIBUTE && !cle.send(RUBYSYNC_SOURCE_INFO_ATTRIBUTE).blank? && !cle.dn.blank?
         path = cle.send(RUBYSYNC_SOURCE_INFO_ATTRIBUTE)[0]
