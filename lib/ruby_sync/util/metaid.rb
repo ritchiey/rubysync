@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # This file is extracted from an article published by "why the lucky stiff" at
-# http://whytheluckystiff.net/articles/seeingMetaclassesClearly.html
+# http://ruby-metaprogramming.rubylearning.com/html/seeingMetaclassesClearly.html
 #
 # Hopefully Why will publish a meta-programming gem later and RubySync can
 # just make that a dependency.
