@@ -147,6 +147,7 @@ if (base_path)
   load_paths << File.join(base_path, 'shared', 'lib')
 end
 
-ActiveSupport::Dependencies.load_paths = load_paths
 
+load_paths_method = ActiveSupport::Dependencies.respond_to?(:autoload_paths=) ? :autoload_paths= :  :load_paths=
 
+ActiveSupport::Dependencies.send(load_paths_method, load_paths)
