@@ -33,7 +33,7 @@ $KCODE = 'UTF8'
 Time.zone = 'UTC' # You can override this timezone
 
 module RubySync
-  VERSION = '0.2.1'
+  VERSION = '0.3.0'
   module Connectors
   end
   module Pipelines
