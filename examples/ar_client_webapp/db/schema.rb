@@ -15,8 +15,8 @@ ActiveRecord::Schema.define(:version => 20090401132733) do
     t.string   "username"
     t.string   "name"
     t.string   "email"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", :limit => 29
+    t.datetime "updated_at", :limit => 29
   end
 
 end

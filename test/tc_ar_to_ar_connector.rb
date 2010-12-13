@@ -19,15 +19,16 @@
 
 require 'ruby_sync_test'
 
-class ActiveRecordTrackingConnector < RubySync::Connectors::ActiveRecordConnector
-  #  model :change_track
+class ActiveRecordTrackingConnector < RubySync::Connectors::ActiveRecordConnector 
+  application "#{File.dirname(__FILE__)}/../examples/ar_track"
+
   changes_model :change_track # Alias of model's method
   associations_model :association_track # Only usefull for vault connector
-  application "#{File.dirname(__FILE__)}/../examples/ar_track"  
 end
 
 class ArClientConnector < RubySync::Connectors::ActiveRecordConnector
   application "#{File.dirname(__FILE__)}/../examples/ar_client_webapp"
+  
   model :user
   path_column :username
   columns :username, :name, :email
@@ -50,6 +51,7 @@ end
 
 class ArVaultConnector < RubySync::Connectors::ActiveRecordConnector
   application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
+
   model :person
   path_column :first_name
   find_method :find_chaining

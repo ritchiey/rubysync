@@ -60,6 +60,7 @@ module RubySync::Connectors
       :encoding=> get_db_encoding,
       :pool => get_db_pool
     )
+    
 
     def method_missing(name)
       if name == :model and respond_to? :changes_model
@@ -111,9 +112,13 @@ module RubySync::Connectors
 
       # Rails app specified, use it to configure
       if application
-
         # Load the database configuration
         @rails_app_path = File.expand_path(application)
+        if defined?(JRUBY_VERSION)
+          require "#{@rails_app_path}/config/initializers/jdbc"
+          log.debug "Using JRuby, version: #{JRUBY_VERSION}" # debug
+        end
+
         ::Module.rails_app_path = @rails_app_path
         db_config_filename = File.join(@rails_app_path, 'config', 'database.yml')
         new_db_config = YAML.load(ERB.new(File.read(db_config_filename)).result).with_indifferent_access[rails_env]

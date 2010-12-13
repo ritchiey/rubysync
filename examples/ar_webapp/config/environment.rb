@@ -23,7 +23,7 @@ Rails::Initializer.run do |config|
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   if RUBY_VERSION <= "1.8.6" # Sqlite3 version 1.3.x isn't compatible with Ruby 1.8.6
     config.gem "sqlite3-ruby", :lib => "sqlite3", :version => '< 1.3.0'
-  else
+  elsif !defined?(JRUBY_VERSION)
     config.gem "sqlite3-ruby", :lib => "sqlite3"
   end
 

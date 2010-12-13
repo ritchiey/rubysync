@@ -23,8 +23,10 @@ require 'ruby_sync_test'
 class ArActiveRecordConnector < RubySync::Connectors::ActiveRecordConnector
   #option :dbm_path
 #  path_column :first_name
-  model :person
   application "#{File.dirname(__FILE__)}/../examples/ar_webapp"
+#  rails_env 'development'
+
+  model :person
   path_column :first_name
   delete_event true
   #dbm_path "/tmp/rubysync_ar_test"
