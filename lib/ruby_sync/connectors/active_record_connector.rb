@@ -116,8 +116,7 @@ module RubySync::Connectors
         @rails_app_path = File.expand_path(application)
         ::Module.rails_app_path = @rails_app_path
         db_config_filename = File.join(@rails_app_path, 'config', 'database.yml')
-        new_db_config = YAML.load(File.read(db_config_filename)).with_indifferent_access[rails_env]
-
+        new_db_config = YAML.load(ERB.new(File.read(db_config_filename)).result).with_indifferent_access[rails_env]
         #Add rails application relative path for sqlite databases
         if new_db_config['adapter'].match('^(jdbc)?sqlite(2|3)?$')
           new_db_config['database'] = @rails_app_path + '/' + new_db_config['database'] if Pathname.new(new_db_config['database']).relative?
