@@ -26,20 +26,28 @@ spec = Gem::Specification.new do |s|
   s.name = 'rubysync'
   s.version = RubySync::VERSION
   s.has_rdoc = true
-  s.extra_rdoc_files = ['README.txt', 'COPYING']
+  s.extra_rdoc_files = ['README.md', 'LICENSE.txt', 'MIT-LICENSE.txt', 'GPL-LICENSE.txt']
   s.summary = 'Event driven identity synchronization engine'
-  s.description = s.summary
-  s.homepage = 'http://rubysync.org/'
+  s.description = "RubySync is a tool for synchronizing part or all of your directory,
+database or application data with anything else. It's event driven
+so it will happily sit there monitoring changes and passing them on.
+Alternatively, you can run it in one-shot mode and simply sync A with B."
+  s.homepage = 'https://github.com/nowhereman/rubysync'
   s.rubyforge_project = 'rubysync'
   s.authors = [ 'Ritchie Young', 'Nowhere Man' ]
   s.email = 'ritchiey@gmail.com'
-  # s.executables = ['your_executable_here']
-  s.files = %w(COPYING README.txt Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
+  s.default_executable = %q{rubysync}
+  s.executables = ["rubysync"]
+  s.files = %w(LICENSE.txt MIT-LICENSE.txt GPL-LICENSE.txt README.md Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
   s.require_path = "lib"
   s.bindir = "bin"
-  s.add_dependency('my-ruby-net-ldap', '>=0.5.0')
-  s.add_dependency('activesupport', '<3.0.0')
-  s.add_dependency('activerecord', '<3.0.0')
+#  if RUBY_VERSION <= "1.8.6"
+#    s.add_dependency('my-ruby-net-ldap', '>=0.5.0') # https://github.com/nowhereman/ruby-net-ldap
+#  else
+#    s.add_dependency('net-ldap', '>=0.2') # https://github.com/halostatue/ruby-net-ldap
+#  end
+  s.add_dependency('activesupport', '~>2.3.0')
+  s.add_dependency('activerecord', '~>2.3.0')
   s.add_dependency('simpleconsole', '>=0.1.1')
   s.add_dependency('contacts', '>=1.0.7')
 
@@ -52,9 +60,9 @@ Rake::GemPackageTask.new(spec) do |p|
 end
 
 Rake::RDocTask.new do |rdoc|
-  files =['README.txt', 'COPYING', 'lib/**/*.rb']
+  files =['README.md', 'LICENSE.txt', 'MIT-LICENSE.txt', 'GPL-LICENSE.txt', 'lib/**/*.rb']
   rdoc.rdoc_files.add(files)
-  rdoc.main = "README.txt" # page to start on
+  rdoc.main = "README.md" # page to start on
   rdoc.title = "RubySync Docs"
   rdoc.rdoc_dir = 'doc/rdoc' # rdoc output folder
   rdoc.options << '--line-numbers'
@@ -72,4 +80,3 @@ end
 Spec::Rake::SpecTask.new do |t|
   t.spec_files = FileList['spec/**/*.rb']
 end
-

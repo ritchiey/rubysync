@@ -113,7 +113,7 @@ examples/csv_to_xml/in/henchmen.csv.bak
 examples/csv_to_xml/transcript.txt
 examples/data/henchmen.csv
 examples/data/more.csv
-lib/net/ldif.rb
+lib/net/ldif_support.rb
 lib/ruby_sync.rb
 lib/ruby_sync/connectors/active_record_association_handler.rb
 lib/ruby_sync/connectors/active_record_connector.rb
