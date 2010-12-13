@@ -20,7 +20,7 @@ $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path
 
 require 'ruby_sync'
 require 'ruby_sync/connectors/ldap_connector'
-require 'net/ldif'
+require 'net/ldif_support'
 $VERBOSE = false
 require 'net/ldap'
 #$VERBOSE = true

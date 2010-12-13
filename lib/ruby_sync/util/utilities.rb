@@ -13,15 +13,16 @@
 # You should have received a copy of the GNU General Public License along with RubySync; if not, write to the
 # Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-lib_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+lib_path = File.expand_path(File.join(File.dirname(__FILE__), '..','..','..', 'lib'))
 $:.unshift lib_path unless $:.include?(lib_path)
 
 require 'fileutils'
 require 'rubygems'
 require 'active_support'
-require 'irb'
+require 'irb' # Useful ?
+
 require 'net/ldap'
-require 'net/ldif'
+require 'net/ldif_support'
 
 module Kernel
   # Make the log method globally available
@@ -54,7 +55,7 @@ module Kernel
     else
       method_missing_without_dependency method_id, *args
     end
-  end  
+  end
 end
 
 module Net
@@ -740,3 +741,4 @@ module RubySync
 
   end
 end
+

@@ -18,7 +18,7 @@
 ].each {|path| $:.unshift path unless $:.include?(path) || $:.include?(File.expand_path(path))}
 
 require 'ruby_sync'
-require 'net/ldif'
+require 'net/ldif_support'
 require 'test/unit'
 
 # TODO: Work out a cross platform method for testing file:// URL imports
