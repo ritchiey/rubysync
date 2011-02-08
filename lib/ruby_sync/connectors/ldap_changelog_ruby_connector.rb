@@ -283,8 +283,8 @@ module RubySync::Connectors
 
             if !self[target_dn] && !ldap_changelogs_queue.key?(target_dn)
              @last_change_number += 1
-              new_changelogs_queue = delete_changelog_entry(target_dn, ldap_result, ldap_changelogs_queue, &blk)
-              if new_changelogs_queue.respond_to?(:length) && new_changelogs_queue.length >= ldap_changelogs_queue.length
+              new_changelogs_queue = delete_changelog_entry(target_dn, ldap_result, ldap_changelogs_queue.dup, &blk)
+              if new_changelogs_queue.respond_to?(:length) && new_changelogs_queue.length > ldap_changelogs_queue.length
                 ldap_changelogs_queue = new_changelogs_queue
               else
                 log.warn "#{name}: Deleting unfound entry with path_field = #{target_dn}"
@@ -302,7 +302,7 @@ module RubySync::Connectors
         end
 
         ldap_changelogs_queue.each do |target, operation|
-          ldap.add(operation)
+          ldap.add(operation) # Create a changelog entry
         end
 
         update_last_sync_state
