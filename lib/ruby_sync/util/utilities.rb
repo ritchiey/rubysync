@@ -177,6 +177,15 @@ class Object
     Time.zone.local_to_utc(Time.zone.parse(time.to_s))
   end
 
+  def first_item
+    return case self.class.name
+      when 'Array' then self.first
+      when 'Hash' then self.values.first
+      when 'String' then self
+      else self.respond_to?(:first)? self.first : self
+    end
+  end
+
 end
 
 
