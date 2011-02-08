@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 #  Copyright (c) 2007 Ritchie Young. All rights reserved.
+#  Copyright (c) 2011 Nowhere Man.
 #
 # This file is part of RubySync.
 #
@@ -33,7 +34,7 @@ $KCODE = 'UTF8'
 Time.zone = 'UTC' # You can override this timezone
 
 module RubySync
-  VERSION = '0.3.0'
+  VERSION = '0.3.1'
   module Connectors
   end
   module Pipelines
