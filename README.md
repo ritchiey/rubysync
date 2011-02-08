@@ -62,8 +62,8 @@ for your organization.
 
   See [LICENSE.txt][3], [MIT-LICENSE.txt][4] and [GPL-LICENSE.txt][5] files.
 
- [1]: https://github.com/ritchiey/rubysync
- [2]: https://github.com/nowhereman/rubysync
+ [1]: https://github.com/ritchiey/rubysync/
+ [2]: https://github.com/nowhereman/rubysync/
  [3]: LICENSE.txt
  [4]: MIT-LICENSE.txt
  [5]: GPL-LICENSE.txt
