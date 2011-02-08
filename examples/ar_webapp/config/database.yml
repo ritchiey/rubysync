@@ -13,7 +13,7 @@ development:
   encoding: utf8
   database: ar_webapp_development
   username: rails_user
-  password: babar
+  password: your_password
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
@@ -38,7 +38,7 @@ test:
   encoding: utf8
   database: ar_webapp_test
   username: rails_user
-  password: babar
+  password: your_password
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
@@ -60,7 +60,7 @@ production:
   encoding: utf8
   database: ar_webapp_production
   username: rails_user
-  password: babar
+  password: your_password
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
