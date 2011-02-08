@@ -56,11 +56,13 @@
 #     $ rubysync once my_pipeline
 #     </tt>
 # 
-# == Author
+# == Authors
 #   Ritchie Young, 9 to 5 Magic (http://9to5magic.com.au)
+#   Nowhere Man
 #  
 # == Copyright
 #   Copyright (c) 2007 Ritchie Young. All rights reserved.
+#   Copyright (c) 2011 Nowhere Man.
 # 
 # This file is part of RubySync.
 # 
