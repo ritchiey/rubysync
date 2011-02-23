@@ -80,7 +80,7 @@ module RubySync::Connectors
     def remove_association association
       path = path_for_association association
       with_ldap do |ldap|
-        ldap.replace_attribute path, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s
+        ldap.delete_value path, RUBYSYNC_ASSOCIATION_ATTRIBUTE, association.to_s
       end
     end
 
