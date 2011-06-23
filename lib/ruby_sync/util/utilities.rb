@@ -35,27 +35,6 @@ module Kernel
     @@log
   end
 
-  alias_method(:method_missing_without_dependency, :method_missing)
-  def method_missing(method_id, *args)
-    loaded = false
-    unless Module.rails_app_path.nil?
-      begin
-        loaded = true
-        require_dependency "#{Module.rails_app_path}/app/models/#{method_id.to_s}"
-      rescue MissingSourceFile => ex
-        loaded = false
-#        log.debug "#{ex.message}" # debug
-        raise NameError, "NameError: undefined local variable or method '#{method_id}'" + ( respond_to?(:name)? " in #{name}" : "" ), caller
-        exit
-      end
-    end
-
-    if loaded
-      method_id
-    else
-      method_missing_without_dependency method_id, *args
-    end
-  end
 end
 
 module Net

@@ -61,7 +61,6 @@ module RubySync::Connectors
       :pool => get_db_pool
     )
     
-
     def method_missing(name)
       if name == :model and respond_to? :changes_model
         changes_model
@@ -119,7 +118,15 @@ module RubySync::Connectors
           log.debug "Using JRuby, version: #{JRUBY_VERSION}" # debug
         end
 
-        ::Module.rails_app_path = @rails_app_path
+        # Load models path of the rails application
+        get_load_paths_method = ActiveSupport::Dependencies.respond_to?(:autoload_paths) ? :autoload_path= :  :load_paths
+        set_load_paths_method = ActiveSupport::Dependencies.respond_to?(:autoload_paths=) ? :autoload_paths= :  :load_paths=
+
+        rails_models_path = File.join(rails_app_path, 'app', 'models')
+        rails_initializers_path = File.join(rails_app_path, 'config', 'initializers')
+        load_paths = ActiveSupport::Dependencies.send(get_load_paths_method) + [rails_initializers_path, rails_models_path]
+        ActiveSupport::Dependencies.send(set_load_paths_method, load_paths)
+
         db_config_filename = File.join(@rails_app_path, 'config', 'database.yml')
         new_db_config = YAML.load(ERB.new(File.read(db_config_filename)).result).with_indifferent_access[rails_env]
         #Add rails application relative path for sqlite databases
