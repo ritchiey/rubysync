@@ -97,62 +97,108 @@ module RubySync::Connectors
     # Dummy method, because we don't have to skip changelog entries with software LDAP changelog
     def skip_existing_changelog_entries; end
 
+    # Transform changelog entries to hash of a given path
+    def transform_changelog_entries(path, changelog_entries)
+      entries_changes = []
+      changelog_entries.each do |changelog_entry|
+        changes = {}
+        if changelog_entry.changetype[0].to_sym == :add
+          changes[:add] = Net::LDIF.parse("dn: #{path}\nchangetype: add\n#{changelog_entry.send(:changes)[0]}")[0].data.symbolize_keys!
+        else
+          change_data = Net::LDIF.parse("dn: #{path}\nchangetype: modify\n#{changelog_entry.send(:changes)[0]}")[0].data
+          if change_data
+            change_data.each do |change|
+              if changes[change[0]]
+                changes[change[0]].merge!({ change[1].underscore.to_sym => change[2] })
+              else
+                changes[change[0]] = { change[1].underscore.to_sym => change[2] }
+              end
+            end
+          end
+        end
+        if changes
+          entries_changes << changes.merge( { :changenumber => changelog_entry[:changenumber][0].to_s,
+            :context => changelog_entry.send(RUBYSYNC_CONTEXT_ATTRIBUTE.downcase)[0] } )
+        end
+      end
+      entries_changes
+    end
+
+    # Reject attributes of a Hash#full_diff who aren't added by the current client/vault (association_context)
+    # Check the changes by the first changelog entry who ADD the current modified or deleted attribute.
+    # So it's not necessary the last changelog entry.
+    # To determine which client/vault (association_context) has added an attribute
+    def reject_conflict_attributes(attributes, changes, targets = [:added, :replaced, :deleted])
+      targets.each do |target|
+        if attributes[target.to_sym]
+          attributes[target.to_sym].reject! do |key|
+            reject = false
+            changes.each do |change|
+              if change[:add] && change[:add][key.to_sym]
+                reject = change[:context] != self.association_context
+                break
+              end
+            end
+            reject
+          end
+        end
+      end
+    end
+
     # Compare current entry with last entry store in changeLogEntry and return a ldif_entry
-    def compare_changes(path, entry, change)
-      
+    def compare_changes(path, entry, changelog_entries)
+      changelog_entry = changelog_entries.last
       ldif_entry = ''
-      if change.attribute_names.include?(:changes) or change.attribute_names.include?(RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym)
+      if changelog_entry.attribute_names.include?(:changes) or changelog_entry.attribute_names.include?(RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym)
 
         # using RUBYSYNC_DUMP_ENTRY_ATTRIBUTE only for change_type :modify
-        changes_attribute = ( change.changetype[0].to_sym == :add )? :changes : RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym
+        changes_attribute = ( changelog_entry.changetype[0].to_sym == :add )? :changes : RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym
 
-        last_entry = Net::LDIF.parse("dn: #{path}\nchangetype: add\n#{change.send(changes_attribute)[0]}")[0].data
+        last_entry = Net::LDIF.parse("dn: #{path}\nchangetype: add\n#{changelog_entry.send(changes_attribute)[0]}")[0].data
         raise Exception.new("#{name}: Wrong type for last entry or current entry") if !last_entry.respond_to?(:deep_diff) && !entry.respond_to?(:deep_diff)
 
         diff_attributes = last_entry.full_diff(entry)
 
-        # Deleting or replacing attributes only if the lastest change has been done by the actual client/vault
-        if change.send(RUBYSYNC_CONTEXT_ATTRIBUTE.downcase)[0] == self.association_context
+        # Deleting or replacing an attribute only if the actual client/vault added this attribute
+        reject_conflict_attributes(diff_attributes, transform_changelog_entries(path, changelog_entries))
+        diff_attributes[:deleted].each do |key|
+          diff_attributes[:old][key].each do |value|
+            if Net::LDIF.binary_value?(value)
+              ldif_entry = ldif_entry + "delete: #{key}\n#{key}:: #{value}\n-\n"
+            else
+              ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
+            end
+            log.debug("#{name}: remove attribute #{key}: #{value}")
+          end
+        end
 
-          diff_attributes[:deleted].each do |key|
+        diff_attributes[:replaced].each do |key|
+          if entry.symbolize_keys[key].is_a?(Array) or last_entry.symbolize_keys[key].is_a?(Array)
             diff_attributes[:old][key].each do |value|
               if Net::LDIF.binary_value?(value)
-                ldif_entry = ldif_entry + "delete: #{key}\n#{key}:: #{value}\n-\n"
+                 ldif_entry = ldif_entry + "delete: #{key}\n#{key}:: #{value}\n-\n"
               else
                 ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
               end
-              log.debug("#{name}: remove attribute #{key}: #{value}")
+              log.debug("#{name}: in replace : remove attribute #{key}: #{value}")
             end
-          end
 
-          diff_attributes[:replaced].each do |key|
-            if entry.symbolize_keys[key].is_a?(Array) or last_entry.symbolize_keys[key].is_a?(Array)
-              diff_attributes[:old][key].each do |value|
-                if Net::LDIF.binary_value?(value)
-                   ldif_entry = ldif_entry + "delete: #{key}\n#{key}:: #{value}\n-\n"
-                else
-                  ldif_entry = ldif_entry + "delete: #{key}\n#{key}: #{value}\n-\n"
-                end
-                log.debug("#{name}: in replace : remove attribute #{key}: #{value}")
-              end
-  
-              diff_attributes[:new][key].each do |value|
-                if Net::LDIF.binary_value?(value)
-                  ldif_entry = ldif_entry + "add: #{key}\n#{key}:: #{value}\n-\n"
-                else
-                  ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
-                end
-                log.debug("#{name}: in replace : add attribute #{key}: #{value}")
-              end
-            else
-              value = diff_attributes[:new][key]
+            diff_attributes[:new][key].each do |value|
               if Net::LDIF.binary_value?(value)
-                ldif_entry = ldif_entry + "replace: #{key}\n#{key}:: #{value}\n-\n"
+                ldif_entry = ldif_entry + "add: #{key}\n#{key}:: #{value}\n-\n"
               else
-                ldif_entry = ldif_entry + "replace: #{key}\n#{key}: #{value}\n-\n"
+                ldif_entry = ldif_entry + "add: #{key}\n#{key}: #{value}\n-\n"
               end
-              log.debug("#{name}: replace attribute #{key}: #{value}")
+              log.debug("#{name}: in replace : add attribute #{key}: #{value}")
             end
+          else
+            value = diff_attributes[:new][key]
+            if Net::LDIF.binary_value?(value)
+              ldif_entry = ldif_entry + "replace: #{key}\n#{key}:: #{value}\n-\n"
+            else
+              ldif_entry = ldif_entry + "replace: #{key}\n#{key}: #{value}\n-\n"
+            end
+            log.debug("#{name}: replace attribute #{key}: #{value}")
           end
         end
 
@@ -195,14 +241,15 @@ module RubySync::Connectors
             if !(ldap_results=ldap.search(:base => changelog_dn, :filter => filter)) || ldap_results.empty?
               type='add'# Create entry
             else
-              change = ldap_results.sort_by { |ldap_result| ldap_result[:changenumber][0].to_i }.last
+              changes = ldap_results.sort_by { |ldap_result| ldap_result[:changenumber][0].to_i }
+              change = changes.last
 
               case change.changetype[0].to_sym
               when :delete
                 type='add'# Recreate entry
               when :add, :modify
                 type = 'modify'# Update existing entry
-                ldif_entry = compare_changes(path, entry, change)
+                ldif_entry = compare_changes(path, entry, changes)
               else
                 raise Exception.new("#{name}: Invalid changelog type")
               end
