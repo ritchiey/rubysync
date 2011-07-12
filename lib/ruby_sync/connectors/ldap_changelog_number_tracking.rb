@@ -30,19 +30,19 @@ module RubySync::Connectors
 
     attr_accessor :sync_info, :last_change_number
 
-    def restore_last_sync_state
+    def restore_last_sync_state(context = nil)
       with_ldap do |ldap|
-        filter = Net::LDAP::Filter.eq(RUBYSYNC_LAST_SYNC_ATTRIBUTE, "#{association_context},*")
+        filter = Net::LDAP::Filter.eq(RUBYSYNC_LAST_SYNC_ATTRIBUTE, "#{context || association_context},*")
         if (ldap_result = ldap.search(:base => path_cookie, :filter => filter, :scope => Net::LDAP::SearchScope_BaseObject)).empty?
           @full_refresh_required = true
           @last_change_number = 0
           sync_info = (@sync_info)? @sync_info : Time.zone.now.strftime("%Y%m%d%H%M%S%z")
           ldap.add_attribute(path_cookie, RUBYSYNC_LAST_SYNC_ATTRIBUTE,
-            @last_sync="#{self.association_context},#{@last_change_number.to_s},#{sync_info}")
+            @last_sync="#{context || self.association_context},#{@last_change_number.to_s},#{sync_info}")
         else
           @full_refresh_required = false
           ldap_result[0][RUBYSYNC_LAST_SYNC_ATTRIBUTE.downcase].each do |last_sync|
-            if last_sync.match(/^#{Regexp.escape(association_context)},.+$/)
+            if last_sync.match(/^#{Regexp.escape(context || association_context)},.+$/)
               @last_sync = last_sync
               #Extract change_number from RUBYSYNC_LAST_SYNC_ATTRIBUTE value
               @last_change_number = @last_sync.split(",")[1].to_i
@@ -55,19 +55,19 @@ module RubySync::Connectors
       end
     end
 
-    def update_last_sync_state
+    def update_last_sync_state(context = nil)
       with_ldap do |ldap|
         sync_info = (@sync_info)? @sync_info : Time.zone.now.strftime("%Y%m%d%H%M%S%z")
-        if(@last_sync != (last_sync = "#{self.association_context},#{@last_change_number.to_s},#{sync_info}"))
+        if(@last_sync != (last_sync = "#{context || self.association_context},#{@last_change_number.to_s},#{sync_info}"))
           @full_refresh_required = false
           ldap.update_attribute(path_cookie, RUBYSYNC_LAST_SYNC_ATTRIBUTE, @last_sync, @last_sync=last_sync)
         end
       end
     end
 
-    def extract_last_sync_info
+    def extract_last_sync_info(context = nil)
       if @last_change_number && @last_change_number > 0 && @last_sync
-        sync_info = @last_sync.match(/^#{Regexp.escape(association_context)},[0-9]+,(.+)$/)
+        sync_info = @last_sync.match(/^#{Regexp.escape(context || association_context)},[0-9]+,(.+)$/)
         if sync_info && sync_info[1]
           sync_info = (@sync_info)? sync_info[1] : Time.zone.parse(sync_info[1])
           return sync_info

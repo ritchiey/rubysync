@@ -128,14 +128,14 @@ module RubySync::Connectors
     # Check the changes by the first changelog entry who ADD the current modified or deleted attribute.
     # So it's not necessary the last changelog entry.
     # To determine which client/vault (association_context) has added an attribute
-    def reject_conflict_attributes(attributes, changes, targets = [:added, :replaced, :deleted])
+    def reject_conflict_attributes(attributes, changes, context, targets = [:added, :replaced, :deleted])
       targets.each do |target|
         if attributes[target.to_sym]
           attributes[target.to_sym].reject! do |key|
-            reject = false
+            reject = false           
             changes.each do |change|
               if change[:add] && change[:add][key.to_sym]
-                reject = change[:context] != self.association_context
+                reject = change[:context] != context
                 break
               end
             end
@@ -146,7 +146,7 @@ module RubySync::Connectors
     end
 
     # Compare current entry with last entry store in changeLogEntry and return a ldif_entry
-    def compare_changes(path, entry, changelog_entries)
+    def compare_changes(path, entry, changelog_entries, context = nil)
       changelog_entry = changelog_entries.last
       ldif_entry = ''
       if changelog_entry.attribute_names.include?(:changes) or changelog_entry.attribute_names.include?(RUBYSYNC_DUMP_ENTRY_ATTRIBUTE.downcase.to_sym)
@@ -157,10 +157,14 @@ module RubySync::Connectors
         last_entry = Net::LDIF.parse("dn: #{path}\nchangetype: add\n#{changelog_entry.send(changes_attribute)[0]}")[0].data
         raise Exception.new("#{name}: Wrong type for last entry or current entry") if !last_entry.respond_to?(:deep_diff) && !entry.respond_to?(:deep_diff)
 
-        diff_attributes = last_entry.full_diff(entry)
+        if context
+          diff_attributes = entry.full_diff(last_entry) # Reverse diff when we fix changelog entries
+        else
+          diff_attributes = last_entry.full_diff(entry)
+        end
 
-        # Deleting or replacing an attribute only if the actual client/vault added this attribute
-        reject_conflict_attributes(diff_attributes, transform_changelog_entries(path, changelog_entries))
+        # Deleting or replacing an attribute only if the actual client/vault has added this attribute
+        reject_conflict_attributes(diff_attributes, transform_changelog_entries(path, changelog_entries), (context || self.association_context))
         diff_attributes[:deleted].each do |key|
           diff_attributes[:old][key].each do |value|
             if Net::LDIF.binary_value?(value)
@@ -263,13 +267,13 @@ module RubySync::Connectors
       end
     end
 
-    def save_changelog_entry(type, path, entry, ldif_entry = '')
+    def save_changelog_entry(type, path, entry, ldif_entry = '', context = nil)
       with_ldap do |ldap|
         if type
           change_number = @last_change_number + 1
           changelog_attributes = {'dn' => 'changenumber=' + change_number.to_s + ',' + changelog_dn, RUBYSYNC_SOURCE_INFO_ATTRIBUTE => path.to_s,
             'changenumber' => change_number.to_s, 'objectclass' => RUBYSYNC_CHANGELOG_CLASS,
-            RUBYSYNC_CONTEXT_ATTRIBUTE => self.association_context, 'changetype' => type}
+            RUBYSYNC_CONTEXT_ATTRIBUTE => context || self.association_context, 'changetype' => type}
 
           if type.to_sym == :add
             entry.to_ldif {|line| ldif_entry = ldif_entry + line + "\n"} # TODO Not Ruby 1.9.+ compliant
@@ -292,10 +296,12 @@ module RubySync::Connectors
                 # Changelog entry successfully added
                 log.debug("#{name}: ldap.add returned '#{result}'")
                 @last_change_number = change_number
-                update_last_sync_state
-                cle = ldap.search(:base => changelog_dn, :filter => Net::LDAP::Filter.eq(:changenumber, change_number.to_s)).first
 
-                yield event_for_changelog_entry(cle)
+                if context.blank? && block_given? # Skip when we fix changelog entries
+                  update_last_sync_state
+                  cle = ldap.search(:base => changelog_dn, :filter => Net::LDAP::Filter.eq(:changenumber, change_number.to_s)).first
+                  yield event_for_changelog_entry(cle)
+                end
               else
                 log.debug changelog_attributes.inspect
                 log.debug ldap.get_operation_result.message
@@ -312,7 +318,7 @@ module RubySync::Connectors
       end
     end
 
-    def delete_changelog_entries(&blk)
+    def delete_changelog_entries(context = nil, &blk)
       with_ldap do |ldap|
         # TODO Filtering by @last_change_number boost performance. But in downside it's drop some entries who have been deleted
         # TODO Scan changelog to find deleted entries in background or periodicaly only ?
@@ -352,7 +358,7 @@ module RubySync::Connectors
           ldap.add(operation) # Create a changelog entry
         end
 
-        update_last_sync_state
+        update_last_sync_state(context)
       end
     end
 
