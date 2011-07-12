@@ -23,6 +23,7 @@ lib_path = File.dirname(__FILE__)
 $:.unshift lib_path unless $:.include?(lib_path) || $:.include?(File.expand_path(lib_path))
 
 require 'rubygems'
+gem 'activesupport', '<3.0.0'
 require 'active_support'
 require 'ruby_sync/util/utilities'
 require 'ruby_sync/util/metaid'
@@ -34,7 +35,7 @@ $KCODE = 'UTF8'
 Time.zone = 'UTC' # You can override this timezone
 
 module RubySync
-  VERSION = '0.3.1'
+  VERSION = '0.4.0'
   module Connectors
   end
   module Pipelines
